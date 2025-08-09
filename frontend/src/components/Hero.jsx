@@ -20,32 +20,9 @@ export default function Hero() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = (e) => {
+    // Let the form submit naturally to Netlify
     setIsLoading(true);
-    setMessage('');
-
-    try {
-      const response = await fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          'form-name': 'waitlist',
-          email: email
-        })
-      });
-
-      if (response.ok) {
-        setMessage('Successfully joined the waitlist!');
-        setEmail('');
-      } else {
-        setMessage('Something went wrong. Please try again.');
-      }
-    } catch (error) {
-      setMessage('Network error. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (
@@ -95,11 +72,12 @@ export default function Hero() {
             across all your accounts. Enterprise-grade security with zero-knowledge encryption.
           </p>
 
-          <form name="waitlist" method="POST" action="/" data-netlify="true" onSubmit={handleSubmit} className="max-w-lg mx-auto mb-16 animate-slide-up" style={{animationDelay: '2.5s', animationFillMode: 'both'}}>
+          <form name="waitlist" method="POST" data-netlify="true" onSubmit={handleSubmit} className="max-w-lg mx-auto mb-16 animate-slide-up" style={{animationDelay: '2.5s', animationFillMode: 'both'}}>
             <input type="hidden" name="form-name" value="waitlist" />
             <div className="flex flex-col sm:flex-row gap-3 p-2 bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
               <input
                 type="email"
+                name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
