@@ -20,10 +20,7 @@ export default function Hero() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleSubmit = (e) => {
-    // Let the form submit naturally to Netlify
-    setIsLoading(true);
-  };
+
 
   return (
     <section id="hero" className="section-spacing pt-32 pb-4 px-6 bg-gradient-to-b from-white to-blue-50">
@@ -72,7 +69,7 @@ export default function Hero() {
             across all your accounts. Enterprise-grade security with zero-knowledge encryption.
           </p>
 
-          <form name="waitlist" method="POST" data-netlify="true" onSubmit={handleSubmit} className="max-w-lg mx-auto mb-16 animate-slide-up" style={{animationDelay: '2.5s', animationFillMode: 'both'}}>
+          <form name="waitlist" method="POST" data-netlify="true" className="max-w-lg mx-auto mb-16 animate-slide-up" style={{animationDelay: '2.5s', animationFillMode: 'both'}}>
             <input type="hidden" name="form-name" value="waitlist" />
             <div className="flex flex-col sm:flex-row gap-3 p-2 bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
               <input
