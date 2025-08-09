@@ -1,155 +1,68 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const navigation = [
-    { name: 'Features', href: '#features' },
-    { name: 'Security', href: '#security' },
-    { name: 'Waitlist', href: '#waitlist' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'FAQ', href: '#faq' },
-  ];
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <motion.header
-      className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-200/50 shadow-sm"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18">
-          {/* Logo */}
-          <motion.div
-            className="flex items-center space-x-3"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-xl">L</span>
+    <header className="fixed w-full top-0 bg-black/20 backdrop-blur-xl border-b border-white/10 z-50">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex items-center h-16">
+          <div className="flex items-center space-x-3 flex-shrink-0">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
             </div>
-            <div className="flex flex-col">
-              <span className="text-2xl font-black text-gray-900 tracking-tight">Lok</span>
-              <span className="text-xs text-gray-500 -mt-1 font-medium">Password Manager</span>
-            </div>
-          </motion.div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
-            {navigation.map((item, index) => (
-              <motion.a
-                key={item.name}
-                href={item.href}
-                className="text-gray-600 hover:text-gray-900 font-semibold text-sm transition-colors duration-200 relative group px-3 py-2 rounded-lg hover:bg-gray-50"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-                <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 group-hover:w-8 transition-all duration-300"></span>
-              </motion.a>
-            ))}
-          </nav>
-
-          {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <a
-              href="#signin"
-              className="text-gray-600 hover:text-gray-900 font-semibold text-sm transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-gray-50"
-            >
-              Sign In
-            </a>
-            <motion.a
-              href="#waitlist"
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all duration-200 shadow-lg hover:shadow-xl"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Get Started
-            </motion.a>
+            <span className="text-xl font-bold text-white">Lok</span>
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200"
-            aria-label="Toggle menu"
+          <nav className="hidden md:flex items-center space-x-2 flex-1 justify-center">
+            <a href="#features" className="relative px-4 py-2 text-gray-300 hover:text-blue-400 text-sm font-semibold transition-all duration-300 rounded-xl hover:bg-white/10 group">
+              <span className="relative z-10">Features</span>
+              <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-blue-400 rounded-full group-hover:w-6 transition-all duration-300"></span>
+            </a>
+            <a href="#pricing" className="relative px-4 py-2 text-gray-300 hover:text-blue-400 text-sm font-semibold transition-all duration-300 rounded-xl hover:bg-white/10 group">
+              <span className="relative z-10">Pricing</span>
+              <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-blue-400 rounded-full group-hover:w-6 transition-all duration-300"></span>
+            </a>
+            <a href="#about" className="relative px-4 py-2 text-gray-300 hover:text-blue-400 text-sm font-semibold transition-all duration-300 rounded-xl hover:bg-white/10 group">
+              <span className="relative z-10">About</span>
+              <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-blue-400 rounded-full group-hover:w-6 transition-all duration-300"></span>
+            </a>
+          </nav>
+
+          <div className="hidden md:flex items-center space-x-4 flex-shrink-0">
+            <button className="text-gray-300 hover:text-white text-sm font-medium transition-colors">Sign In</button>
+            <button className="relative bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-6 py-3 rounded-xl hover:from-cyan-400 hover:to-blue-400 text-sm font-bold transition-all shadow-lg hover:shadow-cyan-500/25 hover:scale-105 overflow-hidden group">
+              <span className="relative z-10">Get Started</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </button>
+          </div>
+
+          <button 
+            className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+            onClick={() => setIsOpen(!isOpen)}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMenuOpen ? (
-                <motion.path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                  initial={{ rotate: 0 }}
-                  animate={{ rotate: 90 }}
-                  transition={{ duration: 0.2 }}
-                />
-              ) : (
-                <motion.path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                  initial={{ rotate: 90 }}
-                  animate={{ rotate: 0 }}
-                  transition={{ duration: 0.2 }}
-                />
-              )}
+            <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
             </svg>
           </button>
         </div>
 
-        {/* Mobile Navigation */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              className="lg:hidden absolute left-0 right-0 top-full bg-white/95 backdrop-blur-lg border-b border-gray-200/50 shadow-xl"
-              initial={{ opacity: 0, height: 0, y: -10 }}
-              animate={{ opacity: 1, height: 'auto', y: 0 }}
-              exit={{ opacity: 0, height: 0, y: -10 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-            >
-              <div className="px-4 py-6 space-y-4">
-                {navigation.map((item, index) => (
-                  <motion.a
-                    key={item.name}
-                    href={item.href}
-                    className="block text-gray-600 hover:text-gray-900 font-semibold text-lg py-3 px-4 rounded-xl hover:bg-gray-100 transition-all duration-200"
-                    onClick={() => setIsMenuOpen(false)}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1, duration: 0.3 }}
-                  >
-                    {item.name}
-                  </motion.a>
-                ))}
-                
-                <div className="pt-4 border-t border-gray-200 space-y-3">
-                  <a
-                    href="#signin"
-                    className="block text-gray-600 hover:text-gray-900 font-semibold text-lg py-3 px-4 rounded-xl hover:bg-gray-100 transition-all duration-200"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Sign In
-                  </a>
-                  <a
-                    href="#waitlist"
-                    className="block bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-4 px-6 rounded-xl text-lg text-center shadow-lg hover:shadow-xl transition-all duration-200"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Get Started
-                  </a>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {isOpen && (
+          <div className="md:hidden py-4 border-t border-white/10">
+            <div className="flex flex-col space-y-2">
+              <a href="#features" className="text-gray-300 hover:text-blue-400 font-semibold py-3 px-4 rounded-xl hover:bg-white/10 transition-all duration-300">Features</a>
+              <a href="#pricing" className="text-gray-300 hover:text-blue-400 font-semibold py-3 px-4 rounded-xl hover:bg-white/10 transition-all duration-300">Pricing</a>
+              <a href="#about" className="text-gray-300 hover:text-blue-400 font-semibold py-3 px-4 rounded-xl hover:bg-white/10 transition-all duration-300">About</a>
+              <button className="text-left text-gray-300 hover:text-white font-semibold py-3 px-4 rounded-xl hover:bg-white/10 transition-all duration-300">Sign In</button>
+              <button className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-6 py-3 rounded-xl hover:from-cyan-400 hover:to-blue-400 font-bold text-left mt-2 shadow-lg hover:shadow-cyan-500/25 transition-all">
+                Get Started
+              </button>
+            </div>
+          </div>
+        )}
       </div>
-    </motion.header>
+    </header>
   );
 }

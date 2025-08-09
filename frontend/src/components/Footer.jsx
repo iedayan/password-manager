@@ -1,136 +1,95 @@
-// No icons needed
+import { useEffect, useRef } from 'react';
 
 export default function Footer() {
-  const navigation = {
-    product: [
-      { name: 'Features', href: '#features' },
-      { name: 'Security', href: '#security' },
-      { name: 'Pricing', href: '#pricing' },
-      { name: 'Roadmap', href: '#roadmap' }
-    ],
-    company: [
-      { name: 'About', href: '#about' },
-      { name: 'Blog', href: '#blog' },
-      { name: 'Careers', href: '#careers' },
-      { name: 'Contact', href: '#contact' }
-    ],
-    legal: [
-      { name: 'Privacy Policy', href: '#privacy' },
-      { name: 'Terms of Service', href: '#terms' },
-      { name: 'Security Policy', href: '#security-policy' },
-      { name: 'Cookie Policy', href: '#cookies' }
-    ]
-  };
+  const footerRef = useRef(null);
 
-  const socialLinks = [
-    { name: 'Twitter', href: '#' },
-    { name: 'GitHub', href: '#' },
-    { name: 'LinkedIn', href: '#' }
-  ];
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const elements = entry.target.querySelectorAll('.footer-animate');
+            elements.forEach((element, index) => {
+              setTimeout(() => {
+                element.classList.add('animate-fade-in');
+                element.style.opacity = '1';
+              }, index * 100);
+            });
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (footerRef.current) {
+      observer.observe(footerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <footer className="bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 text-white relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(59,130,246,0.1),transparent_50%),radial-gradient(circle_at_80%_20%,rgba(139,92,246,0.1),transparent_50%)]"></div>
-
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12">
-          {/* Brand Section */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center mb-8">
-              <div className="flex flex-col">
-                <span className="text-4xl font-black tracking-tight">Lok</span>
-                <span className="text-lg font-medium text-gray-400 -mt-1">Password Manager</span>
+    <footer className="bg-gray-900 text-white py-16 px-6" ref={footerRef}>
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          <div className="col-span-1 md:col-span-2 footer-animate opacity-0">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center hover:rotate-12 transition-transform duration-300">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
               </div>
+              <span className="text-xl font-bold">Lok</span>
             </div>
-            <p className="text-gray-300 mb-8 leading-relaxed max-w-md text-lg font-medium">
-              The last password manager you'll ever need. Secure, intelligent, and effortless.
+            <p className="text-gray-400 mb-6 max-w-md leading-relaxed">
+              AI-powered password manager with zero-knowledge encryption. 
+              Secure your digital life with enterprise-grade protection.
             </p>
-            
-            {/* Social Links */}
             <div className="flex space-x-4">
-              {socialLinks.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="px-4 py-2 bg-gray-800/50 backdrop-blur-sm rounded-xl text-gray-400 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 transition-all duration-300 hover:scale-110 shadow-soft hover:shadow-glow font-medium text-sm"
-                >
-                  {item.name}
+              {[
+                { path: "M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" },
+                { path: "M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" },
+                { path: "M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.097.118.112.221.083.343-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001.012.001z" }
+              ].map((social, index) => (
+                <a key={index} href="#" className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 hover:scale-110 transition-all duration-300">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d={social.path} />
+                  </svg>
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Navigation Links */}
-          <div>
-            <h3 className="text-sm font-semibold text-white mb-4">Product</h3>
-            <ul className="space-y-3">
-              {navigation.product.map((item) => (
-                <li key={item.name}>
-                  <a
-                    href={item.href}
-                    className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
-                  >
-                    {item.name}
-                  </a>
+          <div className="footer-animate opacity-0">
+            <h3 className="font-semibold mb-4 text-white">Product</h3>
+            <ul className="space-y-3 text-gray-400">
+              {['Features', 'Pricing', 'Security', 'Downloads'].map((item, index) => (
+                <li key={index}>
+                  <a href="#" className="hover:text-white transition-colors hover:translate-x-2 inline-block duration-300">{item}</a>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-sm font-semibold text-white mb-4">Company</h3>
-            <ul className="space-y-3">
-              {navigation.company.map((item) => (
-                <li key={item.name}>
-                  <a
-                    href={item.href}
-                    className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
-                  >
-                    {item.name}
-                  </a>
+          <div className="footer-animate opacity-0">
+            <h3 className="font-semibold mb-4 text-white">Company</h3>
+            <ul className="space-y-3 text-gray-400">
+              {['About', 'Blog', 'Careers', 'Contact'].map((item, index) => (
+                <li key={index}>
+                  <a href="#" className="hover:text-white transition-colors hover:translate-x-2 inline-block duration-300">{item}</a>
                 </li>
               ))}
             </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-white mb-4">Legal</h3>
-            <ul className="space-y-3">
-              {navigation.legal.map((item) => (
-                <li key={item.name}>
-                  <a
-                    href={item.href}
-                    className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
-                  >
-                    {item.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-white mb-4">Status</h3>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-300">All systems operational</span>
-            </div>
-            <p className="text-xs text-gray-400">
-              Last updated: {new Date().toLocaleDateString()}
-            </p>
           </div>
         </div>
 
-        {/* Bottom Section */}
-        <div className="mt-12 pt-8 border-t border-gray-800">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <p className="text-gray-400 text-sm">
-              &copy; {new Date().getFullYear()} Lok, Inc. All rights reserved.
-            </p>
-            <p className="text-gray-400 text-sm mt-4 md:mt-0">
-              Made for a more secure internet
-            </p>
+        <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center footer-animate opacity-0">
+          <p className="text-gray-400 text-sm">
+            © 2025 Lok. All rights reserved.
+          </p>
+          <div className="flex space-x-6 mt-4 md:mt-0">
+            <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors hover:scale-105 duration-300">Privacy Policy</a>
+            <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors hover:scale-105 duration-300">Terms of Service</a>
           </div>
         </div>
       </div>
