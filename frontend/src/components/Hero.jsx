@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 export default function Hero() {
   const [email, setEmail] = useState('');
   const [displayText, setDisplayText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
   const fullText = 'Never Worry About Weak Passwords Again';
 
   useEffect(() => {
@@ -18,9 +20,32 @@ export default function Hero() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Email:', email);
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          'form-name': 'waitlist',
+          email: email
+        })
+      });
+
+      if (response.ok) {
+        setMessage('Successfully joined the waitlist!');
+        setEmail('');
+      } else {
+        setMessage('Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      setMessage('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -70,7 +95,8 @@ export default function Hero() {
             across all your accounts. Enterprise-grade security with zero-knowledge encryption.
           </p>
 
-          <form onSubmit={handleSubmit} className="max-w-lg mx-auto mb-16 animate-slide-up" style={{animationDelay: '2.5s', animationFillMode: 'both'}}>
+          <form name="waitlist" method="POST" data-netlify="true" onSubmit={handleSubmit} className="max-w-lg mx-auto mb-16 animate-slide-up" style={{animationDelay: '2.5s', animationFillMode: 'both'}}>
+            <input type="hidden" name="form-name" value="waitlist" />
             <div className="flex flex-col sm:flex-row gap-3 p-2 bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
               <input
                 type="email"
@@ -84,17 +110,35 @@ export default function Hero() {
               <button
                 type="submit"
                 className="bg-gradient-to-r from-blue-700 to-indigo-700 text-white px-8 py-3 rounded-lg hover:from-blue-800 hover:to-indigo-800 font-semibold transition-all shadow-md hover:shadow-lg whitespace-nowrap focus-ring transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                disabled={!email}
+                disabled={!email || isLoading}
               >
                 <span className="flex items-center space-x-2">
-                  <span>Start Free Trial</span>
-                  <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
+                  {isLoading ? (
+                    <>
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Joining...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Join the Waitlist</span>
+                      <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </>
+                  )}
                 </span>
               </button>
             </div>
-            <p className="text-sm text-gray-600 mt-3">30-day free trial • No credit card required • Cancel anytime</p>
+            {message ? (
+              <p className={`text-sm mt-3 font-medium ${message.includes('Successfully') || message.includes('already') ? 'text-green-600' : 'text-red-600'}`}>
+                {message}
+              </p>
+            ) : (
+              <p className="text-sm text-gray-600 mt-3">Be first to get early access • No spam • Unsubscribe anytime</p>
+            )}
           </form>
 
           {/* Download Options */}

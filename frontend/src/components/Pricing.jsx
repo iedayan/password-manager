@@ -145,7 +145,7 @@ export default function Pricing() {
                   ? 'bg-gradient-to-r from-blue-700 to-indigo-700 text-white hover:from-blue-800 hover:to-indigo-800 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
                   : 'bg-white text-gray-900 hover:bg-blue-50 hover:text-blue-700 border-2 border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md'
               }`}>
-                Start Free Trial
+Join Waitlist
               </button>
             </div>
           ))}

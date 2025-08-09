@@ -33,11 +33,12 @@ export default function Header() {
   ];
 
   return (
-    <header className="fixed w-full top-0 bg-white/95 backdrop-blur-sm border-b border-blue-100 z-50 shadow-sm">
+    <header className="fixed w-full top-0 bg-white/95 backdrop-blur-md border-b border-blue-100 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center h-16">
-          <div className="flex items-center space-x-3 flex-shrink-0">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center relative overflow-hidden group">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo Section */}
+          <div className="flex items-center space-x-3">
+            <div className="w-9 h-9 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center relative overflow-hidden group shadow-md">
               <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <svg className="w-5 h-5 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 2l8 3v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l8-3z" />
@@ -50,13 +51,14 @@ export default function Header() {
               </svg>
             </div>
             <span className="text-xl font-bold text-gray-900">Lok</span>
-            <div className="hidden sm:flex items-center ml-4 px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+            <div className="hidden sm:flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
               <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
               Secure
             </div>
           </div>
 
-          <nav className="hidden md:flex items-center space-x-2 flex-1 justify-center">
+          {/* Navigation */}
+          <nav className="hidden lg:flex items-center space-x-1">
             {navItems.map((item) => (
               <a 
                 key={item.href}
@@ -75,45 +77,75 @@ export default function Header() {
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center space-x-4 flex-shrink-0">
-            <button className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors focus-ring rounded-lg px-3 py-2">
-              Sign In
-            </button>
-            <button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-indigo-700 text-sm font-semibold transition-all shadow-sm hover:shadow-md focus-ring transform hover:scale-105">
-              Get Started Free
+          {/* CTA Button */}
+          <div className="hidden md:flex items-center">
+            <button 
+              onClick={() => {
+                const heroSection = document.getElementById('hero');
+                if (heroSection) {
+                  heroSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  // Focus on email input after scroll
+                  setTimeout(() => {
+                    const emailInput = document.querySelector('input[type="email"]');
+                    if (emailInput) emailInput.focus();
+                  }, 800);
+                }
+              }}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 text-sm font-bold transition-all shadow-md hover:shadow-lg focus-ring transform hover:scale-105 flex items-center space-x-2">
+              <span>Join Waitlist</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
             </button>
           </div>
 
+          {/* Mobile Menu Button */}
           <button 
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors focus-ring"
+            className="lg:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors focus-ring"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
-            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
             </svg>
           </button>
         </div>
 
+        {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100">
-            <div className="flex flex-col space-y-2">
+          <div className="lg:hidden py-4 border-t border-gray-100 bg-white/95 backdrop-blur-md">
+            <div className="flex flex-col space-y-1">
               {navItems.map((item) => (
                 <a 
                   key={item.href}
                   href={item.href} 
-                  className="text-gray-700 hover:text-blue-600 font-semibold py-3 px-4 rounded-lg hover:bg-blue-50 transition-all duration-300 focus-ring"
+                  className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 font-semibold py-3 px-4 rounded-lg transition-all duration-300 focus-ring"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.label}
                 </a>
               ))}
-              <button className="text-left text-gray-700 hover:text-gray-900 font-semibold py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-300 focus-ring">
-                Sign In
-              </button>
-              <button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-indigo-700 font-semibold text-left mt-2 shadow-sm focus-ring">
-                Get Started Free
-              </button>
+              <div className="pt-4 border-t border-gray-100 mt-2">
+                <button 
+                  onClick={() => {
+                    const heroSection = document.getElementById('hero');
+                    if (heroSection) {
+                      heroSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      setIsOpen(false);
+                      // Focus on email input after scroll
+                      setTimeout(() => {
+                        const emailInput = document.querySelector('input[type="email"]');
+                        if (emailInput) emailInput.focus();
+                      }, 800);
+                    }
+                  }}
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 font-bold shadow-md focus-ring flex items-center justify-center space-x-2">
+                  <span>Join Waitlist</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         )}
