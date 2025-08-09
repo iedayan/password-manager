@@ -38,16 +38,20 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo Section */}
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center relative overflow-hidden group shadow-md">
+            <div className="w-9 h-9 bg-gradient-to-br from-blue-700 to-indigo-800 rounded-xl flex items-center justify-center relative overflow-hidden group shadow-md">
               <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <svg className="w-5 h-5 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 2l8 3v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l8-3z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.5 10.5l1.5-1.5 1.5 1.5M14.5 13.5l-1.5 1.5-1.5-1.5" />
-                <circle cx="8" cy="12" r="1" fill="currentColor" />
-                <circle cx="12" cy="9" r="1" fill="currentColor" />
-                <circle cx="16" cy="12" r="1" fill="currentColor" />
-                <circle cx="12" cy="15" r="1" fill="currentColor" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.5} d="M8 12h8M12 9v6" opacity="0.6" />
+              <svg className="w-5 h-5 text-white relative z-10" fill="none" viewBox="0 0 24 24">
+                <path d="M12 2l8 3v6c0 5.5-3.5 10.5-8 12-4.5-1.5-8-6.5-8-12V5l8-3z" 
+                      stroke="white" strokeWidth="1.5" fill="none" opacity="0.9"/>
+                <rect x="10" y="10" width="4" height="3" rx="0.5" fill="white" opacity="0.95"/>
+                <path d="M10.5 10v-1c0-0.8 0.7-1.5 1.5-1.5s1.5 0.7 1.5 1.5v1" 
+                      stroke="white" strokeWidth="1" fill="none" opacity="0.95"/>
+                <circle cx="8.5" cy="7" r="0.5" fill="white" opacity="0.7"/>
+                <circle cx="15.5" cy="7" r="0.5" fill="white" opacity="0.7"/>
+                <circle cx="7" cy="12" r="0.5" fill="white" opacity="0.7"/>
+                <circle cx="17" cy="12" r="0.5" fill="white" opacity="0.7"/>
+                <circle cx="8.5" cy="17" r="0.5" fill="white" opacity="0.7"/>
+                <circle cx="15.5" cy="17" r="0.5" fill="white" opacity="0.7"/>
               </svg>
             </div>
             <span className="text-xl font-bold text-gray-900">Lok</span>
