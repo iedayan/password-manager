@@ -1,135 +1,145 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function FAQ() {
-  const [openIndex, setOpenIndex] = useState(null);
+  const [openIndex, setOpenIndex] = useState(0);
+  const sectionRef = useRef(null);
 
   const faqs = [
     {
-      question: "How does Lok's AI-powered password management work?",
-      answer: "Lok uses advanced AI algorithms to monitor the dark web and security databases for compromised passwords. When a breach is detected, our system automatically generates new, secure passwords and updates them across your accounts without any manual intervention."
+      question: "How does automatic password updating work?",
+      answer: "Our AI monitors your accounts and detects weak or reused passwords. When found, it securely logs into your accounts using your saved credentials and updates passwords to strong, unique ones. You'll be notified of all changes and can review them in your dashboard."
     },
     {
-      question: "Is my data safe with zero-knowledge encryption?",
-      answer: "Absolutely. With zero-knowledge encryption, your passwords are encrypted on your device before being sent to our servers. We never have access to your master password or decrypted data. Even if our servers were compromised, your data would remain secure."
-    },
-    {
-      question: "Can I use Lok on multiple devices?",
-      answer: "Yes! Lok works seamlessly across all your devices - desktop, mobile, and web browsers. Your encrypted vault syncs automatically, so you always have access to your passwords wherever you are."
+      question: "Is my data really secure with zero-knowledge encryption?",
+      answer: "Yes. Your master password creates an encryption key that only exists on your devices. We never see your passwords, personal data, or encryption keys. Even if our servers were compromised, your data would remain encrypted and useless to attackers."
     },
     {
       question: "What happens if I forget my master password?",
-      answer: "Since we use zero-knowledge encryption, we cannot recover your master password. However, you can set up emergency access contacts who can help you regain access to your account, or use our secure recovery options that you configure during setup."
+      answer: "Due to zero-knowledge encryption, we cannot recover your master password. However, you can set up emergency access contacts who can help you regain access, or use account recovery methods you've configured during setup."
     },
     {
-      question: "How does the family plan work?",
-      answer: "The family plan allows up to 6 family members to have their own secure vaults while sharing common passwords through a family vault. Each member maintains their privacy while benefiting from shared access to household accounts."
+      question: "How do you update passwords without storing my login credentials?",
+      answer: "We use secure, encrypted sessions that are immediately destroyed after password updates. The process happens locally on your device when possible, or through secure, audited automation that never stores your credentials permanently."
     },
     {
-      question: "Is there a free trial available?",
-      answer: "Yes! We offer a 30-day free trial for all our plans. You can experience all of Lok's features risk-free, and if you're not completely satisfied, you can cancel anytime during the trial period."
+      question: "Which websites and apps support automatic password updates?",
+      answer: "We support over 1,000 popular websites and apps including banking, social media, email, and shopping sites. Our list is constantly growing, and you can request support for specific sites through your dashboard."
     },
     {
-      question: "How does Lok compare to other password managers?",
-      answer: "Lok stands out with its AI-powered automatic password updates, real-time breach monitoring, and advanced threat detection. While other password managers require manual updates, Lok proactively protects you by automatically updating compromised passwords."
+      question: "Can I control which passwords get updated automatically?",
+      answer: "Absolutely. You have full control over the auto-update feature. You can enable/disable it per account, set update schedules, review changes before they're applied, and maintain manual control over sensitive accounts."
     },
     {
-      question: "What kind of customer support do you provide?",
-      answer: "We provide 24/7 customer support through multiple channels including live chat, email, and phone. Our security experts are always available to help you with any questions or concerns about your digital security."
+      question: "What makes this different from other password managers?",
+      answer: "We're the first password manager that proactively maintains your security by automatically updating weak passwords. Traditional managers only store and fill passwords - we actively improve your security posture without manual intervention."
+    },
+    {
+      question: "How do you ensure the new passwords are truly secure?",
+      answer: "Our AI generates passwords using cryptographically secure random generation, checks them against known breach databases, ensures uniqueness across all your accounts, and follows the latest security guidelines for length and complexity."
     }
   ];
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const items = entry.target.querySelectorAll('.faq-item');
+            items.forEach((item, index) => {
+              setTimeout(() => {
+                item.classList.add('animate-slide-up');
+                item.style.opacity = '1';
+              }, index * 100);
+            });
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="faq" className="py-24 bg-gradient-to-b from-white to-gray-50/50 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.05),transparent_50%),radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.05),transparent_50%)]"></div>
-      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-            Frequently Asked Questions
+    <section id="faq" className="section-spacing px-6 bg-gradient-to-b from-white to-blue-50" ref={sectionRef}>
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-16 animate-fade-in">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+            Frequently Asked{' '}
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Questions</span>
           </h2>
-          <p className="text-xl text-gray-600">
-            Everything you need to know about Lok and password security.
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Everything you need to know about our revolutionary password management technology.
           </p>
-        </motion.div>
+        </div>
 
         <div className="space-y-4">
           {faqs.map((faq, index) => (
-            <motion.div
-              key={index}
-              className="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 border border-gray-100"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.05 }}
-              viewport={{ once: true }}
+            <div 
+              key={index} 
+              className="faq-item bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 opacity-0"
             >
               <button
-                className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-blue-50/50 transition-all duration-200 group"
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                className="w-full px-8 py-6 text-left flex items-center justify-between focus:outline-none rounded-2xl group"
+                onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setOpenIndex(openIndex === index ? -1 : index);
+                  }
+                }}
+                aria-expanded={openIndex === index}
+                aria-controls={`faq-answer-${index}`}
               >
-                <span className="text-lg font-semibold text-gray-900 pr-8">
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900 pr-4 leading-relaxed group-hover:text-blue-600 transition-colors">
                   {faq.question}
-                </span>
-                <motion.svg
-                  className="w-6 h-6 text-gray-500 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  animate={{ rotate: openIndex === index ? 180 : 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </motion.svg>
+                </h3>
+                <div className={`flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  openIndex === index ? 'bg-blue-600 rotate-180' : 'group-hover:bg-blue-200'
+                }`}>
+                  <svg 
+                    className={`w-4 h-4 transition-colors duration-300 ${
+                      openIndex === index ? 'text-white' : 'text-blue-600'
+                    }`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </button>
               
-              <AnimatePresence>
-                {openIndex === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="px-8 pb-6">
-                      <p className="text-gray-600 leading-relaxed">
-                        {faq.answer}
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+              <div 
+                id={`faq-answer-${index}`}
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                }`}
+                role="region"
+                aria-labelledby={`faq-question-${index}`}
+              >
+                <div className="px-8 pb-6">
+                  <p className="text-gray-600 leading-relaxed text-base md:text-lg">
+                    {faq.answer}
+                  </p>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
 
-        <motion.div
-          className="mt-16 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          viewport={{ once: true }}
-        >
-          <p className="text-gray-600 mb-6">
-            Still have questions? We're here to help.
+        <div className="text-center mt-12">
+          <p className="text-gray-600 mb-6 text-lg leading-relaxed">
+            Still have questions? Our security experts are here to help.
           </p>
-          <motion.a
-            href="#contact"
-            className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-200"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+          <button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 font-semibold transition-all shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             Contact Support
-            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </motion.a>
-        </motion.div>
+          </button>
+        </div>
       </div>
     </section>
   );

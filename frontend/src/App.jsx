@@ -4,6 +4,7 @@ import Hero from './components/Hero';
 import Features from './components/Features';
 import About from './components/About';
 import Pricing from './components/Pricing';
+import FAQ from './components/FAQ';
 import Footer from './components/Footer';
 
 export default function App() {
@@ -30,11 +31,10 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-indigo-900 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-transparent to-purple-900/10"></div>
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animation: 'float 8s ease-in-out infinite'}}></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{animation: 'float 10s ease-in-out infinite reverse'}}></div>
-      <div className="absolute top-1/2 left-10 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" style={{animation: 'float 6s ease-in-out infinite 2s'}}></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-100 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-100/30 via-transparent to-indigo-100/20"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl" style={{animation: 'float 12s ease-in-out infinite'}}></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-200/15 rounded-full blur-3xl" style={{animation: 'float 15s ease-in-out infinite reverse'}}></div>
       {/* Scroll Progress */}
       <div className="fixed top-0 left-0 w-full h-1 bg-white/10 z-50">
         <div 
@@ -50,6 +50,7 @@ export default function App() {
         <Features />
         <Pricing />
         <About />
+        <FAQ />
       </main>
       <Footer />
       </div>

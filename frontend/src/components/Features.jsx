@@ -13,7 +13,8 @@ export default function Features() {
       ),
       title: 'Auto-Update Weak Passwords',
       description: 'Automatically detects weak and reused passwords, then updates them across all your accounts without you lifting a finger.',
-      color: 'from-blue-500 to-indigo-500'
+      color: 'from-blue-500 to-indigo-500',
+      bgColor: 'bg-blue-50'
     },
     {
       icon: (
@@ -23,7 +24,8 @@ export default function Features() {
       ),
       title: 'Zero-Knowledge Encryption',
       description: 'Your passwords are encrypted locally. We never have access to your sensitive data.',
-      color: 'from-green-500 to-emerald-500'
+      color: 'from-green-500 to-emerald-500',
+      bgColor: 'bg-green-50'
     },
     {
       icon: (
@@ -33,7 +35,8 @@ export default function Features() {
       ),
       title: 'Cross-Platform Sync',
       description: 'Access your passwords seamlessly across all devices with real-time synchronization.',
-      color: 'from-purple-500 to-violet-500'
+      color: 'from-purple-500 to-violet-500',
+      bgColor: 'bg-purple-50'
     },
     {
       icon: (
@@ -43,7 +46,8 @@ export default function Features() {
       ),
       title: 'Instant Autofill',
       description: 'Smart autofill works perfectly across websites and apps for seamless login experience.',
-      color: 'from-orange-500 to-red-500'
+      color: 'from-orange-500 to-red-500',
+      bgColor: 'bg-orange-50'
     },
     {
       icon: (
@@ -54,7 +58,8 @@ export default function Features() {
       ),
       title: 'Biometric Access',
       description: 'Unlock with Face ID, Touch ID, or fingerprint for secure, passwordless authentication.',
-      color: 'from-indigo-500 to-purple-500'
+      color: 'from-indigo-500 to-purple-500',
+      bgColor: 'bg-indigo-50'
     },
     {
       icon: (
@@ -64,7 +69,8 @@ export default function Features() {
       ),
       title: 'Mobile Apps',
       description: 'Native iOS and Android apps with offline access and seamless cloud synchronization.',
-      color: 'from-pink-500 to-rose-500'
+      color: 'from-pink-500 to-rose-500',
+      bgColor: 'bg-pink-50'
     }
   ];
 
@@ -94,7 +100,7 @@ export default function Features() {
   }, []);
 
   return (
-    <section id="features" className="py-24 px-6 bg-gradient-to-b from-white to-gray-50" ref={sectionRef}>
+    <section id="features" className="section-spacing px-6 bg-white" ref={sectionRef}>
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
@@ -110,7 +116,7 @@ export default function Features() {
           {features.map((feature, index) => (
             <div 
               key={index} 
-              className="feature-card group p-8 bg-white rounded-3xl shadow-lg border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 opacity-0 cursor-pointer"
+              className={`feature-card group p-8 ${feature.bgColor} rounded-3xl shadow-lg border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 opacity-0 cursor-pointer`}
               style={{
                 transform: 'perspective(1000px)',
               }}

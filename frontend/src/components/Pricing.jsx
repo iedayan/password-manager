@@ -87,7 +87,7 @@ export default function Pricing() {
   };
 
   return (
-    <section id="pricing" className="py-24 px-6 bg-gradient-to-b from-gray-50 to-white" ref={sectionRef} onMouseMove={handleMouseMove}>
+    <section id="pricing" className="section-spacing px-6 bg-gradient-to-b from-blue-50 to-white" ref={sectionRef} onMouseMove={handleMouseMove}>
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
@@ -140,10 +140,10 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              <button className={`w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300 group-hover:scale-105 mt-auto ${
+              <button className={`w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300 group-hover:scale-105 mt-auto focus-ring ${
                 plan.popular
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
-                  : 'bg-gray-100 text-gray-900 hover:bg-blue-50 hover:text-blue-700 border-2 border-transparent hover:border-blue-200'
+                  ? 'bg-gradient-to-r from-blue-700 to-indigo-700 text-white hover:from-blue-800 hover:to-indigo-800 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
+                  : 'bg-white text-gray-900 hover:bg-blue-50 hover:text-blue-700 border-2 border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md'
               }`}>
                 Start Free Trial
               </button>

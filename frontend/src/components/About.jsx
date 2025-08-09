@@ -59,7 +59,7 @@ export default function About() {
   }, []);
 
   return (
-    <section id="about" className="py-24 px-6 bg-gradient-to-b from-white to-slate-50" ref={sectionRef}>
+    <section id="about" className="section-spacing px-6 bg-gradient-to-b from-white to-blue-50" ref={sectionRef}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16 animate-fade-in">
