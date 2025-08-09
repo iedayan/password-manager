@@ -1,15 +1,8 @@
 import { motion } from 'framer-motion';
-import { useIntersectionObserver } from '../hooks';
-import { cn } from '../lib/utils';
+import { useState } from 'react';
 
 export default function Hero() {
-  const [ref, isInView] = useIntersectionObserver({ threshold: 0.1 });
-
-  const features = [
-    { text: 'Auto-Updates', delay: 0.1 },
-    { text: 'Military-Grade Security', delay: 0.2 },
-    { text: 'AI-Powered', delay: 0.3 },
-  ];
+  const [email, setEmail] = useState('');
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -34,203 +27,114 @@ export default function Hero() {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle email submission
+    console.log('Email submitted:', email);
+  };
+
   return (
-    <section
-      ref={ref}
-      className="relative h-screen flex items-center justify-center overflow-hidden"
-    >
-      {/* Futuristic Background Elements */}
-      <div className="absolute inset-0">
-        {/* Holographic Orbs */}
-        <motion.div
-          className="absolute top-32 left-20 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl"
-          animate={{
-            y: [0, -30, 0],
-            rotate: [0, 360, 0],
-            scale: [1, 1.2, 1]
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute bottom-32 right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"
-          animate={{
-            y: [0, 25, 0],
-            rotate: [0, -180, 0],
-            scale: [1, 0.8, 1]
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 3
-          }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl"
-          animate={{
-            y: [0, -20, 0],
-            x: [0, 15, 0],
-            scale: [1, 1.1, 1],
-            rotate: [0, 90, 0]
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 6
-          }}
-        />
-
-        {/* Matrix Grid */}
-        <div className="absolute inset-0 matrix-bg opacity-30"></div>
-
-        {/* Scanning Lines */}
-        <div className="absolute inset-0">
-          <div className="scan-line"></div>
-          <div className="scan-line" style={{animationDelay: '2s'}}></div>
-        </div>
+    <section className="relative pt-16 pb-20 sm:pt-24 sm:pb-32 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-32 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
       </div>
 
-      <motion.div
-        className="relative z-10 max-w-5xl mx-auto px-8 text-center"
-        variants={containerVariants}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
-      >
-        {/* Futuristic Announcement */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          className="inline-flex items-center space-x-3 cyber-card px-8 py-4 mb-12 hologram-effect"
-          variants={itemVariants}
+          className="text-center"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
         >
+          {/* Announcement Badge */}
           <motion.div
-            className="w-3 h-3 bg-cyan-400 rounded-full neon-border"
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [1, 0.7, 1]
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-          <span className="text-sm font-bold text-cyan-300 tracking-wider uppercase">QUANTUM BETA • INITIALIZE ACCESS</span>
-        </motion.div>
-
-        {/* Futuristic Headline */}
-        <motion.h1
-          className="text-7xl font-black mb-8 leading-[0.9] text-balance md:text-6xl sm:text-5xl"
-          variants={itemVariants}
-        >
-          <span className="text-white">THE FINAL</span>{' '}
-          <span className="neon-text text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">
-            QUANTUM VAULT
-          </span>{' '}
-          <span className="text-white">PROTOCOL</span>
-        </motion.h1>
-
-        {/* Futuristic Subtitle */}
-        <motion.p
-          className="text-2xl text-cyan-200/80 max-w-4xl mx-auto mb-16 leading-relaxed text-balance font-medium md:text-xl sm:text-lg"
-          variants={itemVariants}
-        >
-          <span className="text-cyan-300">Neural-enhanced security protocols</span> with quantum encryption.
-          Autonomous threat detection and <span className="text-cyan-300">zero-touch password evolution</span>—
-          your digital fortress operates beyond human limitations.
-        </motion.p>
-
-        {/* Futuristic Feature Pills */}
-        <motion.div
-          className="flex flex-wrap justify-center gap-6 mb-16"
-          variants={itemVariants}
-        >
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              className="group cyber-card px-8 py-4 cursor-pointer relative overflow-hidden"
-              whileHover={{
-                scale: 1.05,
-                y: -5,
-                transition: { duration: 0.3 }
-              }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, y: 30, rotateX: -15 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0 }}
-              transition={{ delay: feature.delay, duration: 0.8 }}
-            >
-              <span className="text-sm font-bold text-cyan-300 tracking-wider uppercase relative z-10">
-                {feature.text}
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Futuristic CTA Buttons */}
-        <motion.div
-          className="flex flex-row items-center justify-center gap-8 mb-20 md:flex-col md:gap-6 sm:flex-col sm:gap-6"
-          variants={itemVariants}
-        >
-          <motion.a
-            href="#waitlist"
-            className="cyber-button px-12 py-6 text-lg font-black tracking-wider"
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 0 40px rgba(0, 255, 255, 0.8)"
-            }}
-            whileTap={{ scale: 0.95 }}
+            className="inline-flex items-center space-x-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-8"
+            variants={itemVariants}
           >
-            INITIALIZE ACCESS
-          </motion.a>
-          <motion.button
-            className="relative px-12 py-6 text-lg font-bold text-cyan-300 border-2 border-cyan-500/50 rounded-lg bg-transparent hover:bg-cyan-500/10 transition-all duration-300 tracking-wider neon-border"
-            whileHover={{
-              scale: 1.05,
-              backgroundColor: "rgba(0, 255, 255, 0.1)"
-            }}
-            whileTap={{ scale: 0.95 }}
+            <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+            <span>Now in Beta • Join the Waitlist</span>
+          </motion.div>
+
+          {/* Main Headline */}
+          <motion.h1
+            className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 mb-6 leading-tight"
+            variants={itemVariants}
           >
-            VIEW PROTOCOL
-          </motion.button>
-        </motion.div>
+            The Last{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600">
+              Password Manager
+            </span>{' '}
+            You'll Ever Need
+          </motion.h1>
 
-        {/* Social Proof */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-gray-500">
-          <div className="flex items-center space-x-3">
-            <div className="flex -space-x-2">
-              {[...Array(5)].map((_, i) => (
-                <div
-                  key={i}
-                  className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full border-2 border-white"
-                ></div>
-              ))}
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-gray-900">12,000+</div>
-              <div className="text-xs text-gray-500">developers waiting</div>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <span className="text-sm font-medium">★★★★★ 4.9/5 rating</span>
-          </div>
-        </div>
-      </motion.div>
+          {/* Subtitle */}
+          <motion.p
+            className="text-xl sm:text-2xl text-gray-600 max-w-4xl mx-auto mb-12 leading-relaxed"
+            variants={itemVariants}
+          >
+            Lok uses advanced AI to automatically update compromised passwords,
+            monitor security breaches, and keep you protected—without you lifting a finger.
+          </motion.p>
 
-      {/* Scroll Indicator */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        <div className="w-6 h-10 border-2 border-gray-300 rounded-full flex justify-center">
+          {/* Email Signup Form */}
+          <motion.form
+            className="max-w-md mx-auto mb-16"
+            variants={itemVariants}
+            onSubmit={handleSubmit}
+          >
+            <div className="flex flex-col sm:flex-row gap-4">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
+                required
+              />
+              <motion.button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Get Started
+              </motion.button>
+            </div>
+            <p className="text-sm text-gray-500 mt-3">
+              Join 10,000+ users who trust Lok with their digital security
+            </p>
+          </motion.form>
+
+          {/* Trust Indicators */}
           <motion.div
-            className="w-1 h-3 bg-gray-400 rounded-full mt-2"
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
-        </div>
-      </motion.div>
+            className="flex flex-wrap justify-center items-center gap-8 text-gray-400"
+            variants={itemVariants}
+          >
+            <div className="flex items-center space-x-2">
+              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm font-medium">256-bit Encryption</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm font-medium">Zero-Knowledge</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm font-medium">SOC 2 Compliant</span>
+            </div>
+          </motion.div>
+
+        </motion.div>
+      </div>
     </section>
   );
 }

@@ -1,40 +1,38 @@
-import { Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
+import Header from './components/Header';
+import Hero from './components/Hero';
+import Features from './components/Features';
+import Security from './components/Security';
+import Pricing from './components/Pricing';
+import Testimonials from './components/Testimonials';
+import FAQ from './components/FAQ';
+import CTA from './components/CTA';
+import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import NotificationContainer from './components/NotificationContainer';
 
-// Lazy load with priority
-const Header = lazy(() => import("./components/Header"));
-const Hero = lazy(() => import("./components/Hero"));
-const Features = lazy(() => import("./components/Features" /* webpackPrefetch: true */));
-const Waitlist = lazy(() => import("./components/Waitlist" /* webpackPrefetch: true */));
-const Footer = lazy(() => import("./components/Footer"));
-
 export default function App() {
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 w-full overflow-x-hidden relative font-sans text-white leading-normal">
-      <ErrorBoundary>
-        {/* Header loads first */}
-        <Suspense fallback={<LoadingSpinner />}>
+    <ErrorBoundary>
+      <Suspense fallback={<LoadingSpinner />}>
+        <div className="min-h-screen bg-white">
           <Header />
-        </Suspense>
 
-        {/* Main content */}
-        <main className="flex-grow">
-          <Suspense fallback={<LoadingSpinner className="min-h-[60vh]" />}>
+          <main>
             <Hero />
             <Features />
-            <Waitlist />
-          </Suspense>
-        </main>
+            <Security />
+            <Pricing />
+            <Testimonials />
+            <FAQ />
+            <CTA />
+          </main>
 
-        {/* Footer loads last */}
-        <Suspense fallback={null}>
           <Footer />
-        </Suspense>
-      </ErrorBoundary>
-
-      <NotificationContainer className="fixed bottom-4 right-4 z-50" />
-    </div>
+          <NotificationContainer />
+        </div>
+      </Suspense>
+    </ErrorBoundary>
   );
 }
