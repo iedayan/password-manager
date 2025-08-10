@@ -87,3 +87,144 @@ temp/
 
 # Vite build tool
 .vite/
+
+# Python virtual environments
+venv/
+env/
+.venv/
+.env/
+backend/venv/
+backend/env/
+backend/.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Flask
+instance/
+.webassets-cache
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Backend specific
+backend/.env
+backend/instance/
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+backend/logs/
+backend/uploads/
+backend/migrations/versions/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/**/*.pyo
+backend/**/*.pyd
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Redis dump
+dump.rdb
+
+# Playwright
+backend/test-results/
+backend/playwright-report/
+backend/playwright/.cache/
+
+# Security keys (if accidentally created)
+*.pem
+*.key
+fernet.key
+
+# Python bytecode
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Flask session files
+flask_session/
+
+# Database files
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Testing
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Translations
+*.mo
+*.pot
+
+# Scrapy stuff
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
