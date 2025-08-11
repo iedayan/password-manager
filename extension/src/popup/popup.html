@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 350px;
+      min-height: 400px;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .container {
+      padding: 20px;
+      color: white;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .logo {
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 6px;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #667eea;
+      font-size: 12px;
+    }
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .login-form, .vault {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: white;
+      color: #667eea;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #f0f0f0;
+    }
+    .password-item {
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .password-item:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    .site-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .username {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    .hidden {
+      display: none;
+    }
+    .generate-btn {
+      background: #4CAF50;
+      color: white;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">L</div>
+      <div class="title">Lok</div>
+    </div>
+    
+    <div id="loginForm" class="login-form">
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <button id="loginBtn">Login</button>
+    </div>
+    
+    <div id="vault" class="vault hidden">
+      <div id="currentSite" style="margin-bottom: 16px;">
+        <div style="font-size: 14px; opacity: 0.8; margin-bottom: 8px;">Current site:</div>
+        <div id="siteName" style="font-weight: 600;"></div>
+      </div>
+      
+      <div id="passwordList"></div>
+      
+      <button id="generateBtn" class="generate-btn">Generate Password</button>
+      <button id="logoutBtn" style="margin-top: 8px; background: rgba(255,255,255,0.2);">Logout</button>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
