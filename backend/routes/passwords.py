@@ -4,9 +4,10 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime
 from models.password import Password, PasswordUpdateLog
 from models.user import User
-from config.database import db
+from config.extensions import db
 from services.encryption_service import encryption_service
 from utils.password_utils import calculate_password_strength
+from middleware.security import log_sensitive_operation, require_master_key
 
 passwords_bp = Blueprint('passwords', __name__)
 bcrypt = Bcrypt()
@@ -30,6 +31,7 @@ def get_passwords():
 
 @passwords_bp.route('', methods=['POST'])
 @jwt_required()
+@log_sensitive_operation('password_add')
 def add_password():
     user_id = int(get_jwt_identity())
     data = request.get_json()
@@ -51,10 +53,17 @@ def add_password():
     db.session.add(password)
     db.session.commit()
     
-    return jsonify({'message': 'Password added successfully', 'id': password.id}), 201
+    return jsonify({
+        'message': 'Password added successfully', 
+        'id': password.id,
+        'site_name': password.site_name,
+        'username': password.username,
+        'strength_score': password.strength_score
+    }), 201
 
 @passwords_bp.route('/<int:password_id>', methods=['PUT'])
 @jwt_required()
+@log_sensitive_operation('password_update')
 def update_password(password_id):
     user_id = int(get_jwt_identity())
     password = Password.query.filter_by(id=password_id, user_id=user_id).first()
@@ -86,8 +95,25 @@ def update_password(password_id):
     db.session.commit()
     return jsonify({'message': 'Password updated successfully'})
 
+@passwords_bp.route('/<int:password_id>', methods=['DELETE'])
+@jwt_required()
+@log_sensitive_operation('password_delete')
+def delete_password(password_id):
+    user_id = int(get_jwt_identity())
+    password = Password.query.filter_by(id=password_id, user_id=user_id).first()
+    
+    if not password:
+        return jsonify({'error': 'Password not found'}), 404
+    
+    db.session.delete(password)
+    db.session.commit()
+    
+    return jsonify({'message': 'Password deleted successfully'})
+
 @passwords_bp.route('/<int:password_id>/decrypt', methods=['POST'])
 @jwt_required()
+@require_master_key
+@log_sensitive_operation('password_decrypt')
 def decrypt_password(password_id):
     user_id = int(get_jwt_identity())
     password = Password.query.filter_by(id=password_id, user_id=user_id).first()
@@ -98,12 +124,17 @@ def decrypt_password(password_id):
     data = request.get_json()
     user = User.query.get(user_id)
     
-    master_key = data.get('master_key', data.get('password', ''))
+    master_key = data.get('master_key')
     if not master_key or not bcrypt.check_password_hash(user.master_key_hash, master_key):
         return jsonify({'error': 'Invalid master key'}), 401
     
     try:
         decrypted_password = encryption_service.decrypt(password.encrypted_password)
+        
+        # Update last accessed
+        password.last_accessed = datetime.utcnow()
+        db.session.commit()
+        
         return jsonify({'password': decrypted_password})
-    except:
+    except Exception as e:
         return jsonify({'error': 'Failed to decrypt password'}), 500

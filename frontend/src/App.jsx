@@ -1,3 +1,4 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -6,20 +7,13 @@ import About from './components/About';
 import Pricing from './components/Pricing';
 import FAQ from './components/FAQ';
 import Footer from './components/Footer';
+import Login from './components/Login';
+import Dashboard from './components/Dashboard';
 
-export default function App() {
+const LandingPage = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    if (window.location.hash) {
-      document.body.style.opacity = '0';
-      document.body.style.transition = 'opacity 0.3s ease';
-      setTimeout(() => {
-        window.history.replaceState(null, null, window.location.pathname);
-        window.location.reload();
-      }, 300);
-    }
-
     const handleScroll = () => {
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = (window.scrollY / totalHeight) * 100;
@@ -35,7 +29,6 @@ export default function App() {
       <div className="absolute inset-0 bg-gradient-to-r from-blue-100/30 via-transparent to-indigo-100/20"></div>
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl" style={{animation: 'float 12s ease-in-out infinite'}}></div>
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-200/15 rounded-full blur-3xl" style={{animation: 'float 15s ease-in-out infinite reverse'}}></div>
-      {/* Scroll Progress */}
       <div className="fixed top-0 left-0 w-full h-1 bg-white/10 z-50">
         <div 
           className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300"
@@ -44,16 +37,37 @@ export default function App() {
       </div>
       
       <div className="relative z-10 animate-fade-in">
-      <Header />
-      <main>
-        <Hero />
-        <Features />
-        <Pricing />
-        <About />
-        <FAQ />
-      </main>
-      <Footer />
+        <Header />
+        <main>
+          <Hero />
+          <Features />
+          <Pricing />
+          <About />
+          <FAQ />
+        </main>
+        <Footer />
       </div>
     </div>
+  );
+};
+
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  return token ? children : <Navigate to="/login" />;
+};
+
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+      </Routes>
+    </Router>
   );
 }

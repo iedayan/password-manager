@@ -6,7 +6,10 @@
   "permissions": [
     "activeTab",
     "storage",
-    "tabs"
+    "tabs",
+    "contextMenus",
+    "notifications",
+    "alarms"
   ],
   "host_permissions": [
     "http://localhost:5000/*",
@@ -19,7 +22,13 @@
     {
       "matches": ["<all_urls>"],
       "js": ["src/content/content.js"],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "all_frames": true,
+      "exclude_matches": [
+        "*://chrome://*",
+        "*://chrome-extension://*",
+        "*://moz-extension://*"
+      ]
     }
   ],
   "action": {
