@@ -38,85 +38,114 @@ class LokContentScript {
   }
 
   addLokButton(form, passwordField) {
-    // Check if button already exists
     if (form.querySelector('.lok-autofill-btn')) return;
+
+    const container = passwordField.parentElement;
+    const existingButtons = container.querySelectorAll('button, [role="button"], .eye-icon, [class*="eye"], [class*="show"], [class*="toggle"]');
+    
+    let rightOffset = 8;
+    let paddingRight = 45;
+    
+    if (existingButtons.length > 0) {
+      rightOffset = 45;
+      paddingRight = 80;
+    }
 
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'lok-autofill-btn';
     button.innerHTML = `
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;">
-        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <rect x="6" y="11" width="12" height="7" rx="1"></rect>
+        <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
       </svg>
-      Lok
     `;
     button.style.cssText = `
       position: absolute;
-      right: 8px;
+      right: ${rightOffset}px;
       top: 50%;
       transform: translateY(-50%);
-      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-      color: white;
-      border: none;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(8, 145, 178, 0.12) 100%);
+      border: 1px solid rgba(6, 182, 212, 0.25);
       border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 11px;
-      font-weight: 600;
+      padding: 7px;
       cursor: pointer;
       z-index: 10000;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       display: flex;
       align-items: center;
-      box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
-      transition: all 0.2s ease;
-      opacity: 0.9;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0.85;
+      color: #0891b2;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 8px rgba(6, 182, 212, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     `;
-
-    // Position relative to password field
-    passwordField.style.paddingRight = '70px';
     
-    const container = passwordField.parentElement;
+    const style = document.createElement('style');
+    style.textContent = `
+      .lok-autofill-btn:hover {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(8, 145, 178, 0.2) 100%) !important;
+        border-color: rgba(6, 182, 212, 0.4) !important;
+        opacity: 1 !important;
+        transform: translateY(-50%) scale(1.08) !important;
+        box-shadow: 0 4px 16px rgba(6, 182, 212, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+        color: #06b6d4 !important;
+      }
+      
+      .lok-autofill-btn:active {
+        transform: translateY(-50%) scale(0.96) !important;
+        box-shadow: 0 1px 4px rgba(6, 182, 212, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+      }
+    `;
+    
+    if (!document.querySelector('#lok-button-styles')) {
+      style.id = 'lok-button-styles';
+      document.head.appendChild(style);
+    }
+
+    passwordField.style.paddingRight = `${paddingRight}px`;
     container.style.position = 'relative';
     container.appendChild(button);
-
-    // Hover effects
-    button.addEventListener('mouseenter', () => {
-      button.style.opacity = '1';
-      button.style.transform = 'translateY(-50%) scale(1.05)';
-    });
-    
-    button.addEventListener('mouseleave', () => {
-      button.style.opacity = '0.9';
-      button.style.transform = 'translateY(-50%) scale(1)';
-    });
 
     button.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      
-      // Show loading state
-      button.style.opacity = '0.6';
+      await this.handleButtonClick(button);
+    });
+  }
+  
+  async handleButtonClick(button) {
+    if (button.disabled) return;
+    button.disabled = true;
+    
+    try {
+      button.style.opacity = '0.7';
       button.innerHTML = 'Loading...';
       
-      // Check if user is logged in first
       const result = await chrome.storage.local.get(['token']);
+      
       if (!result.token) {
         this.showLoginPrompt();
       } else {
         await this.showPasswordOptions();
       }
-      
-      // Reset button
+    } catch (error) {
+      console.error('Lok button error:', error);
+      this.showNotification('Something went wrong. Please try again.', 'error');
+    } finally {
       setTimeout(() => {
-        button.style.opacity = '0.9';
+        button.style.opacity = '0.85';
         button.innerHTML = `
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;">
-            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="6" y="11" width="12" height="7" rx="1"></rect>
+            <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
           </svg>
-          Lok
         `;
+        button.disabled = false;
       }, 500);
-    });
+    }
   }
 
   async showPasswordOptions() {
@@ -124,7 +153,6 @@ class LokContentScript {
     if (!result.token) return;
 
     try {
-      // Get passwords for current site
       const response = await fetch(`${this.apiUrl}/passwords`, {
         headers: { 'Authorization': `Bearer ${result.token}` }
       });
@@ -149,7 +177,6 @@ class LokContentScript {
   }
 
   showPasswordDropdown(passwords) {
-    // Remove existing dropdown
     const existing = document.querySelector('.lok-password-dropdown');
     if (existing) existing.remove();
 
@@ -199,7 +226,6 @@ class LokContentScript {
     dropdown.innerHTML = header + passwordItems;
     document.body.appendChild(dropdown);
 
-    // Add hover effects
     dropdown.querySelectorAll('.lok-password-option').forEach(option => {
       option.addEventListener('mouseenter', () => {
         option.style.background = 'rgba(6, 182, 212, 0.1)';
@@ -219,67 +245,17 @@ class LokContentScript {
       });
     });
 
-    // Close button
     dropdown.querySelector('.lok-close-btn').addEventListener('click', () => {
       dropdown.remove();
     });
 
-    // Auto-close after 15 seconds
     setTimeout(() => {
       if (dropdown.parentElement) dropdown.remove();
-    }, 15000);
+    }, 30000);
   }
 
   showNoPasswordsFound() {
     this.showNotification('No passwords found for this site', 'info');
-  }
-
-  showLoginPrompt() {
-    const prompt = document.createElement('div');
-    prompt.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(6, 182, 212, 0.3);
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      z-index: 10003;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      text-align: center;
-      color: white;
-      min-width: 300px;
-    `;
-    
-    prompt.innerHTML = `
-      <div style="margin-bottom: 20px;">
-        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); border-radius: 12px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: bold;">L</div>
-        <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Login Required</div>
-        <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Please login to Lok to save and fill passwords</div>
-      </div>
-      <div style="display: flex; gap: 12px;">
-        <button id="lokLoginBtn" style="flex: 1; padding: 12px 20px; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600;">Open Lok</button>
-        <button id="lokCancelBtn" style="flex: 1; padding: 12px 20px; background: rgba(255, 255, 255, 0.1); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; cursor: pointer; font-weight: 600;">Cancel</button>
-      </div>
-    `;
-    
-    document.body.appendChild(prompt);
-    
-    prompt.querySelector('#lokLoginBtn').addEventListener('click', () => {
-      chrome.runtime.sendMessage({ action: 'openPopup' });
-      prompt.remove();
-    });
-    
-    prompt.querySelector('#lokCancelBtn').addEventListener('click', () => {
-      prompt.remove();
-    });
-    
-    setTimeout(() => {
-      if (prompt.parentElement) prompt.remove();
-    }, 10000);
   }
 
   setupFormSubmitListener(form) {
@@ -299,21 +275,17 @@ class LokContentScript {
     
     if (!password || !username) return;
 
-    // Check if user is logged in
     const result = await chrome.storage.local.get(['token']);
     if (!result.token) return;
 
-    // Don't save if password is too short or common
     if (password.length < 6) return;
 
-    // Ask user if they want to save this password
     setTimeout(() => {
       this.showSavePasswordPrompt(username, password, window.location.hostname);
     }, 1000);
   }
 
   showSavePasswordPrompt(username, password, siteName) {
-    // Create save prompt overlay
     const overlay = document.createElement('div');
     overlay.style.cssText = `
       position: fixed;
@@ -331,36 +303,30 @@ class LokContentScript {
 
     overlay.innerHTML = `
       <div style="display: flex; align-items: center; margin-bottom: 12px;">
-        <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 4px; margin-right: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: bold;">L</div>
         <strong>Save Password?</strong>
       </div>
       <div style="margin-bottom: 16px; color: #666; font-size: 14px;">
         Save password for <strong>${siteName}</strong>?
       </div>
       <div style="display: flex; gap: 8px;">
-        <button id="lokSaveBtn" style="flex: 1; padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">Save</button>
-        <button id="lokCancelBtn" style="flex: 1; padding: 8px 16px; background: #f0f0f0; color: #666; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">Cancel</button>
+        <button id="lokSaveBtn" style="flex: 1; padding: 8px 16px; background: #06b6d4; color: white; border: none; border-radius: 6px; cursor: pointer;">Save</button>
+        <button id="lokCancelBtn" style="flex: 1; padding: 8px 16px; background: #f0f0f0; color: #666; border: none; border-radius: 6px; cursor: pointer;">Cancel</button>
       </div>
     `;
 
     document.body.appendChild(overlay);
 
-    // Handle save
     overlay.querySelector('#lokSaveBtn').addEventListener('click', async () => {
       await this.savePassword(username, password, siteName);
       overlay.remove();
     });
 
-    // Handle cancel
     overlay.querySelector('#lokCancelBtn').addEventListener('click', () => {
       overlay.remove();
     });
 
-    // Auto-remove after 10 seconds
     setTimeout(() => {
-      if (overlay.parentElement) {
-        overlay.remove();
-      }
+      if (overlay.parentElement) overlay.remove();
     }, 10000);
   }
 
@@ -456,12 +422,61 @@ class LokContentScript {
     this.showNotification('Password filled successfully!', 'success');
   }
 
+  showLoginPrompt() {
+    const prompt = document.createElement('div');
+    prompt.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      z-index: 10003;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      text-align: center;
+      color: white;
+      min-width: 300px;
+    `;
+    
+    prompt.innerHTML = `
+      <div style="margin-bottom: 20px;">
+        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); border-radius: 12px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: bold;">L</div>
+        <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Login Required</div>
+        <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Please login to Lok to save and fill passwords</div>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button id="lokLoginBtn" style="flex: 1; padding: 12px 20px; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600;">Open Lok</button>
+        <button id="lokCancelBtn" style="flex: 1; padding: 12px 20px; background: rgba(255, 255, 255, 0.1); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; cursor: pointer; font-weight: 600;">Cancel</button>
+      </div>
+    `;
+    
+    document.body.appendChild(prompt);
+    
+    prompt.querySelector('#lokLoginBtn').addEventListener('click', () => {
+      chrome.runtime.sendMessage({ action: 'openPopup' });
+      prompt.remove();
+    });
+    
+    prompt.querySelector('#lokCancelBtn').addEventListener('click', () => {
+      prompt.remove();
+    });
+    
+    setTimeout(() => {
+      if (prompt.parentElement) prompt.remove();
+    }, 10000);
+  }
+
   showNotification(message, type) {
     const notification = document.createElement('div');
     const bgColor = {
       'success': 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
       'error': 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-      'info': 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)'
+      'info': 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+      'warning': 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
     }[type] || 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)';
     
     notification.style.cssText = `
@@ -486,12 +501,10 @@ class LokContentScript {
     notification.textContent = message;
     document.body.appendChild(notification);
 
-    // Slide in animation
     setTimeout(() => {
       notification.style.transform = 'translateX(0)';
     }, 10);
 
-    // Slide out and remove
     setTimeout(() => {
       notification.style.transform = 'translateX(100%)';
       setTimeout(() => notification.remove(), 300);

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="minimalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891b2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Clean background -->
+  <rect x="8" y="8" width="48" height="48" rx="16" fill="url(#minimalGradient)"/>
+  
+  <!-- Ultra minimal lock -->
+  <g transform="translate(32, 32)">
+    <!-- Lock body - simple rectangle -->
+    <rect x="-5" y="1" width="10" height="7" rx="1" fill="white"/>
+    <!-- Lock shackle - clean arc -->
+    <path d="M-2.5 1V-1.5C-2.5 -2.88 -1.38 -4 0 -4C1.38 -4 2.5 -2.88 2.5 -1.5V1" 
+          stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <!-- Single dot -->
+    <circle cx="0" cy="4.5" r="0.8" fill="#06b6d4"/>
+  </g>
+</svg>
