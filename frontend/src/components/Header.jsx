@@ -38,22 +38,13 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo Section */}
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center relative overflow-hidden group shadow-md">
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <svg className="w-5 h-5 text-white relative z-10" fill="none" viewBox="0 0 24 24">
-                <!-- Shield -->
-                <path d="M12 2C12 2 8 1 5 1C2 1 0 2 0 2V12C0 17 3 20 6 22C9 24 12 22 15 22C18 20 21 17 21 12V2S19 1 16 1C13 1 12 2 12 2Z" 
-                      fill="white" opacity="0.95"/>
-                <!-- Lock -->
-                <rect x="8" y="13" width="6" height="4" rx="0.5" fill="#06b6d4" opacity="0.9"/>
-                <path d="M9 13V11C9 9.9 9.9 9 11 9H13C14.1 9 15 9.9 15 11V13" 
-                      stroke="#06b6d4" strokeWidth="1" fill="none" opacity="0.9"/>
-                <circle cx="11" cy="15" r="0.8" fill="white"/>
-                <!-- Security dots -->
-                <circle cx="6" cy="8" r="0.4" fill="#06b6d4" opacity="0.6"/>
-                <circle cx="18" cy="8" r="0.4" fill="#06b6d4" opacity="0.6"/>
-                <circle cx="4" cy="14" r="0.4" fill="#06b6d4" opacity="0.6"/>
-                <circle cx="20" cy="14" r="0.4" fill="#06b6d4" opacity="0.6"/>
+            <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group">
+              <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" fill="none" viewBox="0 0 32 32">
+                <path d="M16 3l10 4v8c0 7-4 14-10 16-6-2-10-9-10-16V7l10-4z" fill="white" opacity="0.95"/>
+                <rect x="12" y="16" width="8" height="7" rx="1.5" fill="#0891b2"/>
+                <path d="M13 16V12c0-1.7 1.3-3 3-3s3 1.3 3 3v4" stroke="#0891b2" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+                <circle cx="16" cy="19.5" r="1.8" fill="white"/>
+                <rect x="12.5" y="16.5" width="7" height="1" rx="0.5" fill="rgba(255,255,255,0.5)"/>
               </svg>
             </div>
             <span className="text-xl font-bold text-gray-900">Lok</span>

@@ -1,0 +1,5 @@
+<svg width="160" height="40" viewBox="0 0 160 40" xmlns="http://www.w3.org/2000/svg">
+  <rect x="4" y="4" width="32" height="32" rx="6" fill="#06b6d4"/>
+  <path d="M20 8l12 4v8c0 6-4 12-12 16-8-4-12-10-12-16v-8l12-4z" fill="white"/>
+  <text x="48" y="28" font-family="system-ui, sans-serif" font-size="24" font-weight="700" fill="#0f172a">Lok</text>
+</svg>
