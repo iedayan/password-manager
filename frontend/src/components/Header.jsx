@@ -1,4 +1,157 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+const AuthButtons = () => {
+  const [user, setUser] = useState(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('user_id');
+    if (token && userId) {
+      setUser({ id: userId });
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user_id');
+    setUser(null);
+    setShowUserMenu(false);
+    navigate('/');
+  };
+
+  const isOnDashboard = location.pathname.includes('/dashboard') || location.pathname.includes('/vault') || location.pathname.includes('/app');
+
+  if (user) {
+    return (
+      <>
+        {/* Desktop */}
+        <div className="hidden md:flex items-center gap-3">
+          {!isOnDashboard && (
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-medium flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              My Vault
+            </button>
+          )}
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
+            >
+              <span className="text-sm font-bold text-white">U</span>
+            </button>
+            {showUserMenu && (
+              <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 animate-fade-in">
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <p className="text-sm font-medium text-gray-900">Account</p>
+                  <p className="text-xs text-gray-500">Manage your vault</p>
+                </div>
+                <button
+                  onClick={() => { navigate('/dashboard'); setShowUserMenu(false); }}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm flex items-center gap-3 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => { navigate('/'); setShowUserMenu(false); }}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm flex items-center gap-3 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  Home
+                </button>
+                <div className="border-t border-gray-100 mt-2 pt-2">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-3 hover:bg-red-50 text-sm text-red-600 flex items-center gap-3 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Sign Out
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Mobile */}
+        <div className="md:hidden flex items-center gap-2">
+          {!isOnDashboard && (
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </button>
+          )}
+          <button
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center"
+          >
+            <span className="text-xs font-bold text-white">U</span>
+          </button>
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {/* Desktop */}
+      <div className="hidden md:flex items-center gap-3">
+        <button
+          onClick={() => navigate('/login')}
+          className="text-gray-700 hover:text-blue-600 px-4 py-2 rounded-xl hover:bg-blue-50 transition-all font-medium"
+        >
+          Sign In
+        </button>
+        <button
+          onClick={() => navigate('/login')}
+          className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl hover:from-blue-700 hover:to-indigo-700 font-medium transition-all shadow-md hover:shadow-lg transform hover:scale-105"
+        >
+          Get Started
+        </button>
+      </div>
+      
+      {/* Mobile */}
+      <div className="md:hidden">
+        <button
+          onClick={() => navigate('/login')}
+          className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-medium"
+        >
+          Sign In
+        </button>
+      </div>
+    </>
+  );
+};
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,49 +213,30 @@ export default function Header() {
               <a 
                 key={item.href}
                 href={item.href} 
-                className={`relative px-4 py-2 text-sm font-semibold transition-all duration-300 rounded-lg group focus-ring ${
+                className={`relative px-4 py-2.5 text-sm font-medium transition-all duration-300 rounded-xl group ${
                   activeSection === item.href.slice(1) 
-                    ? 'text-blue-600 bg-blue-50' 
+                    ? 'text-blue-600 bg-blue-50 shadow-sm' 
                     : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
                 }`}
               >
                 <span className="relative z-10">{item.label}</span>
-                <span className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-blue-600 rounded-full transition-all duration-300 ${
+                <span className={`absolute bottom-1 left-1/2 transform -translate-x-1/2 h-0.5 bg-blue-600 rounded-full transition-all duration-300 ${
                   activeSection === item.href.slice(1) ? 'w-6' : 'w-0 group-hover:w-6'
                 }`}></span>
               </a>
             ))}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden md:flex items-center">
-            <button 
-              onClick={() => {
-                const emailSignup = document.getElementById('email-signup');
-                if (emailSignup) {
-                  emailSignup.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  // Focus on email input after scroll
-                  setTimeout(() => {
-                    const emailInput = emailSignup.querySelector('input[type="email"]');
-                    if (emailInput) emailInput.focus();
-                  }, 800);
-                }
-              }}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 text-sm font-bold transition-all shadow-md hover:shadow-lg focus-ring transform hover:scale-105 flex items-center space-x-2">
-              <span>Join Waitlist</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </button>
-          </div>
+          {/* Auth Buttons */}
+          <AuthButtons />
 
           {/* Mobile Menu Button */}
           <button 
-            className="lg:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors focus-ring"
+            className="lg:hidden p-2.5 rounded-xl hover:bg-gray-100 transition-all focus-ring"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
-            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-700 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
             </svg>
           </button>
@@ -110,38 +244,23 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="lg:hidden py-4 border-t border-gray-100 bg-white/95 backdrop-blur-md">
-            <div className="flex flex-col space-y-1">
+          <div className="lg:hidden py-4 border-t border-gray-100 bg-white/95 backdrop-blur-md animate-fade-in">
+            <div className="flex flex-col space-y-2">
               {navItems.map((item) => (
                 <a 
                   key={item.href}
                   href={item.href} 
-                  className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 font-semibold py-3 px-4 rounded-lg transition-all duration-300 focus-ring"
+                  className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 font-medium py-3 px-4 rounded-xl transition-all duration-300 flex items-center gap-3"
                   onClick={() => setIsOpen(false)}
                 >
+                  <span className="w-2 h-2 bg-blue-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   {item.label}
                 </a>
               ))}
-              <div className="pt-4 border-t border-gray-100 mt-2">
-                <button 
-                  onClick={() => {
-                    const emailSignup = document.getElementById('email-signup');
-                    if (emailSignup) {
-                      emailSignup.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      setIsOpen(false);
-                      // Focus on email input after scroll
-                      setTimeout(() => {
-                        const emailInput = emailSignup.querySelector('input[type="email"]');
-                        if (emailInput) emailInput.focus();
-                      }, 800);
-                    }
-                  }}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 font-bold shadow-md focus-ring flex items-center justify-center space-x-2">
-                  <span>Join Waitlist</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </button>
+              
+              {/* Mobile Auth Buttons */}
+              <div className="pt-4 border-t border-gray-100 mt-4 space-y-3">
+                <AuthButtons />
               </div>
             </div>
           </div>

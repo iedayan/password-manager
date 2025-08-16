@@ -12,6 +12,7 @@ psycopg2-binary>=2.9.9
 redis>=5.0.1
 celery>=5.3.4
 requests>=2.31.0
+gunicorn>=21.2.0
 
 # Security & Monitoring
 Flask-Talisman>=1.1.0

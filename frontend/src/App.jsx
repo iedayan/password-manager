@@ -40,9 +40,13 @@ const LandingPage = () => {
         <Header />
         <main>
           <Hero />
+          <div className="section-divider"></div>
           <Features />
+          <div className="section-divider"></div>
           <Pricing />
+          <div className="section-divider"></div>
           <About />
+          <div className="section-divider"></div>
           <FAQ />
         </main>
         <Footer />
@@ -62,7 +66,18 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Login />} />
+        <Route path="/app" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
         <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/vault" element={
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>

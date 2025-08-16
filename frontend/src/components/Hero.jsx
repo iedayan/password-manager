@@ -23,7 +23,7 @@ export default function Hero() {
 
 
   return (
-    <section id="hero" className="section-spacing pt-32 pb-4 px-6 bg-gradient-to-b from-white to-blue-50">
+    <section id="hero" className="pt-32 pb-20 md:pb-24 lg:pb-32 px-6 bg-gradient-to-b from-white to-blue-50">
       <div className="max-w-5xl mx-auto">
         {/* Trust Indicators */}
         <div className="flex justify-center items-center space-x-8 mb-12 animate-fade-in">
@@ -69,7 +69,20 @@ export default function Hero() {
             across all your accounts. Enterprise-grade security with zero-knowledge encryption.
           </p>
 
-          <form id="email-signup" name="waitlist" method="POST" action="/success.html" data-netlify="true" className="max-w-lg mx-auto mb-16 animate-slide-up" style={{animationDelay: '2.5s', animationFillMode: 'both'}}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8 animate-slide-up" style={{animationDelay: '2.5s', animationFillMode: 'both'}}>
+            <button
+              onClick={() => window.location.href = '/login'}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
+            >
+              <span>Try Demo</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+            <span className="text-gray-400 hidden sm:block">or</span>
+          </div>
+
+          <form id="email-signup" name="waitlist" method="POST" action="/success.html" data-netlify="true" className="max-w-lg mx-auto mb-16 animate-slide-up" style={{animationDelay: '2.8s', animationFillMode: 'both'}}>
             <input type="hidden" name="form-name" value="waitlist" />
             <div className="flex flex-col sm:flex-row gap-3 p-2 bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
               <input

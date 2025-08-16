@@ -37,10 +37,12 @@ def create_app(config_name=None):
     # Register error handlers
     register_error_handlers(app)
 
-    # Create database tables
+    # Create database tables (production safe)
     with app.app_context():
-        db.drop_all()
-        db.create_all()
+        if config_name == "development":
+            db.create_all()
+        elif not db.engine.dialect.has_table(db.engine, "users"):
+            db.create_all()
 
     return app
 
