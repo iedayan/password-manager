@@ -56,7 +56,8 @@ export default function Waitlist() {
         addToast('🎉 Welcome to the waitlist! We\'ll notify you soon.', 'success');
         setFormData({ email: '', name: '', role: '' });
         setIsSuccess(true);
-        setTimeout(() => setIsSuccess(false), 5000);
+        const timer = setTimeout(() => setIsSuccess(false), 5000);
+        return () => clearTimeout(timer);
       }
     } catch (err) {
       addToast('Something went wrong. Please try again.', 'error');

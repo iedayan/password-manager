@@ -231,7 +231,7 @@ class LokPopup {
 
   displayPasswords(passwords) {
     const container = document.getElementById('passwordList');
-    container.innercontainer.inncontainer.innerHTML = '';
+    container.innerHTML = '';
 
     if (!this.currentSite) {
       container.innerHTML = `
@@ -412,6 +412,13 @@ class LokPopup {
   }
 
   async generatePassword() {
+    const token = await this.getStoredToken();
+    if (!token) {
+      this.showNotification('Please login first', 'error');
+      this.showLogin();
+      return;
+    }
+    
     const password = this.generateSecurePassword();
     
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -455,19 +462,22 @@ class LokPopup {
   }
 }
 
-// Add notification animations
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-    to { opacity: 1; transform: translateX(-50%) translateY(0); }
-  }
-  @keyframes slideUp {
-    from { opacity: 1; transform: translateX(-50%) translateY(0); }
-    to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-  }
-`;
-document.head.appendChild(style);
+// Add notification animations (only if not already added)
+if (!document.querySelector('#lok-popup-styles')) {
+  const style = document.createElement('style');
+  style.id = 'lok-popup-styles';
+  style.textContent = `
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 1; transform: translateX(-50%) translateY(0); }
+      to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    }
+  `;
+  document.head.appendChild(style);
+}
 
 // Initialize popup when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {

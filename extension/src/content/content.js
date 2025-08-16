@@ -512,8 +512,13 @@ class LokContentScript {
   }
 
   observeFormChanges() {
+    let throttleTimer = null;
     const observer = new MutationObserver(() => {
-      this.detectLoginForms();
+      if (throttleTimer) return;
+      throttleTimer = setTimeout(() => {
+        this.detectLoginForms();
+        throttleTimer = null;
+      }, 200);
     });
 
     observer.observe(document.body, {

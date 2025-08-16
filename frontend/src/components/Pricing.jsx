@@ -109,7 +109,7 @@ export default function Pricing() {
                   : 'border-gray-200 hover:border-blue-300 shadow-lg'
               }`}
               style={{
-                transform: `translate(${(mousePosition.x - window.innerWidth / 2) * 0.01}px, ${(mousePosition.y - window.innerHeight / 2) * 0.01}px)`,
+                transform: `translate(${Math.max(-10, Math.min(10, (mousePosition.x - (typeof window !== 'undefined' ? window.innerWidth : 0) / 2) * 0.01))}px, ${Math.max(-10, Math.min(10, (mousePosition.y - (typeof window !== 'undefined' ? window.innerHeight : 0) / 2) * 0.01))}px)`,
               }}
             >
               {plan.popular && (

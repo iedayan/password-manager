@@ -1,11 +1,13 @@
-# Production configuration - DO NOT COMMIT TO GIT
-SECRET_KEY = 'your-production-secret-key-here'
-JWT_SECRET_KEY = 'your-production-jwt-secret-here'
-ENCRYPTION_KEY = 'your-production-encryption-key-here'
+# Production configuration - use environment variables
+import os
+
+SECRET_KEY = os.environ.get('SECRET_KEY')
+JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY')
 
 # Database
-DATABASE_URL = 'postgresql://user:pass@localhost/lok_production'
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
 # Email settings
-MAIL_USERNAME = 'your-email@domain.com'
-MAIL_PASSWORD = 'your-app-password'
+MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')

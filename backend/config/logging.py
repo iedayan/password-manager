@@ -6,8 +6,15 @@ from datetime import datetime
 def setup_logging(app):
     """Configure comprehensive logging for security and monitoring"""
     
-    # Create logs directory if it doesn't exist
-    log_dir = os.path.join(os.path.dirname(app.root_path), 'logs')
+    # Create logs directory if it doesn't exist - validate path
+    base_dir = os.path.dirname(app.root_path)
+    log_dir = os.path.join(base_dir, 'logs')
+    
+    # Validate log directory path to prevent traversal
+    log_dir = os.path.abspath(log_dir)
+    if not log_dir.startswith(os.path.abspath(base_dir)):
+        raise ValueError("Invalid log directory path")
+    
     os.makedirs(log_dir, exist_ok=True)
     
     # Configure root logger
