@@ -1,0 +1,55 @@
+{
+  "name": "lok-password-manager",
+  "version": "1.0.0",
+  "description": "Enterprise-grade password manager with zero-knowledge encryption and AI-powered security",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "extension"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && python app.py",
+    "build": "npm run build:frontend && npm run build:extension",
+    "build:frontend": "cd frontend && npm run build",
+    "build:extension": "cd extension && npm run build",
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && python -m pytest",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:backend": "cd backend && flake8 .",
+    "deploy": "npm run build && ./deployment/scripts/deploy-production.sh",
+    "docker:up": "cd backend && docker-compose up -d",
+    "docker:down": "cd backend && docker-compose down",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && pip install -r requirements.txt"
+  },
+  "keywords": [
+    "password-manager",
+    "security",
+    "encryption",
+    "cybersecurity",
+    "chrome-extension",
+    "zero-knowledge"
+  ],
+  "author": "Lok Security Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iedayan/password-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/iedayan/password-manager/issues"
+  },
+  "homepage": "https://github.com/iedayan/password-manager#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
