@@ -1,6 +1,10 @@
 class LokContentScript {
   constructor() {
     this.apiUrl = 'http://localhost:5000/api';
+    this.cachedForms = null;
+    this.cachedPasswords = null;
+    this.currentSite = window.location.hostname.replace('www.', '');
+    this.observer = null;
     this.init();
   }
 
@@ -24,6 +28,7 @@ class LokContentScript {
   }
 
   detectLoginForms() {
+    this.cachedForms = null; // Reset cache for new detection
     const forms = document.querySelectorAll('form');
     
     forms.forEach(form => {
@@ -159,10 +164,10 @@ class LokContentScript {
 
       if (response.ok) {
         const passwords = await response.json();
-        const currentSite = window.location.hostname.replace('www.', '');
+        this.cachedPasswords = passwords; // Cache passwords
         const sitePasswords = passwords.filter(p => 
-          p.site_url.toLowerCase().includes(currentSite.toLowerCase()) || 
-          p.site_name.toLowerCase().includes(currentSite.toLowerCase())
+          p.site_url.toLowerCase().includes(this.currentSite.toLowerCase()) || 
+          p.site_name.toLowerCase().includes(this.currentSite.toLowerCase())
         );
 
         if (sitePasswords.length > 0) {
@@ -513,7 +518,7 @@ class LokContentScript {
 
   observeFormChanges() {
     let throttleTimer = null;
-    const observer = new MutationObserver(() => {
+    this.observer = new MutationObserver(() => {
       if (throttleTimer) return;
       throttleTimer = setTimeout(() => {
         this.detectLoginForms();
@@ -521,16 +526,34 @@ class LokContentScript {
       }, 200);
     });
 
-    observer.observe(document.body, {
+    this.observer.observe(document.body, {
       childList: true,
       subtree: true
     });
   }
+
+  disconnect() {
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
+  }
 }
 
 // Initialize content script
+let lokScript = null;
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => new LokContentScript());
+  document.addEventListener('DOMContentLoaded', () => {
+    lokScript = new LokContentScript();
+  });
 } else {
-  new LokContentScript();
+  lokScript = new LokContentScript();
 }
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+  if (lokScript) {
+    lokScript.disconnect();
+  }
+});
