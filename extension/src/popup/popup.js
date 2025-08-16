@@ -28,13 +28,23 @@ class LokPopup {
   bindEvents() {
     document.getElementById('loginBtn').addEventListener('click', () => this.login());
     document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
-    document.getElementById('generateBtn').addEventListener('click', () => this.generatePassword());
+    document.getElementById('generateBtn').addEventListener('click', () => this.authorizedAction(() => this.generatePassword()));
     document.getElementById('togglePasswordBtn').addEventListener('click', () => this.togglePassword());
     
     // Enter key for login
     document.getElementById('password').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') this.login();
     });
+  }
+
+  async authorizedAction(action) {
+    const token = await this.getStoredToken();
+    if (!token) {
+      this.showNotification('Please login first', 'error');
+      this.showLogin();
+      return;
+    }
+    return action();
   }
 
   togglePassword() {
@@ -181,10 +191,17 @@ class LokPopup {
   }
 
   async logout() {
-    await chrome.storage.local.clear();
-    chrome.runtime.sendMessage({ action: 'autoLock' });
-    this.showLogin();
-    this.showNotification('Logged out successfully', 'success');
+    try {
+      await chrome.storage.local.clear();
+      chrome.runtime.sendMessage({ action: 'autoLock' });
+      this.showLogin();
+      this.showNotification('Logged out successfully', 'success');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Still show login form even if storage clearing fails
+      this.showLogin();
+      this.showNotification('Logout completed with warnings', 'error');
+    }
   }
 
   async loadPasswords() {
@@ -214,7 +231,7 @@ class LokPopup {
 
   displayPasswords(passwords) {
     const container = document.getElementById('passwordList');
-    container.innerHTML = '';
+    container.innercontainer.inncontainer.innerHTML = '';
 
     if (!this.currentSite) {
       container.innerHTML = `
@@ -432,9 +449,11 @@ class LokPopup {
     document.getElementById('loginForm').classList.add('hidden');
     document.getElementById('vault').classList.remove('hidden');
   }
+  
+  resetAutoLockTimer() {
+    chrome.runtime.sendMessage({ action: 'resetAutoLock' });
+  }
 }
-
-
 
 // Add notification animations
 const style = document.createElement('style');
@@ -449,11 +468,6 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
-
-  resetAutoLockTimer() {
-    chrome.runtime.sendMessage({ action: 'resetAutoLock' });
-  }
-}
 
 // Initialize popup when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {

@@ -42,7 +42,10 @@ export function useDebounce(value, delay) {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedValue(value);
+      // Sanitize value to prevent XSS if it's a string
+      const sanitizedValue = typeof value === 'string' ? 
+        value.replace(/<script[^>]*>.*?<\/script>/gi, '') : value;
+      setDebouncedValue(sanitizedValue);
     }, delay);
 
     return () => {
@@ -65,14 +68,18 @@ export function useIntersectionObserver(options = {}) {
   useEffect(() => {
     if (!element) return;
 
+    // Sanitize options to prevent XSS
+    const sanitizedOptions = {
+      threshold: typeof options.threshold === 'number' ? options.threshold : 0.1,
+      root: options.root instanceof Element ? options.root : null,
+      rootMargin: typeof options.rootMargin === 'string' ? options.rootMargin : '0px'
+    };
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsIntersecting(entry.isIntersecting);
       },
-      {
-        threshold: 0.1,
-        ...options
-      }
+      sanitizedOptions
     );
 
     observer.observe(element);

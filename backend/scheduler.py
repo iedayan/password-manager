@@ -44,9 +44,9 @@ class SecurityScheduler:
             for user in users:
                 try:
                     updated_count = self.password_updater.update_weak_passwords(user.id)
-                    print(f"Updated {updated_count} passwords for user {user.email}")
+                    print(f"Updated {updated_count} passwords for user ID {user.id}")
                 except Exception as e:
-                    print(f"Error updating passwords for user {user.email}: {str(e)}")
+                    print(f"Error updating passwords for user ID {user.id}: {str(e)}")
     
     def check_breached_passwords(self):
         """Check if any passwords have been compromised in data breaches"""
@@ -62,7 +62,7 @@ class SecurityScheduler:
                     # Check against Have I Been Pwned API
                     if self.is_password_breached(decrypted_password):
                         password_record.is_compromised = True
-                        print(f"Password compromised for {password_record.site_name}")
+                        print(f"Password compromised for password ID {password_record.id}")
                         
                         # Trigger automatic update if enabled
                         if password_record.auto_update_enabled:
@@ -74,10 +74,10 @@ class SecurityScheduler:
                                 password_record.strength_score = self.password_updater.calculate_password_strength(new_password)
                                 password_record.is_compromised = False
                                 password_record.last_updated = datetime.utcnow()
-                                print(f"Auto-updated compromised password for {password_record.site_name}")
+                                print(f"Auto-updated compromised password for password ID {password_record.id}")
                 
                 except Exception as e:
-                    print(f"Error checking password breach for {password_record.site_name}: {str(e)}")
+                    print(f"Error checking password breach for password ID {password_record.id}: {str(e)}")
                     continue
             
             db.session.commit()

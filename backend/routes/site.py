@@ -108,6 +108,11 @@ class Site(db.Model):
     @staticmethod
     def _generate_name_from_domain(domain: str) -> str:
         """Generate a display name from domain"""
+        import html
+
+        # Sanitize domain input to prevent XSS
+        domain = html.escape(domain.strip())
+
         # Remove TLD and capitalize
         parts = domain.split(".")
         if len(parts) > 1:
@@ -123,6 +128,12 @@ class Site(db.Model):
         Returns True if successful
         """
         try:
+            import re
+
+            # Validate domain to prevent XSS in URL construction
+            if not re.match(r"^[a-zA-Z0-9.-]+$", self.domain):
+                return False
+
             # Try common favicon URLs
             favicon_urls = [
                 f"https://{self.domain}/favicon.ico",

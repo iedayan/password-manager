@@ -53,7 +53,9 @@ export function isValidEmail(email) {
  * @returns {string} Random ID
  */
 export function generateId(length = 8) {
-  return Math.random().toString(36).substring(2, length + 2);
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(36)).join('').substring(0, length);
 }
 
 /**
