@@ -8,17 +8,22 @@ __pycache__/
 env/
 venv/
 .venv/
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Environment variables
 .env
 .env.local
 .env.production
 .env.staging
+.env.development
+*.env
 
-# Database
+# Database files
 *.db
 *.sqlite
 *.sqlite3
+instance/
 
 # Logs
 logs/
@@ -26,36 +31,94 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+app.log
+errors.log
+security.log
 
 # Build outputs
 dist/
 build/
 *.egg-info/
+.next/
+out/
 
-# IDE
+# IDE and editors
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+.sublime-project
+.sublime-workspace
 
-# OS
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+
+# Security sensitive files
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+keys/
+certs/
 
 # Deployment
 deployment/scripts/.env
 deployment/configs/.env*
 
-# Chrome extension
+# Browser extension
 extension/dist/
 extension/build/
+extension/web-ext-artifacts/
 
 # Testing
 .coverage
 .pytest_cache/
 coverage/
+.nyc_output/
+junit.xml
+
+# Cache directories
+.cache/
+.parcel-cache/
+.eslintcache
 
 # Temporary files
 *.tmp
 *.temp
+*.bak
+*.backup
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Local Netlify folder
+.netlify
+
+# Railway
+.railway/
+
+# Vercel
+.vercel
