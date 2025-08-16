@@ -38,20 +38,22 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo Section */}
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-700 to-indigo-800 rounded-xl flex items-center justify-center relative overflow-hidden group shadow-md">
+            <div className="w-9 h-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center relative overflow-hidden group shadow-md">
               <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <svg className="w-5 h-5 text-white relative z-10" fill="none" viewBox="0 0 24 24">
-                <path d="M12 2l8 3v6c0 5.5-3.5 10.5-8 12-4.5-1.5-8-6.5-8-12V5l8-3z" 
-                      stroke="white" strokeWidth="1.5" fill="none" opacity="0.9"/>
-                <rect x="10" y="10" width="4" height="3" rx="0.5" fill="white" opacity="0.95"/>
-                <path d="M10.5 10v-1c0-0.8 0.7-1.5 1.5-1.5s1.5 0.7 1.5 1.5v1" 
-                      stroke="white" strokeWidth="1" fill="none" opacity="0.95"/>
-                <circle cx="8.5" cy="7" r="0.5" fill="white" opacity="0.7"/>
-                <circle cx="15.5" cy="7" r="0.5" fill="white" opacity="0.7"/>
-                <circle cx="7" cy="12" r="0.5" fill="white" opacity="0.7"/>
-                <circle cx="17" cy="12" r="0.5" fill="white" opacity="0.7"/>
-                <circle cx="8.5" cy="17" r="0.5" fill="white" opacity="0.7"/>
-                <circle cx="15.5" cy="17" r="0.5" fill="white" opacity="0.7"/>
+                <!-- Shield -->
+                <path d="M12 2C12 2 8 1 5 1C2 1 0 2 0 2V12C0 17 3 20 6 22C9 24 12 22 15 22C18 20 21 17 21 12V2S19 1 16 1C13 1 12 2 12 2Z" 
+                      fill="white" opacity="0.95"/>
+                <!-- Lock -->
+                <rect x="8" y="13" width="6" height="4" rx="0.5" fill="#06b6d4" opacity="0.9"/>
+                <path d="M9 13V11C9 9.9 9.9 9 11 9H13C14.1 9 15 9.9 15 11V13" 
+                      stroke="#06b6d4" strokeWidth="1" fill="none" opacity="0.9"/>
+                <circle cx="11" cy="15" r="0.8" fill="white"/>
+                <!-- Security dots -->
+                <circle cx="6" cy="8" r="0.4" fill="#06b6d4" opacity="0.6"/>
+                <circle cx="18" cy="8" r="0.4" fill="#06b6d4" opacity="0.6"/>
+                <circle cx="4" cy="14" r="0.4" fill="#06b6d4" opacity="0.6"/>
+                <circle cx="20" cy="14" r="0.4" fill="#06b6d4" opacity="0.6"/>
               </svg>
             </div>
             <span className="text-xl font-bold text-gray-900">Lok</span>
