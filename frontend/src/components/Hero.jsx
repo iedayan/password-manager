@@ -69,7 +69,7 @@ export default function Hero() {
             across all your accounts. Enterprise-grade security with zero-knowledge encryption.
           </p>
 
-          <form name="waitlist" method="POST" action="/success.html" data-netlify="true" className="max-w-lg mx-auto mb-16 animate-slide-up" style={{animationDelay: '2.5s', animationFillMode: 'both'}}>
+          <form id="email-signup" name="waitlist" method="POST" action="/success.html" data-netlify="true" className="max-w-lg mx-auto mb-16 animate-slide-up" style={{animationDelay: '2.5s', animationFillMode: 'both'}}>
             <input type="hidden" name="form-name" value="waitlist" />
             <div className="flex flex-col sm:flex-row gap-3 p-2 bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
               <input

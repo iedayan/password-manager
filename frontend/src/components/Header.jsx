@@ -78,12 +78,12 @@ export default function Header() {
           <div className="hidden md:flex items-center">
             <button 
               onClick={() => {
-                const heroSection = document.getElementById('hero');
-                if (heroSection) {
-                  heroSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const emailSignup = document.getElementById('email-signup');
+                if (emailSignup) {
+                  emailSignup.scrollIntoView({ behavior: 'smooth', block: 'center' });
                   // Focus on email input after scroll
                   setTimeout(() => {
-                    const emailInput = document.querySelector('input[type="email"]');
+                    const emailInput = emailSignup.querySelector('input[type="email"]');
                     if (emailInput) emailInput.focus();
                   }, 800);
                 }
@@ -125,13 +125,13 @@ export default function Header() {
               <div className="pt-4 border-t border-gray-100 mt-2">
                 <button 
                   onClick={() => {
-                    const heroSection = document.getElementById('hero');
-                    if (heroSection) {
-                      heroSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const emailSignup = document.getElementById('email-signup');
+                    if (emailSignup) {
+                      emailSignup.scrollIntoView({ behavior: 'smooth', block: 'center' });
                       setIsOpen(false);
                       // Focus on email input after scroll
                       setTimeout(() => {
-                        const emailInput = document.querySelector('input[type="email"]');
+                        const emailInput = emailSignup.querySelector('input[type="email"]');
                         if (emailInput) emailInput.focus();
                       }, 800);
                     }

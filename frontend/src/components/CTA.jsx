@@ -49,12 +49,13 @@ export default function CTA() {
                 required
               />
               <motion.button
-                type="submit"
+                type="button"
+                onClick={() => document.getElementById('email-signup')?.scrollIntoView({ behavior: 'smooth' })}
                 className="bg-white hover:bg-gray-50 text-indigo-600 font-bold px-8 py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl text-lg"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Start Free Trial
+                Join Waitlist
               </motion.button>
             </div>
           </motion.form>

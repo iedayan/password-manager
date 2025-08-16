@@ -140,7 +140,9 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              <button className={`w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300 group-hover:scale-105 mt-auto focus-ring ${
+              <button 
+                onClick={() => document.getElementById('email-signup')?.scrollIntoView({ behavior: 'smooth' })}
+                className={`w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300 group-hover:scale-105 mt-auto focus-ring ${
                 plan.popular
                   ? 'bg-gradient-to-r from-blue-700 to-indigo-700 text-white hover:from-blue-800 hover:to-indigo-800 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
                   : 'bg-white text-gray-900 hover:bg-blue-50 hover:text-blue-700 border-2 border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md'

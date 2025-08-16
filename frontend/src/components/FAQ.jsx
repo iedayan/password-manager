@@ -136,7 +136,9 @@ export default function FAQ() {
           <p className="text-gray-600 mb-6 text-lg leading-relaxed">
             Still have questions? Our security experts are here to help.
           </p>
-          <button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 font-semibold transition-all shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          <button 
+            onClick={() => document.getElementById('email-signup')?.scrollIntoView({ behavior: 'smooth' })}
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 font-semibold transition-all shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             Join Waitlist
           </button>
         </div>
