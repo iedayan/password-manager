@@ -1,5 +1,5 @@
 from datetime import datetime
-from ..config.extensions import db
+from ..core.database import db
 
 class Password(db.Model):
     """Password storage model with encryption"""
@@ -11,9 +11,9 @@ class Password(db.Model):
     site_url = db.Column(db.String(255), nullable=False)
     username = db.Column(db.String(100), nullable=False)
     encrypted_password = db.Column(db.Text, nullable=False)
-    strength_score = db.Column(db.Integer, default=0)
+    notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    last_updated = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     last_accessed = db.Column(db.DateTime)
     auto_update_enabled = db.Column(db.Boolean, default=True, nullable=False)
     is_compromised = db.Column(db.Boolean, default=False, nullable=False)

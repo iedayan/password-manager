@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from ..config.extensions import db
+from ..core.database import db
 import uuid
 
 
@@ -18,7 +18,6 @@ class User(db.Model):
     )
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(128), nullable=False)
-    master_key_hash = db.Column(db.String(128), nullable=False)
 
     # Security fields
     failed_login_attempts = db.Column(db.Integer, default=0, nullable=False)

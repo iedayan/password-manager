@@ -1,17 +1,18 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 const Login = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const location = useLocation();
+  const [isLogin, setIsLogin] = useState(location.pathname !== '/signup');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    master_key: ''
+    confirm_password: ''
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showMasterKey, setShowMasterKey] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -196,28 +197,24 @@ const Login = () => {
               </button>
             </div>
 
-            {/* Master Key Field (Sign Up Only) */}
+            {/* Confirm Password Field (Sign Up Only) */}
             {!isLogin && (
-              <div>
-                <div className="relative">
-                  <input
-                    type={showMasterKey ? 'text' : 'password'}
-                    value={formData.master_key}
-                    onChange={(e) => setFormData(prev => ({...prev, master_key: e.target.value}))}
-                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Master Key (optional)"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowMasterKey(!showMasterKey)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showMasterKey ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
-                  </button>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Used to decrypt passwords. Defaults to your password.
-                </p>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={formData.confirm_password}
+                  onChange={(e) => setFormData(prev => ({...prev, confirm_password: e.target.value}))}
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white text-gray-900 placeholder-gray-500"
+                  placeholder="Confirm password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showConfirmPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
+                </button>
               </div>
             )}
 
@@ -250,7 +247,7 @@ const Login = () => {
                 onClick={() => {
                   setIsLogin(!isLogin);
                   setError('');
-                  setFormData({ email: '', password: '', master_key: '' });
+                  setFormData({ email: '', password: '', confirm_password: '' });
                 }}
                 className="ml-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors"
               >
