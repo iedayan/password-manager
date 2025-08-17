@@ -9,11 +9,9 @@ class EncryptionService:
         logger.info("Initializing encryption service")
         self.encryption_key = os.getenv('ENCRYPTION_KEY')
         if not self.encryption_key:
-            if os.getenv('FLASK_ENV') == 'production':
-                raise ValueError("ENCRYPTION_KEY environment variable is required in production")
-            # Development only - generate temporary key
+            # Generate a new key if none provided
             self.encryption_key = Fernet.generate_key()
-            logger.warning("No ENCRYPTION_KEY found. Using temporary key for development only.")
+            logger.warning("No ENCRYPTION_KEY found. Generated new key - set ENCRYPTION_KEY env var for persistence.")
         else:
             self.encryption_key = self.encryption_key.encode()
         
