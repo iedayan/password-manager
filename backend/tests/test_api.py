@@ -10,10 +10,10 @@ BASE_URL = 'http://localhost:5000/api'
 def test_backend():
     print("🧪 Testing Lok Backend MVP...")
     
-    # Test data
+    # Test data - use environment variables in production
     test_user = {
-        'email': 'test@lok.security',
-        'password': 'TestPassword123!'
+        'email': 'test@example.com',
+        'password': 'TestPass123!'
     }
     
     test_password = {
@@ -74,11 +74,14 @@ def test_backend():
         # 5. Test Decrypt Password
         print("\n5️⃣ Testing password decryption...")
         decrypt_data = {'master_key': test_user['password']}
+        # Validate URL to prevent SSRF
+        if not BASE_URL.startswith(('http://localhost', 'http://127.0.0.1')):
+            raise ValueError("Invalid base URL for testing")
         response = requests.post(f'{BASE_URL}/passwords/{password_id}/decrypt', 
                                json=decrypt_data, headers=headers)
         if response.status_code == 200:
             decrypted = response.json()['password']
-            print(f"✅ Password decrypted: {decrypted}")
+            print("✅ Password decrypted successfully")
             if decrypted == test_password['password']:
                 print("✅ Decryption matches original password")
             else:

@@ -3,7 +3,7 @@
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import create_access_token
 from sqlalchemy.exc import IntegrityError
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import ValidationError
 
 from ...models.user import User
@@ -92,7 +92,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password_hash, login_data.password):
             # Reset failed attempts on successful login
             user.reset_failed_login()
-            user.last_login = datetime.utcnow()
+            user.last_login = datetime.now(timezone.utc)
             db.session.commit()
             
             access_token = create_access_token(identity=str(user.id))

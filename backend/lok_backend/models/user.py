@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from ..core.database import db
 import uuid
 
@@ -57,7 +57,7 @@ class User(db.Model):
     def is_locked(self):
         """Check if user account is locked"""
         if self.locked_until:
-            return datetime.utcnow() < self.locked_until
+            return datetime.now(timezone.utc) < self.locked_until
         return False
 
     def lock_account(self, duration_minutes=30):

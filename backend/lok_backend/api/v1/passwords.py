@@ -2,7 +2,7 @@
 
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import ValidationError
 
 from ...models.password import Password
@@ -67,7 +67,7 @@ def add_password():
         db.session.add(password)
         db.session.commit()
         
-        current_app.logger.info(f"Password added for user {user_id}: {password_data.site_name}")
+        current_app.logger.info(f"Password added for user {user_id}: {password_data.site_name.replace('\n', '').replace('\r', '')}")
         
         return jsonify({
             'message': 'Password added successfully',
@@ -114,7 +114,7 @@ def update_password(password_id):
         if update_data.notes is not None:
             password.notes = update_data.notes
         
-        password.updated_at = datetime.utcnow()
+        password.updated_at = datetime.now(timezone.utc)
         db.session.commit()
         
         return jsonify({
@@ -143,7 +143,7 @@ def delete_password(password_id):
         db.session.delete(password)
         db.session.commit()
         
-        current_app.logger.info(f"Password deleted for user {user_id}: {password.site_name}")
+        current_app.logger.info(f"Password deleted for user {user_id}: {password.site_name.replace('\n', '').replace('\r', '')}")
         
         return jsonify({'message': 'Password deleted successfully'}), 200
         
@@ -184,7 +184,7 @@ def decrypt_password(password_id):
         # Decrypt password
         decrypted_password = encryption_service.decrypt(password.encrypted_password)
         
-        current_app.logger.info(f"Password decrypted for user {user_id}: {password.site_name}")
+        current_app.logger.info(f"Password decrypted for user {user_id}: {password.site_name.replace('\n', '').replace('\r', '')}")
         
         return jsonify({
             'password': decrypted_password,
