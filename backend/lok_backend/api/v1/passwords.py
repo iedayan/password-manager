@@ -67,7 +67,8 @@ def add_password():
         db.session.add(password)
         db.session.commit()
         
-        current_app.logger.info(f"Password added for user {user_id}: {password_data.site_name.replace('\n', '').replace('\r', '')}")
+        sanitized_name = password_data.site_name.replace('\n', '').replace('\r', '')
+        current_app.logger.info(f"Password added for user {user_id}: {sanitized_name}")
         
         return jsonify({
             'message': 'Password added successfully',
@@ -143,7 +144,8 @@ def delete_password(password_id):
         db.session.delete(password)
         db.session.commit()
         
-        current_app.logger.info(f"Password deleted for user {user_id}: {password.site_name.replace('\n', '').replace('\r', '')}")
+        sanitized_name = password.site_name.replace('\n', '').replace('\r', '')
+        current_app.logger.info(f"Password deleted for user {user_id}: {sanitized_name}")
         
         return jsonify({'message': 'Password deleted successfully'}), 200
         
@@ -184,7 +186,8 @@ def decrypt_password(password_id):
         # Decrypt password
         decrypted_password = encryption_service.decrypt(password.encrypted_password)
         
-        current_app.logger.info(f"Password decrypted for user {user_id}: {password.site_name.replace('\n', '').replace('\r', '')}")
+        sanitized_name = password.site_name.replace('\n', '').replace('\r', '')
+        current_app.logger.info(f"Password decrypted for user {user_id}: {sanitized_name}")
         
         return jsonify({
             'password': decrypted_password,
