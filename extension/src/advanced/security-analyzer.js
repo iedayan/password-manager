@@ -83,6 +83,15 @@ class SecurityAnalyzer {
     return password.length * Math.log2(charset);
   }
 
+  constantTimeEquals(a, b) {
+    if (a.length !== b.length) return false;
+    let result = 0;
+    for (let i = 0; i < a.length; i++) {
+      result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    }
+    return result === 0;
+  }
+
   hasRepeatingPatterns(password) {
     // Check for repeated characters
     if (/(.)\1{2,}/.test(password)) return true;
@@ -121,7 +130,7 @@ class SecurityAnalyzer {
       const lines = text.split('\n');
       for (const line of lines) {
         const [hash, count] = line.split(':');
-        if (hash === suffix) {
+        if (this.constantTimeEquals(hash, suffix)) {
           return {
             breached: true,
             count: parseInt(count)
@@ -253,8 +262,13 @@ class SecurityAnalyzer {
       password += charset[randomIndex];
     }
 
-    // Shuffle the password
-    return password.split('').sort(() => Math.random() - 0.5).join('');
+    // Shuffle using Fisher-Yates algorithm for better performance
+    const chars = password.split('');
+    for (let i = chars.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [chars[i], chars[j]] = [chars[j], chars[i]];
+    }
+    return chars.join('');
   }
 }
 

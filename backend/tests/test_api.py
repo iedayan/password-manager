@@ -4,16 +4,24 @@ API integration tests for Lok backend
 """
 import requests
 import json
+import os
+import secrets
+import string
 
 BASE_URL = 'http://localhost:5000/api'
+
+def generate_test_password():
+    """Generate a secure random password for testing."""
+    alphabet = string.ascii_letters + string.digits + '!@#$%^&*'
+    return ''.join(secrets.choice(alphabet) for _ in range(12))
 
 def test_backend():
     print("🧪 Testing Lok Backend MVP...")
     
-    # Test data - use environment variables in production
+    # Use environment variables or generate secure test data
     test_user = {
-        'email': 'test@example.com',
-        'password': 'TestPass123!'
+        'email': os.getenv('TEST_EMAIL', f'test_{secrets.token_hex(4)}@example.com'),
+        'password': os.getenv('TEST_PASSWORD', generate_test_password())
     }
     
     test_password = {

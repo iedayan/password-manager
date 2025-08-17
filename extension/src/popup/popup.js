@@ -270,7 +270,7 @@ class LokPopup {
             </svg>
           </div>
           No passwords saved for<br>
-          <strong style="font-weight: 700; margin: 6px 0; display: block; color: #06b6d4;">${this.currentSite}</strong>
+          <strong style="font-weight: 700; margin: 6px 0; display: block; color: #06b6d4;">${this.sanitizeText(this.currentSite)}</strong>
           <small style="opacity: 0.7; margin-top: 6px; display: block; font-size: 11px;">Generate a password or login to save one</small>
         </div>`;
       return;
@@ -299,7 +299,7 @@ class LokPopup {
       const strengthColor = this.getStrengthColor(password.strength_score);
       const strengthWidth = Math.max(password.strength_score, 10);
       const strengthText = this.getStrengthText(password.strength_score);
-      const favicon = password.site_name.charAt(0).toUpperCase();
+      const favicon = this.sanitizeText(password.site_name).charAt(0).toUpperCase();
       
       const item = document.createElement('div');
       item.className = 'password-item';
@@ -308,7 +308,7 @@ class LokPopup {
         <div class="password-item-header">
           <div class="site-name">
             <div class="site-favicon">${favicon}</div>
-            <div class="site-name-text">${password.site_name}</div>
+            <div class="site-name-text">${this.sanitizeText(password.site_name)}</div>
           </div>
           <div class="password-actions">
             <div class="action-btn" title="Copy password" data-action="copy">
@@ -330,7 +330,7 @@ class LokPopup {
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
-          <span style="overflow: hidden; text-overflow: ellipsis;">${password.username}</span>
+          <span style="overflow: hidden; text-overflow: ellipsis;">${this.sanitizeText(password.username)}</span>
         </div>
         <div class="password-item-footer">
           <div class="strength-container">
@@ -373,8 +373,21 @@ class LokPopup {
     return 'Weak';
   }
 
+  sanitizeText(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   async copyPassword(passwordData) {
     const token = await this.getStoredToken();
+    
+    if (!token) {
+      this.showNotification('Please login first', 'error');
+      this.showLogin();
+      return;
+    }
     
     try {
       // Get the actual password from the API
@@ -386,6 +399,10 @@ class LokPopup {
         const data = await response.json();
         await navigator.clipboard.writeText(data.password);
         this.showNotification('Password copied to clipboard', 'success');
+      } else if (response.status === 401) {
+        await chrome.storage.local.clear();
+        this.showLogin();
+        this.showNotification('Session expired. Please login again.', 'error');
       } else {
         this.showNotification('Failed to copy password', 'error');
       }
@@ -397,6 +414,12 @@ class LokPopup {
 
   async fillPassword(passwordData) {
     const token = await this.getStoredToken();
+    
+    if (!token) {
+      this.showNotification('Please login first', 'error');
+      this.showLogin();
+      return;
+    }
     
     // Send message to content script to fill the password
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
