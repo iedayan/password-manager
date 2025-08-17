@@ -9,6 +9,10 @@ import FAQ from './components/FAQ';
 import Footer from './components/Footer';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
+import SecurityPage from './components/SecurityPage';
+import ScrollToTop from './components/ScrollToTop';
 
 const LandingPage = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -63,6 +67,7 @@ const ProtectedRoute = ({ children }) => {
 export default function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
@@ -82,6 +87,9 @@ export default function App() {
             <Dashboard />
           </ProtectedRoute>
         } />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/security" element={<SecurityPage />} />
       </Routes>
     </Router>
   );

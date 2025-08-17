@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   const footerRef = useRef(null);
@@ -80,19 +81,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div className="col-span-1 md:col-span-2 footer-animate opacity-0">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-700 to-indigo-800 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-white relative z-10" fill="none" viewBox="0 0 24 24">
-                  <path d="M12 2l8 3v6c0 5.5-3.5 10.5-8 12-4.5-1.5-8-6.5-8-12V5l8-3z" 
-                        stroke="white" strokeWidth="1.5" fill="none" opacity="0.9"/>
-                  <rect x="10" y="10" width="4" height="3" rx="0.5" fill="white" opacity="0.95"/>
-                  <path d="M10.5 10v-1c0-0.8 0.7-1.5 1.5-1.5s1.5 0.7 1.5 1.5v1" 
-                        stroke="white" strokeWidth="1" fill="none" opacity="0.95"/>
-                  <circle cx="8.5" cy="7" r="0.5" fill="white" opacity="0.7"/>
-                  <circle cx="15.5" cy="7" r="0.5" fill="white" opacity="0.7"/>
-                  <circle cx="7" cy="12" r="0.5" fill="white" opacity="0.7"/>
-                  <circle cx="17" cy="12" r="0.5" fill="white" opacity="0.7"/>
-                  <circle cx="8.5" cy="17" r="0.5" fill="white" opacity="0.7"/>
-                  <circle cx="15.5" cy="17" r="0.5" fill="white" opacity="0.7"/>
+              <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
               <span className="text-xl font-bold">Lok</span>
@@ -118,11 +109,10 @@ export default function Footer() {
           <div className="footer-animate opacity-0">
             <h3 className="font-semibold mb-4 text-white">Product</h3>
             <ul className="space-y-3 text-gray-400">
-              {['Features', 'Pricing', 'Security', 'Downloads'].map((item, index) => (
-                <li key={index}>
-                  <a href="#" className="hover:text-white transition-colors hover:translate-x-1 inline-block duration-300">{item}</a>
-                </li>
-              ))}
+              <li><a href="#features" className="hover:text-white transition-colors hover:translate-x-1 inline-block duration-300">Features</a></li>
+              <li><a href="#pricing" className="hover:text-white transition-colors hover:translate-x-1 inline-block duration-300">Pricing</a></li>
+              <li><Link to="/security" className="hover:text-white transition-colors hover:translate-x-1 inline-block duration-300">Security</Link></li>
+              <li><a href="#" className="hover:text-white transition-colors hover:translate-x-1 inline-block duration-300">Downloads</a></li>
             </ul>
           </div>
 
@@ -143,9 +133,9 @@ export default function Footer() {
             © 2025 Lok Security Inc. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
-            <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</a>
-            <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Security</a>
+            <Link to="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</Link>
+            <Link to="/security" className="text-gray-400 hover:text-white text-sm transition-colors">Security</Link>
           </div>
         </div>
       </div>
