@@ -21,7 +21,6 @@ class Password(db.Model):
     # Indexes for better query performance
     __table_args__ = (
         db.Index('idx_user_site', 'user_id', 'site_name'),
-        db.Index('idx_strength_score', 'strength_score'),
     )
     
     def __repr__(self):
@@ -34,9 +33,9 @@ class Password(db.Model):
             'site_name': self.site_name,
             'site_url': self.site_url,
             'username': self.username,
-            'strength_score': self.strength_score,
+            'strength_score': 0,  # Default value for compatibility
             'created_at': self.created_at.isoformat(),
-            'last_updated': self.last_updated.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
             'last_accessed': self.last_accessed.isoformat() if self.last_accessed else None,
             'auto_update_enabled': self.auto_update_enabled,
             'is_compromised': self.is_compromised
