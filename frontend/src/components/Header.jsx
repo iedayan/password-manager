@@ -190,7 +190,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo Section */}
-          <div className="flex items-center space-x-3">
+          <a href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
             <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group">
               <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" fill="none" viewBox="0 0 32 32">
                 <path d="M16 3l10 4v8c0 7-4 14-10 16-6-2-10-9-10-16V7l10-4z" fill="white" opacity="0.95"/>
@@ -205,7 +205,7 @@ export default function Header() {
               <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
               Secure
             </div>
-          </div>
+          </a>
 
           {/* Navigation */}
           <nav className="hidden lg:flex items-center space-x-1">
