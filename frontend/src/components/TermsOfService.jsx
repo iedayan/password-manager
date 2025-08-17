@@ -14,7 +14,7 @@ export default function TermsOfService() {
       <header className="relative z-20 border-b border-white/10 backdrop-blur-xl">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-3">
+            <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-lg flex items-center justify-center">
                 <Scale className="w-5 h-5 text-white" />
               </div>
