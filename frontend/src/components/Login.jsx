@@ -11,6 +11,7 @@ const Login = () => {
     password: '',
     confirm_password: ''
   });
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -48,8 +49,10 @@ const Login = () => {
         ? await api.auth.login(payload)
         : await api.auth.register(payload);
 
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('user_id', data.user_id);
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem('token', data.access_token);
+      storage.setItem('user_id', data.user_id);
+      storage.setItem('remember_me', rememberMe.toString());
       navigate('/dashboard');
     } catch (error) {
       console.error('Auth error:', error);
@@ -231,6 +234,36 @@ const Login = () => {
               </div>
             )}
 
+            {/* Remember Me (Login Only) */}
+            {isLogin && (
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition-colors"
+                    />
+                    {rememberMe && (
+                      <svg className="absolute inset-0 w-4 h-4 text-blue-600 pointer-events-none" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="text-sm text-gray-600 group-hover:text-gray-800 transition-colors">
+                    Remember me
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
@@ -261,6 +294,7 @@ const Login = () => {
                   setIsLogin(!isLogin);
                   setError('');
                   setFormData({ email: '', password: '', confirm_password: '' });
+                  setRememberMe(false);
                 }}
                 className="ml-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors"
               >
@@ -268,6 +302,18 @@ const Login = () => {
               </button>
             </p>
           </div>
+
+          {/* Remember Me Info */}
+          {isLogin && rememberMe && (
+            <div className="mt-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="text-sm text-green-700 font-medium">Stay signed in on this device</span>
+              </div>
+            </div>
+          )}
 
           {/* Enhanced Security Notice */}
           <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg relative overflow-hidden">

@@ -23,7 +23,7 @@ const Dashboard = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    api.auth.logout();
     window.location.href = '/';
   };
 

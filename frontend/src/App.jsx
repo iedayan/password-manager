@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { auth } from './lib/auth';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
@@ -60,8 +61,7 @@ const LandingPage = () => {
 };
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
-  return token ? children : <Navigate to="/login" />;
+  return auth.isAuthenticated() ? children : <Navigate to="/login" />;
 };
 
 export default function App() {

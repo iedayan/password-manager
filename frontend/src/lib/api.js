@@ -2,7 +2,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://password-manager-p
 
 export const api = {
   async request(endpoint, options = {}) {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -53,6 +53,14 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(userData),
     }),
+    logout: () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user_id');
+      localStorage.removeItem('remember_me');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user_id');
+      sessionStorage.removeItem('remember_me');
+    },
   },
 
   // Password endpoints
