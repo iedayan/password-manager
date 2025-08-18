@@ -81,6 +81,24 @@ export const api = {
     delete: (id) => api.request(`/api/v1/passwords/${id}`, {
       method: 'DELETE',
     }),
+    export: () => api.request('/api/v1/passwords/export'),
+    import: (passwords) => api.request('/api/v1/passwords/import', {
+      method: 'POST',
+      body: JSON.stringify({ passwords }),
+    }),
+  },
+
+  // User endpoints
+  user: {
+    getProfile: () => api.request('/api/v1/user/profile'),
+    updateProfile: (data) => api.request('/api/v1/user/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+    getSessions: () => api.request('/api/v1/user/sessions'),
+    terminateSession: (sessionId) => api.request(`/api/v1/user/sessions/${sessionId}`, {
+      method: 'DELETE',
+    }),
   },
 };
 

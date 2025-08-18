@@ -3,6 +3,7 @@ import { PlusIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon, UserIcon, ShieldChe
 import PasswordVault from './PasswordVault';
 import PasswordGenerator from './PasswordGenerator';
 import AddPasswordModal from './AddPasswordModal';
+import Settings from './Settings';
 import Breadcrumb from './Breadcrumb';
 import { api } from '../lib/api';
 
@@ -30,7 +31,8 @@ const Dashboard = () => {
   const tabs = [
     { id: 'vault', name: 'Vault' },
     { id: 'generator', name: 'Generator' },
-    { id: 'security', name: 'Security' }
+    { id: 'security', name: 'Security' },
+    { id: 'settings', name: 'Settings' }
   ];
 
   return (
@@ -68,9 +70,12 @@ const Dashboard = () => {
                       <UserIcon className="w-5 h-5" />
                       Profile
                     </button>
-                    <button className="w-full px-5 py-3 text-left text-sm text-gray-700 hover:bg-gray-50/80 flex items-center gap-3 transition-colors">
+                    <button 
+                      onClick={() => setActiveTab('settings')}
+                      className="w-full px-5 py-3 text-left text-sm text-gray-700 hover:bg-gray-50/80 flex items-center gap-3 transition-colors"
+                    >
                       <ShieldCheckIcon className="w-5 h-5" />
-                      Security Settings
+                      Settings
                     </button>
                     <hr className="my-2 border-gray-200" />
                     <button 
@@ -120,6 +125,7 @@ const Dashboard = () => {
               <PasswordGenerator />
             </div>
           )}
+          {activeTab === 'settings' && <Settings />}
           {activeTab === 'security' && (
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">

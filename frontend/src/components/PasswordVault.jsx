@@ -3,12 +3,15 @@ import { MagnifyingGlassIcon, EyeIcon, ClipboardIcon, PencilIcon, TrashIcon, Fun
 import QuickActions from './QuickActions';
 import EditPasswordModal from './EditPasswordModal';
 import DeleteConfirmModal from './DeleteConfirmModal';
+import LoadingSpinner from './LoadingSpinner';
+import ErrorMessage from './ErrorMessage';
 import { api } from '../lib/api';
 
 const PasswordVault = ({ showAddForm, setShowAddForm }) => {
   const [passwords, setPasswords] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [showMasterKeyModal, setShowMasterKeyModal] = useState(null);
   const [editingPassword, setEditingPassword] = useState(null);
   const [deletingPassword, setDeletingPassword] = useState(null);
@@ -48,10 +51,12 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
 
   const fetchPasswords = async () => {
     try {
+      setError('');
       const data = await api.passwords.getAll();
       setPasswords(data.passwords || data);
     } catch (error) {
       console.error('Failed to fetch passwords:', error);
+      setError('Failed to load passwords. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -90,12 +95,7 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
     setTimeout(() => navigator.clipboard.writeText(''), 30000);
   };
 
-  if (loading) return (
-    <div className="flex justify-center items-center p-12">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      <span className="ml-3 text-gray-600">Loading vault...</span>
-    </div>
-  );
+  if (loading) return <LoadingSpinner size="lg" text="Loading vault..." />;
 
   if (passwords.length === 0) {
     return (
@@ -121,6 +121,8 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
+      {error && <ErrorMessage message={error} onClose={() => setError('')} />}
+      
       {/* Header with Stats */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">

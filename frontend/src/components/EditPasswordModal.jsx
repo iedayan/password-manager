@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { EyeIcon, EyeSlashIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import LoadingSpinner from './LoadingSpinner';
 import { api } from '../lib/api';
 
 const EditPasswordModal = ({ password, onClose, onUpdate }) => {
@@ -59,6 +60,8 @@ const EditPasswordModal = ({ password, onClose, onUpdate }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {loading && <LoadingSpinner text="Updating password..." />}
+          
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-red-700 text-sm">{error}</p>

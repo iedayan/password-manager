@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { auth } from './lib/auth';
+import { ToastProvider } from './contexts/ToastContext';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
@@ -66,9 +67,10 @@ const ProtectedRoute = ({ children }) => {
 
 export default function App() {
   return (
-    <Router>
-      <ScrollToTop />
-      <Routes>
+    <ToastProvider>
+      <Router>
+        <ScrollToTop />
+        <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Login />} />
@@ -90,7 +92,8 @@ export default function App() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/security" element={<SecurityPage />} />
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </ToastProvider>
   );
 }
