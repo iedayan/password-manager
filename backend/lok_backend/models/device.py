@@ -24,8 +24,8 @@ class Device(db.Model):
     is_active = db.Column(db.Boolean, default=True)
 
     # Timestamps
-    created_at = db.Column(db.DateTime, default=datetime.now(datetime.utc))
-    last_seen = db.Column(db.DateTime, default=datetime.now(datetime.utc))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         safe_name = ''.join(
