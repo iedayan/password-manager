@@ -3,6 +3,7 @@ import { PlusIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import PasswordVault from './PasswordVault';
 import PasswordGenerator from './PasswordGenerator';
 import Breadcrumb from './Breadcrumb';
+import { api } from '../lib/api';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('vault');
@@ -90,20 +91,9 @@ const AddPasswordForm = ({ onClose, onAdd }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/passwords', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        onAdd(data);
-      }
+      const data = await api.passwords.create(formData);
+      onAdd?.(data.password);
+      onClose();
     } catch (error) {
       console.error('Failed to add password:', error);
     }

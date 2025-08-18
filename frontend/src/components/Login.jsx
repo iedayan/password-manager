@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { api } from '../lib/api';
 
 const Login = () => {
   const location = useLocation();
@@ -36,29 +37,20 @@ const Login = () => {
     }
 
     try {
-      const endpoint = isLogin ? '/api/v1/auth/login' : '/api/v1/auth/register';
       const payload = isLogin 
         ? { email: formData.email, password: formData.password }
         : { email: formData.email, password: formData.password, confirm_password: formData.confirm_password };
       
-      const response = await fetch(`http://localhost:5000${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+      const data = isLogin 
+        ? await api.auth.login(payload)
+        : await api.auth.register(payload);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.access_token);
-        localStorage.setItem('user_id', data.user_id);
-        navigate('/dashboard');
-      } else {
-        setError(data.error || 'Authentication failed');
-      }
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('user_id', data.user_id);
+      navigate('/dashboard');
     } catch (error) {
       console.error('Auth error:', error);
-      setError('Network error. Please try again.');
+      setError(error.message || 'Authentication failed');
     } finally {
       setLoading(false);
     }

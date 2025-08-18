@@ -34,11 +34,11 @@ export const api = {
 
   // Auth endpoints
   auth: {
-    login: (credentials) => api.request('/api/auth/login', {
+    login: (credentials) => api.request('/api/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     }),
-    register: (userData) => api.request('/api/auth/register', {
+    register: (userData) => api.request('/api/v1/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     }),
@@ -46,16 +46,16 @@ export const api = {
 
   // Password endpoints
   passwords: {
-    getAll: () => api.request('/api/passwords'),
-    create: (password) => api.request('/api/passwords', {
+    getAll: () => api.request('/api/v1/passwords'),
+    create: (password) => api.request('/api/v1/passwords', {
       method: 'POST',
       body: JSON.stringify(password),
     }),
-    decrypt: (id, masterKey) => api.request(`/api/passwords/${id}/decrypt`, {
+    decrypt: (id, masterKey) => api.request(`/api/v1/passwords/${id}/decrypt`, {
       method: 'POST',
-      body: JSON.stringify({ master_key: masterKey }),
+      body: JSON.stringify({ master_password: masterKey }),
     }),
-    delete: (id) => api.request(`/api/passwords/${id}`, {
+    delete: (id) => api.request(`/api/v1/passwords/${id}`, {
       method: 'DELETE',
     }),
   },

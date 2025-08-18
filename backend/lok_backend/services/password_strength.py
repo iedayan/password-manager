@@ -1,9 +1,15 @@
 import re
 import math
 from typing import Dict, List
-from requests import get
 from hashlib import sha1
 import logging
+
+try:
+    from requests import get
+    REQUESTS_AVAILABLE = True
+except ImportError:
+    REQUESTS_AVAILABLE = False
+    get = None
 
 logger = logging.getLogger(__name__)
 
@@ -241,6 +247,10 @@ class PasswordStrengthAnalyzer:
 
     async def check_breach_status(self, password: str) -> bool:
         """Check if password has been breached using HaveIBeenPwned API"""
+        if not REQUESTS_AVAILABLE:
+            logger.warning("Requests library not available, skipping breach check")
+            return False
+            
         try:
             # Hash password with SHA-1 (required by HaveIBeenPwned API)
             sha1_hash = sha1(password.encode()).hexdigest().upper()

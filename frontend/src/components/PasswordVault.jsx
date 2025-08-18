@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MagnifyingGlassIcon, PlusIcon, EyeIcon, EyeSlashIcon, ClipboardIcon } from '@heroicons/react/24/outline';
 import QuickActions from './QuickActions';
+import { api } from '../lib/api';
 
 const PasswordVault = () => {
   const [passwords, setPasswords] = useState([]);
@@ -33,12 +34,8 @@ const PasswordVault = () => {
 
   const fetchPasswords = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/passwords', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await response.json();
-      setPasswords(data);
+      const data = await api.passwords.getAll();
+      setPasswords(data.passwords || data);
     } catch (error) {
       console.error('Failed to fetch passwords:', error);
     } finally {
@@ -168,24 +165,11 @@ const MasterKeyModal = ({ passwordId, onClose, onSuccess }) => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/passwords/${passwordId}/decrypt`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ master_key: masterKey })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        onSuccess(data.password);
-      } else {
-        alert('Invalid master key');
-      }
+      const data = await api.passwords.decrypt(passwordId, masterKey);
+      onSuccess(data.password);
     } catch (error) {
       console.error('Failed to decrypt:', error);
+      alert(error.message || 'Invalid master key');
     } finally {
       setLoading(false);
     }

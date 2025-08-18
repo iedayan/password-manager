@@ -8,5 +8,6 @@ SQLAlchemy>=2.0.25
 pydantic[email]>=2.6.0
 cryptography>=42.0.2
 python-dotenv>=1.0.0
+requests>=2.31.0
 gunicorn>=22.0.0
 psycopg2-binary>=2.9.9
