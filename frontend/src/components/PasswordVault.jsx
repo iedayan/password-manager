@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { MagnifyingGlassIcon, PlusIcon, EyeIcon, EyeSlashIcon, ClipboardIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, PlusIcon, EyeIcon, EyeSlashIcon, ClipboardIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import QuickActions from './QuickActions';
+import EditPasswordModal from './EditPasswordModal';
 import { api } from '../lib/api';
 
 const PasswordVault = () => {
@@ -8,6 +9,8 @@ const PasswordVault = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [showMasterKeyModal, setShowMasterKeyModal] = useState(null);
+  const [editingPassword, setEditingPassword] = useState(null);
+  const [deletingPassword, setDeletingPassword] = useState(null);
 
   useEffect(() => {
     fetchPasswords();
@@ -89,9 +92,41 @@ const PasswordVault = () => {
             password={password}
             onCopy={copyToClipboard}
             onReveal={setShowMasterKeyModal}
+            onEdit={setEditingPassword}
+            onDelete={setDeletingPassword}
           />
         ))}
       </div>
+
+      {/* Edit Password Modal */}
+      {editingPassword && (
+        <EditPasswordModal
+          password={editingPassword}
+          onClose={() => setEditingPassword(null)}
+          onUpdate={(updatedPassword) => {
+            setPasswords(prev => prev.map(p => 
+              p.id === updatedPassword.id ? updatedPassword : p
+            ));
+          }}
+        />
+      )}
+
+      {/* Delete Confirmation */}
+      {deletingPassword && (
+        <DeleteConfirmModal
+          passwordId={deletingPassword}
+          onClose={() => setDeletingPassword(null)}
+          onConfirm={async () => {
+            try {
+              await api.passwords.delete(deletingPassword);
+              setPasswords(prev => prev.filter(p => p.id !== deletingPassword));
+              setDeletingPassword(null);
+            } catch (error) {
+              console.error('Failed to delete password:', error);
+            }
+          }}
+        />
+      )}
 
       {/* Master Key Modal */}
       {showMasterKeyModal && (
@@ -108,7 +143,7 @@ const PasswordVault = () => {
   );
 };
 
-const PasswordCard = ({ password, onCopy, onReveal }) => {
+const PasswordCard = ({ password, onCopy, onReveal, onEdit, onDelete }) => {
   const getStrengthColor = (score) => {
     if (score >= 80) return 'bg-green-100 text-green-800';
     if (score >= 60) return 'bg-yellow-100 text-yellow-800';
@@ -144,11 +179,25 @@ const PasswordCard = ({ password, onCopy, onReveal }) => {
             <ClipboardIcon className="w-4 h-4" />
           </button>
           <button
+            onClick={() => onEdit(password)}
+            className="p-2 text-gray-400 hover:text-blue-600"
+            title="Edit password"
+          >
+            <PencilIcon className="w-4 h-4" />
+          </button>
+          <button
             onClick={() => onReveal(password.id)}
             className="p-2 text-gray-400 hover:text-blue-600"
             title="Reveal password"
           >
             <EyeIcon className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => onDelete(password.id)}
+            className="p-2 text-gray-400 hover:text-red-600"
+            title="Delete password"
+          >
+            <TrashIcon className="w-4 h-4" />
           </button>
         </div>
       </div>

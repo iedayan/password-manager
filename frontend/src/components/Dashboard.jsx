@@ -74,7 +74,13 @@ const Dashboard = () => {
       </div>
 
       {showAddForm && (
-        <AddPasswordForm onClose={() => setShowAddForm(false)} />
+        <AddPasswordForm 
+          onClose={() => setShowAddForm(false)} 
+          onAdd={(newPassword) => {
+            // Refresh passwords or add to state
+            window.location.reload(); // Simple refresh for now
+          }}
+        />
       )}
     </div>
   );
