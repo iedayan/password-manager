@@ -752,11 +752,20 @@ def get_onboarding_progress():
         
         progress = onboarding_service.get_onboarding_progress(user_id)
         
-        return jsonify(progress), 200
+        current_app.logger.info(f"Onboarding progress retrieved for user {user_id}")
+        
+        return jsonify({
+            'success': True,
+            'data': progress
+        }), 200
         
     except Exception as e:
         current_app.logger.error(f"Onboarding progress failed: {str(e)}")
-        return jsonify({"error": "Failed to get onboarding progress"}), 500
+        return jsonify({
+            'success': False,
+            'error': 'Failed to get onboarding progress',
+            'message': str(e)
+        }), 500
 
 
 @passwords_bp.route("/onboarding/complete-step", methods=["POST"])
@@ -768,17 +777,29 @@ def complete_onboarding_step():
         data = request.get_json(force=True)
         
         if not data or "step_id" not in data:
-            return jsonify({"error": "Step ID required"}), 400
+            return jsonify({
+                'success': False,
+                'error': 'Step ID required'
+            }), 400
         
         from ...services.onboarding_service import onboarding_service
         
         result = onboarding_service.complete_step(user_id, data["step_id"])
         
-        return jsonify(result), 200
+        current_app.logger.info(f"Step {data['step_id']} completed for user {user_id}")
+        
+        return jsonify({
+            'success': True,
+            'data': result
+        }), 200
         
     except Exception as e:
         current_app.logger.error(f"Complete onboarding step failed: {str(e)}")
-        return jsonify({"error": "Failed to complete step"}), 500
+        return jsonify({
+            'success': False,
+            'error': 'Failed to complete step',
+            'message': str(e)
+        }), 500
 
 
 @passwords_bp.route("/security-assessment", methods=["GET"])

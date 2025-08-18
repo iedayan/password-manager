@@ -79,40 +79,102 @@ class OnboardingService:
         ]
     
     def get_onboarding_progress(self, user_id: int) -> Dict:
-        """Get user's onboarding progress."""
-        # In production, this would fetch from database
-        # For now, return default progress
+        """Get user's onboarding progress from database."""
+        from ..models.onboarding import OnboardingProgress
+        import json
+        
+        # Get or create onboarding progress
+        progress_record = OnboardingProgress.query.filter_by(user_id=user_id).first()
+        
+        if not progress_record:
+            # Create new onboarding progress
+            from ..core.database import db
+            progress_record = OnboardingProgress(
+                user_id=user_id,
+                completed_steps='[]',
+                current_step='welcome'
+            )
+            db.session.add(progress_record)
+            db.session.commit()
+        
+        # Parse completed steps
+        try:
+            completed_step_ids = json.loads(progress_record.completed_steps or '[]')
+        except:
+            completed_step_ids = []
+        
+        # Update step completion status
+        for step in self.onboarding_steps:
+            step.completed = step.id in completed_step_ids
         
         total_steps = len(self.onboarding_steps)
-        completed_steps = 0  # Would be fetched from user preferences
+        completed_steps = len(completed_step_ids)
         
         return {
-            'steps': [step.__dict__ for step in self.onboarding_steps],
+            'steps': [{
+                'id': step.id,
+                'title': step.title,
+                'description': step.description,
+                'completed': step.completed,
+                'required': step.required,
+                'estimated_time': step.estimated_time
+            } for step in self.onboarding_steps],
             'progress': {
                 'completed_steps': completed_steps,
                 'total_steps': total_steps,
-                'percentage': (completed_steps / total_steps) * 100,
+                'percentage': (completed_steps / total_steps) * 100 if total_steps > 0 else 0,
                 'estimated_time_remaining': sum(
                     step.estimated_time for step in self.onboarding_steps 
                     if not step.completed
                 )
             },
-            'current_step': self._get_current_step(),
-            'is_complete': completed_steps == total_steps
+            'current_step': progress_record.current_step or self._get_current_step(completed_step_ids),
+            'is_complete': progress_record.is_complete
         }
     
     def complete_step(self, user_id: int, step_id: str) -> Dict:
-        """Mark an onboarding step as completed."""
-        # In production, update user preferences in database
+        """Mark an onboarding step as completed in database."""
+        from ..models.onboarding import OnboardingProgress
+        from ..core.database import db
+        import json
         
         step = next((s for s in self.onboarding_steps if s.id == step_id), None)
         if not step:
             raise ValueError(f"Invalid step ID: {step_id}")
         
-        step.completed = True
+        # Get or create progress record
+        progress_record = OnboardingProgress.query.filter_by(user_id=user_id).first()
+        if not progress_record:
+            progress_record = OnboardingProgress(
+                user_id=user_id,
+                completed_steps='[]',
+                current_step='welcome'
+            )
+            db.session.add(progress_record)
+        
+        # Update completed steps
+        try:
+            completed_steps = json.loads(progress_record.completed_steps or '[]')
+        except:
+            completed_steps = []
+        
+        if step_id not in completed_steps:
+            completed_steps.append(step_id)
+            progress_record.completed_steps = json.dumps(completed_steps)
+        
+        # Update current step
+        progress_record.current_step = self._get_current_step(completed_steps)
+        
+        # Check if onboarding is complete
+        required_steps = [s.id for s in self.onboarding_steps if s.required]
+        progress_record.is_complete = all(step_id in completed_steps for step_id in required_steps)
+        
+        progress_record.updated_at = datetime.now(timezone.utc)
+        db.session.commit()
         
         return {
             'step_completed': step_id,
+            'message': f'Step "{step.title}" completed successfully',
             'progress': self.get_onboarding_progress(user_id)
         }
     
@@ -214,10 +276,13 @@ class OnboardingService:
             'support_resources': self._get_support_resources()
         }
     
-    def _get_current_step(self) -> Optional[str]:
+    def _get_current_step(self, completed_steps: List[str] = None) -> Optional[str]:
         """Get the current onboarding step."""
+        if completed_steps is None:
+            completed_steps = []
+            
         for step in self.onboarding_steps:
-            if not step.completed:
+            if step.id not in completed_steps:
                 return step.id
         return None
     
