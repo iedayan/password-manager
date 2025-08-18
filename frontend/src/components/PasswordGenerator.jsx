@@ -25,12 +25,13 @@ const PasswordGenerator = ({ onGenerate }) => {
     { name: 'Amazon', url: 'amazon.com' },
   ];
 
-  const generatePassword = (customOptions = options) => {
+  const generatePassword = (customOptions) => {
+    const opts = customOptions || options;
     let charset = '';
-    if (customOptions.lowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
-    if (customOptions.uppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    if (customOptions.numbers) charset += '0123456789';
-    if (customOptions.symbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+    if (opts.lowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+    if (opts.uppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if (opts.numbers) charset += '0123456789';
+    if (opts.symbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
 
     if (!charset) {
       // Fallback to lowercase if no options selected
@@ -38,7 +39,7 @@ const PasswordGenerator = ({ onGenerate }) => {
     }
 
     let password = '';
-    for (let i = 0; i < customOptions.length; i++) {
+    for (let i = 0; i < opts.length; i++) {
       password += charset.charAt(Math.floor(Math.random() * charset.length));
     }
     
