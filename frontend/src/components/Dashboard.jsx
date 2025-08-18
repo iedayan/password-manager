@@ -115,7 +115,7 @@ const Dashboard = () => {
         <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8">
           {activeTab === 'vault' && <PasswordVault />}
           {activeTab === 'generator' && (
-            <div className="max-w-lg mx-auto">
+            <div className="max-w-2xl mx-auto">
               <PasswordGenerator />
             </div>
           )}
