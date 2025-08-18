@@ -62,6 +62,10 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(password),
     }),
+    update: (id, password) => api.request(`/api/v1/passwords/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(password),
+    }),
     decrypt: (id, masterKey) => api.request(`/api/v1/passwords/${id}/decrypt`, {
       method: 'POST',
       body: JSON.stringify({ master_password: masterKey }),

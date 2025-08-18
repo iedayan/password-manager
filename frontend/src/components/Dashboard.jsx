@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { PlusIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon, UserIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import PasswordVault from './PasswordVault';
 import PasswordGenerator from './PasswordGenerator';
+import AddPasswordModal from './AddPasswordModal';
 import Breadcrumb from './Breadcrumb';
 import { api } from '../lib/api';
 
@@ -113,7 +114,7 @@ const Dashboard = () => {
           <Breadcrumb />
         </div>
         <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8">
-          {activeTab === 'vault' && <PasswordVault />}
+          {activeTab === 'vault' && <PasswordVault showAddForm={showAddForm} setShowAddForm={setShowAddForm} />}
           {activeTab === 'generator' && (
             <div className="max-w-2xl mx-auto">
               <PasswordGenerator />
@@ -181,92 +182,11 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {showAddForm && (
-        <AddPasswordForm 
-          onClose={() => setShowAddForm(false)} 
-          onAdd={(newPassword) => {
-            // Refresh passwords or add to state
-            window.location.reload(); // Simple refresh for now
-          }}
-        />
-      )}
-    </div>
-  );
-};
-
-const AddPasswordForm = ({ onClose, onAdd }) => {
-  const [formData, setFormData] = useState({
-    site_name: '',
-    site_url: '',
-    username: '',
-    password: ''
-  });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const data = await api.passwords.create(formData);
-      onAdd?.(data.password);
-      onClose();
-    } catch (error) {
-      console.error('Failed to add password:', error);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 p-8 w-full max-w-lg">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Add New Password</h2>
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <input
-            type="text"
-            placeholder="Site Name"
-            value={formData.site_name}
-            onChange={(e) => setFormData(prev => ({...prev, site_name: e.target.value}))}
-            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/80"
-            required
-          />
-          <input
-            type="url"
-            placeholder="Site URL"
-            value={formData.site_url}
-            onChange={(e) => setFormData(prev => ({...prev, site_url: e.target.value}))}
-            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/80"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Username"
-            value={formData.username}
-            onChange={(e) => setFormData(prev => ({...prev, username: e.target.value}))}
-            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/80"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={(e) => setFormData(prev => ({...prev, password: e.target.value}))}
-            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/80"
-            required
-          />
-          <div className="flex gap-3 pt-2">
-            <button
-              type="submit"
-              className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-lg"
-            >
-              Add Password
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-300 transition-all duration-200 font-medium"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
+      <AddPasswordModal 
+        isOpen={showAddForm}
+        onClose={() => setShowAddForm(false)}
+        onAdd={() => setShowAddForm(false)}
+      />
     </div>
   );
 };

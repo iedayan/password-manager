@@ -5,7 +5,7 @@ import EditPasswordModal from './EditPasswordModal';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import { api } from '../lib/api';
 
-const PasswordVault = () => {
+const PasswordVault = ({ showAddForm, setShowAddForm }) => {
   const [passwords, setPasswords] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
@@ -29,7 +29,7 @@ const PasswordVault = () => {
             break;
           case 'n':
             e.preventDefault();
-            console.log('Add new password');
+            setShowAddForm?.(true);
             break;
         }
       }
@@ -37,7 +37,14 @@ const PasswordVault = () => {
     
     document.addEventListener('keydown', handleKeyPress);
     return () => document.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  }, [setShowAddForm]);
+
+  // Refresh passwords when add form closes
+  useEffect(() => {
+    if (!showAddForm) {
+      fetchPasswords();
+    }
+  }, [showAddForm]);
 
   const fetchPasswords = async () => {
     try {
@@ -101,7 +108,10 @@ const PasswordVault = () => {
           <p className="text-gray-600 mb-8 max-w-md mx-auto">
             Start securing your digital life by adding your first password. All passwords are encrypted with military-grade security.
           </p>
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={() => setShowAddForm?.(true)}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
             Add Your First Password
           </button>
         </div>
@@ -160,7 +170,7 @@ const PasswordVault = () => {
       </div>
 
       {/* Quick Actions */}
-      <QuickActions onAddPassword={() => console.log('Add password')} />
+      <QuickActions onAddPassword={() => setShowAddForm?.(true)} />
 
       {/* Search and Filters */}
       <div className="mb-6 space-y-4">
