@@ -99,18 +99,18 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
 
   if (passwords.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="text-center py-12">
-          <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <ShieldExclamationIcon className="w-12 h-12 text-blue-600" />
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center py-16">
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <ShieldExclamationIcon className="w-10 h-10 text-blue-600" />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Your vault is empty</h2>
-          <p className="text-gray-600 mb-8 max-w-md mx-auto">
-            Start securing your digital life by adding your first password. All passwords are encrypted with military-grade security.
+          <h2 className="text-2xl font-semibold text-gray-900 mb-3">Your vault is empty</h2>
+          <p className="text-gray-600 mb-8 max-w-lg mx-auto text-sm leading-relaxed">
+            Start securing your digital life by adding your first password. All passwords are encrypted with military-grade security and stored safely.
           </p>
           <button 
             onClick={() => setShowAddForm?.(true)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-medium"
           >
             Add Your First Password
           </button>
@@ -120,95 +120,111 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto">
       {error && <ErrorMessage message={error} onClose={() => setError('')} />}
       
       {/* Header with Stats */}
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Password Vault</h1>
-          <span className="text-sm text-gray-500">{stats.total} passwords</span>
+        <div className="flex justify-between items-center mb-5">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Password Vault</h1>
+            <p className="text-gray-500 text-sm mt-1">Secure storage for all your passwords</p>
+          </div>
+          <div className="text-right">
+            <span className="text-2xl font-bold text-blue-600">{stats.total}</span>
+            <p className="text-xs text-gray-500">Total passwords</p>
+          </div>
         </div>
         
         {/* Password Health Stats */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-white border rounded-lg p-4">
+        <div className="grid grid-cols-4 gap-3 mb-6">
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/60 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Total</p>
+                <p className="text-xl font-bold text-gray-900">{stats.total}</p>
               </div>
-              <ShieldExclamationIcon className="w-8 h-8 text-gray-400" />
+              <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center">
+                <ShieldExclamationIcon className="w-5 h-5 text-gray-500" />
+              </div>
             </div>
           </div>
-          <div className="bg-white border rounded-lg p-4">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-100 border border-green-200/60 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-green-600">Strong</p>
-                <p className="text-2xl font-bold text-green-600">{stats.strong}</p>
+                <p className="text-xs font-medium text-green-700 uppercase tracking-wide">Strong</p>
+                <p className="text-xl font-bold text-green-700">{stats.strong}</p>
               </div>
-              <CheckCircleIcon className="w-8 h-8 text-green-400" />
+              <div className="w-8 h-8 bg-green-200 rounded-lg flex items-center justify-center">
+                <CheckCircleIcon className="w-5 h-5 text-green-600" />
+              </div>
             </div>
           </div>
-          <div className="bg-white border rounded-lg p-4">
+          <div className="bg-gradient-to-br from-yellow-50 to-amber-100 border border-yellow-200/60 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-yellow-600">Medium</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.medium}</p>
+                <p className="text-xs font-medium text-yellow-700 uppercase tracking-wide">Medium</p>
+                <p className="text-xl font-bold text-yellow-700">{stats.medium}</p>
               </div>
-              <ExclamationTriangleIcon className="w-8 h-8 text-yellow-400" />
+              <div className="w-8 h-8 bg-yellow-200 rounded-lg flex items-center justify-center">
+                <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" />
+              </div>
             </div>
           </div>
-          <div className="bg-white border rounded-lg p-4">
+          <div className="bg-gradient-to-br from-red-50 to-rose-100 border border-red-200/60 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-red-600">Weak</p>
-                <p className="text-2xl font-bold text-red-600">{stats.weak}</p>
+                <p className="text-xs font-medium text-red-700 uppercase tracking-wide">Weak</p>
+                <p className="text-xl font-bold text-red-700">{stats.weak}</p>
               </div>
-              <ExclamationTriangleIcon className="w-8 h-8 text-red-400" />
+              <div className="w-8 h-8 bg-red-200 rounded-lg flex items-center justify-center">
+                <ExclamationTriangleIcon className="w-5 h-5 text-red-600" />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <QuickActions onAddPassword={() => setShowAddForm?.(true)} />
+      {passwords.length > 0 && <QuickActions onAddPassword={() => setShowAddForm?.(true)} />}
 
       {/* Search and Filters */}
-      <div className="mb-6 space-y-4">
-        <div className="flex gap-4">
+      <div className="mb-6 space-y-3">
+        <div className="flex gap-3">
           <div className="relative flex-1">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search passwords... (Ctrl+K)"
+              placeholder="Search passwords... (⌘K)"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-20 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 backdrop-blur-sm"
+              className="w-full pl-12 pr-16 py-3 border border-gray-200/60 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-sm transition-all"
             />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 bg-gray-100/80 px-2 py-1 rounded-md">
               ⌘K
             </div>
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 flex items-center gap-2"
+            className={`px-4 py-3 border border-gray-200/60 rounded-xl hover:bg-gray-50/80 flex items-center gap-2 text-sm transition-all ${
+              showFilters ? 'bg-blue-50 border-blue-200 text-blue-700' : 'text-gray-600'
+            }`}
           >
-            <FunnelIcon className="w-5 h-5" />
+            <FunnelIcon className="w-4 h-4" />
             Filters
             <ChevronDownIcon className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
           </button>
         </div>
         
         {showFilters && (
-          <div className="bg-white border rounded-xl p-4">
+          <div className="bg-white/90 backdrop-blur-sm border border-gray-200/60 rounded-xl p-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Sort by</label>
+                <label className="block text-xs font-medium text-gray-700 mb-2 uppercase tracking-wide">Sort by</label>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2.5 border border-gray-200/60 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-white/80"
                 >
                   <option value="name">Name (A-Z)</option>
                   <option value="strength">Password Strength</option>
@@ -216,11 +232,11 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Filter by strength</label>
+                <label className="block text-xs font-medium text-gray-700 mb-2 uppercase tracking-wide">Filter by strength</label>
                 <select
                   value={filterBy}
                   onChange={(e) => setFilterBy(e.target.value)}
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2.5 border border-gray-200/60 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-white/80"
                 >
                   <option value="all">All passwords</option>
                   <option value="strong">Strong (80%+)</option>
@@ -234,7 +250,7 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
       </div>
 
       {/* Password List */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         {filteredPasswords.map((password) => (
           <PasswordCard 
             key={password.id} 
@@ -294,9 +310,15 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
 
 const PasswordCard = ({ password, onCopy, onReveal, onEdit, onDelete }) => {
   const getStrengthColor = (score) => {
-    if (score >= 80) return 'bg-green-100 text-green-800 border-green-200';
-    if (score >= 60) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    return 'bg-red-100 text-red-800 border-red-200';
+    if (score >= 80) return 'bg-green-100 text-green-700 border-green-200';
+    if (score >= 60) return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+    return 'bg-red-100 text-red-700 border-red-200';
+  };
+
+  const getStrengthLabel = (score) => {
+    if (score >= 80) return 'Strong';
+    if (score >= 60) return 'Medium';
+    return 'Weak';
   };
 
   const getFaviconUrl = (siteUrl) => {
@@ -311,66 +333,66 @@ const PasswordCard = ({ password, onCopy, onReveal, onEdit, onDelete }) => {
   const faviconUrl = getFaviconUrl(password.site_url);
 
   return (
-    <div className="bg-white border rounded-xl p-5 hover:shadow-lg transition-all duration-200 hover:border-blue-200">
+    <div className="bg-white/90 backdrop-blur-sm border border-gray-200/60 rounded-xl p-4 hover:shadow-lg hover:bg-white transition-all duration-200 hover:border-blue-200/80 group">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center overflow-hidden">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
               {faviconUrl ? (
                 <img 
                   src={faviconUrl} 
                   alt={`${password.site_name} favicon`}
-                  className="w-8 h-8"
+                  className="w-6 h-6"
                   onError={(e) => {
                     e.target.style.display = 'none';
                     e.target.nextSibling.style.display = 'block';
                   }}
                 />
               ) : null}
-              <span className={`text-blue-600 font-bold text-lg ${faviconUrl ? 'hidden' : 'block'}`}>
+              <span className={`text-blue-600 font-semibold text-sm ${faviconUrl ? 'hidden' : 'block'}`}>
                 {password.site_name.charAt(0).toUpperCase()}
               </span>
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-gray-900 truncate">{password.site_name}</h3>
-                <span className={`text-xs px-2 py-1 rounded-full border ${getStrengthColor(password.strength_score || 0)}`}>
-                  {password.strength_score || 0}%
+                <h3 className="font-semibold text-gray-900 truncate text-sm">{password.site_name}</h3>
+                <span className={`text-xs px-2 py-0.5 rounded-md border font-medium ${getStrengthColor(password.strength_score || 0)}`}>
+                  {getStrengthLabel(password.strength_score || 0)}
                 </span>
               </div>
-              <p className="text-sm text-gray-500 truncate">{password.username}</p>
+              <p className="text-xs text-gray-500 truncate">{password.username}</p>
               {password.site_url && (
-                <p className="text-xs text-gray-400 truncate">{password.site_url}</p>
+                <p className="text-xs text-gray-400 truncate mt-0.5">{password.site_url}</p>
               )}
             </div>
           </div>
         </div>
         
-        <div className="flex items-center gap-1 ml-4">
+        <div className="flex items-center gap-0.5 ml-3 opacity-60 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onCopy(password.username)}
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50/80 rounded-lg transition-colors"
             title="Copy username"
           >
             <ClipboardIcon className="w-4 h-4" />
           </button>
           <button
             onClick={() => onReveal(password.id)}
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50/80 rounded-lg transition-colors"
             title="Copy password"
           >
             <EyeIcon className="w-4 h-4" />
           </button>
           <button
             onClick={() => onEdit(password)}
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50/80 rounded-lg transition-colors"
             title="Edit password"
           >
             <PencilIcon className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(password.id)}
-            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50/80 rounded-lg transition-colors"
             title="Delete password"
           >
             <TrashIcon className="w-4 h-4" />
@@ -401,16 +423,16 @@ const MasterKeyModal = ({ passwordId, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-sm">
-        <h3 className="text-lg font-semibold mb-4">Enter Master Key</h3>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white/95 backdrop-blur-md rounded-2xl p-6 w-full max-w-sm border border-gray-200/60 shadow-2xl">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">Enter Master Key</h3>
         <form onSubmit={handleSubmit}>
           <input
             type="password"
             placeholder="Master key"
             value={masterKey}
             onChange={(e) => setMasterKey(e.target.value)}
-            className="w-full p-3 border rounded-lg mb-4 focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-200/60 rounded-xl mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 text-sm"
             autoFocus
             required
           />
@@ -418,14 +440,14 @@ const MasterKeyModal = ({ passwordId, onClose, onSuccess }) => {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2.5 rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 transition-all text-sm font-medium"
             >
               {loading ? 'Decrypting...' : 'Reveal'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
+              className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-xl hover:bg-gray-200 transition-colors text-sm font-medium"
             >
               Cancel
             </button>
