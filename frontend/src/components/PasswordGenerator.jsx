@@ -232,7 +232,7 @@ const PasswordGenerator = ({ onGenerate }) => {
                 <div className="text-xs text-gray-500 font-mono mt-1 bg-gray-100 px-2 py-1 rounded inline-block">{option.example}</div>
               </div>
             </label>
-          ))
+          ))}
         </div>
       </div>
 
@@ -391,26 +391,3 @@ const SavePasswordModal = ({ website, password, onClose, onSave }) => {
 };
 
 export default PasswordGenerator;
-
-/* Custom slider styles */
-<style jsx>{`
-  .slider::-webkit-slider-thumb {
-    appearance: none;
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6, #06b6d4);
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  }
-  
-  .slider::-moz-range-thumb {
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6, #06b6d4);
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  }
-`}</style>
