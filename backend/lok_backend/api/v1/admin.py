@@ -21,9 +21,13 @@ def setup_database():
         # Create all tables
         db.create_all()
         
-        # Verify tables exist
+        # Verify tables exist (works for both SQLite and PostgreSQL)
         with db.engine.connect() as conn:
-            result = conn.execute(text("SELECT tablename FROM pg_tables WHERE schemaname = 'public'"))
+            db_url = str(db.engine.url)
+            if 'postgresql' in db_url or 'postgres' in db_url:
+                result = conn.execute(text("SELECT tablename FROM pg_tables WHERE schemaname = 'public'"))
+            else:
+                result = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table'"))
             tables = [row[0] for row in result.fetchall()]
         
         current_app.logger.info(f"Tables created: {tables}")
@@ -31,6 +35,7 @@ def setup_database():
         return jsonify({
             "success": True,
             "message": "Database setup completed",
+            "database_type": "PostgreSQL" if 'postgresql' in db_url else "SQLite",
             "tables": tables,
             "count": len(tables)
         }), 200
@@ -46,15 +51,22 @@ def setup_database():
 def database_status():
     """Check database connection and table status."""
     try:
-        # Test connection
+        # Test connection and detect database type
         with db.engine.connect() as conn:
-            # Get PostgreSQL version
-            version_result = conn.execute(text("SELECT version()"))
-            version = version_result.fetchone()[0]
+            db_url = str(db.engine.url)
             
-            # Get all tables
-            tables_result = conn.execute(text("SELECT tablename FROM pg_tables WHERE schemaname = 'public'"))
-            tables = [row[0] for row in tables_result.fetchall()]
+            # Detect database type
+            if 'postgresql' in db_url or 'postgres' in db_url:
+                # PostgreSQL queries
+                version_result = conn.execute(text("SELECT version()"))
+                version = version_result.fetchone()[0]
+                tables_result = conn.execute(text("SELECT tablename FROM pg_tables WHERE schemaname = 'public'"))
+                tables = [row[0] for row in tables_result.fetchall()]
+            else:
+                # SQLite queries
+                version = "SQLite (not PostgreSQL!)"
+                tables_result = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table'"))
+                tables = [row[0] for row in tables_result.fetchall()]
             
             # Get table row counts
             table_counts = {}
@@ -67,6 +79,8 @@ def database_status():
         
         return jsonify({
             "success": True,
+            "database_type": "PostgreSQL" if 'postgresql' in db_url else "SQLite",
+            "database_url": db_url.split('@')[0] + '@***' if '@' in db_url else db_url,
             "database_version": version,
             "tables": tables,
             "table_counts": table_counts,
