@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ArrowPathIcon, ClipboardIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect } from 'react';
+import { ArrowPathIcon, ClipboardIcon, CheckIcon, GlobeAltIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 const PasswordGenerator = ({ onGenerate }) => {
   const [options, setOptions] = useState({
@@ -11,16 +11,34 @@ const PasswordGenerator = ({ onGenerate }) => {
   });
   const [generatedPassword, setGeneratedPassword] = useState('');
   const [copied, setCopied] = useState(false);
+  const [selectedWebsite, setSelectedWebsite] = useState('');
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  
+  const popularWebsites = [
+    { name: 'Google', url: 'google.com', icon: '🔍' },
+    { name: 'Facebook', url: 'facebook.com', icon: '📘' },
+    { name: 'Twitter', url: 'twitter.com', icon: '🐦' },
+    { name: 'Instagram', url: 'instagram.com', icon: '📷' },
+    { name: 'LinkedIn', url: 'linkedin.com', icon: '💼' },
+    { name: 'GitHub', url: 'github.com', icon: '🐙' },
+    { name: 'Netflix', url: 'netflix.com', icon: '🎬' },
+    { name: 'Amazon', url: 'amazon.com', icon: '📦' },
+  ];
 
-  const generatePassword = () => {
+  const generatePassword = (customOptions = options) => {
     let charset = '';
-    if (options.lowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
-    if (options.uppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    if (options.numbers) charset += '0123456789';
-    if (options.symbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+    if (customOptions.lowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+    if (customOptions.uppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if (customOptions.numbers) charset += '0123456789';
+    if (customOptions.symbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+    if (!charset) {
+      // Fallback to lowercase if no options selected
+      charset = 'abcdefghijklmnopqrstuvwxyz';
+    }
 
     let password = '';
-    for (let i = 0; i < options.length; i++) {
+    for (let i = 0; i < customOptions.length; i++) {
       password += charset.charAt(Math.floor(Math.random() * charset.length));
     }
     
@@ -52,18 +70,66 @@ const PasswordGenerator = ({ onGenerate }) => {
     return { label: 'Weak', color: 'text-red-600' };
   };
 
+  useEffect(() => {
+    // Auto-generate password on component mount
+    generatePassword();
+  }, []);
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="text-center">
+        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <ArrowPathIcon className="w-8 h-8 text-white" />
+        </div>
         <h2 className="text-3xl font-bold text-gray-800 mb-2">Password Generator</h2>
-        <p className="text-gray-600">Create strong, secure passwords for your accounts</p>
+        <p className="text-gray-600">Create strong, secure passwords tailored for your accounts</p>
+      </div>
+
+      {/* Website Selection */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <GlobeAltIcon className="w-5 h-5" />
+          Generate Password For
+        </h3>
+        
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder="Enter website or service name (e.g., google.com)"
+            value={selectedWebsite}
+            onChange={(e) => setSelectedWebsite(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {popularWebsites.map((site) => (
+              <button
+                key={site.url}
+                onClick={() => setSelectedWebsite(site.url)}
+                className={`p-3 rounded-xl border-2 transition-all hover:shadow-md ${
+                  selectedWebsite === site.url
+                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                }`}
+              >
+                <div className="text-2xl mb-1">{site.icon}</div>
+                <div className="text-sm font-medium">{site.name}</div>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
       
       {/* Generated Password Display */}
       {generatedPassword && (
         <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">Generated Password</h3>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800">Generated Password</h3>
+              {selectedWebsite && (
+                <p className="text-sm text-gray-600">For: {selectedWebsite}</p>
+              )}
+            </div>
             <div className={`flex items-center gap-2 ${getStrengthLabel().color}`}>
               <div className="w-3 h-3 rounded-full bg-current"></div>
               <span className="text-sm font-medium">{getStrengthLabel().label}</span>
@@ -78,16 +144,35 @@ const PasswordGenerator = ({ onGenerate }) => {
                   ? 'bg-green-100 text-green-600' 
                   : 'bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600'
               }`}
+              title="Copy password"
             >
               {copied ? <CheckIcon className="w-5 h-5" /> : <ClipboardIcon className="w-5 h-5" />}
             </button>
+            {selectedWebsite && (
+              <button
+                onClick={() => setShowSaveModal(true)}
+                className="p-3 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
+                title="Save to vault"
+              >
+                <PlusIcon className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
       )}
 
       {/* Password Options */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-6">
-        <h3 className="text-xl font-semibold text-gray-800">Customize Your Password</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-semibold text-gray-800">Password Options</h3>
+          <button
+            onClick={generatePassword}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          >
+            <ArrowPathIcon className="w-4 h-4" />
+            Regenerate
+          </button>
+        </div>
         
         {/* Length Slider */}
         <div className="space-y-3">
@@ -100,7 +185,11 @@ const PasswordGenerator = ({ onGenerate }) => {
             min="8"
             max="64"
             value={options.length}
-            onChange={(e) => setOptions(prev => ({...prev, length: parseInt(e.target.value)}))}
+            onChange={(e) => {
+              const newOptions = {...options, length: parseInt(e.target.value)};
+              setOptions(newOptions);
+              setTimeout(() => generatePassword(newOptions), 100);
+            }}
             className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
           />
           <div className="flex justify-between text-xs text-gray-500">
@@ -110,23 +199,35 @@ const PasswordGenerator = ({ onGenerate }) => {
         </div>
 
         {/* Character Options */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
-            { key: 'uppercase', label: 'Uppercase (A-Z)', example: 'ABC' },
-            { key: 'lowercase', label: 'Lowercase (a-z)', example: 'abc' },
-            { key: 'numbers', label: 'Numbers (0-9)', example: '123' },
-            { key: 'symbols', label: 'Symbols (!@#)', example: '!@#' }
+            { key: 'uppercase', label: 'Uppercase Letters', example: 'ABCDEF', icon: '🔤' },
+            { key: 'lowercase', label: 'Lowercase Letters', example: 'abcdef', icon: '🔡' },
+            { key: 'numbers', label: 'Numbers', example: '123456', icon: '🔢' },
+            { key: 'symbols', label: 'Special Characters', example: '!@#$%^', icon: '🔣' }
           ].map(option => (
-            <label key={option.key} className="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+            <label key={option.key} className={`flex items-center p-4 rounded-xl border-2 transition-all cursor-pointer ${
+              options[option.key] 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-200 hover:border-gray-300 bg-gray-50'
+            }`}>
               <input
                 type="checkbox"
                 checked={options[option.key]}
-                onChange={(e) => setOptions(prev => ({...prev, [option.key]: e.target.checked}))}
-                className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 mr-3"
+                onChange={(e) => {
+                  const newOptions = {...options, [option.key]: e.target.checked};
+                  setOptions(newOptions);
+                  // Auto-regenerate when options change
+                  setTimeout(() => generatePassword(newOptions), 100);
+                }}
+                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-3"
               />
-              <div>
-                <div className="text-sm font-medium text-gray-800">{option.label}</div>
-                <div className="text-xs text-gray-500 font-mono">{option.example}</div>
+              <div className="flex items-center gap-3 flex-1">
+                <span className="text-2xl">{option.icon}</span>
+                <div>
+                  <div className="text-sm font-medium text-gray-800">{option.label}</div>
+                  <div className="text-xs text-gray-500 font-mono">{option.example}</div>
+                </div>
               </div>
             </label>
           ))}
@@ -152,14 +253,137 @@ const PasswordGenerator = ({ onGenerate }) => {
         </div>
       </div>
 
-      {/* Generate Button */}
-      <button
-        onClick={generatePassword}
-        className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 rounded-2xl hover:from-blue-700 hover:to-cyan-700 font-semibold text-lg flex items-center justify-center gap-3 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-      >
-        <ArrowPathIcon className="w-6 h-6" />
-        Generate New Password
-      </button>
+      {/* Quick Actions */}
+      <div className="flex gap-3">
+        <button
+          onClick={generatePassword}
+          className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 rounded-2xl hover:from-blue-700 hover:to-cyan-700 font-semibold text-lg flex items-center justify-center gap-3 transition-all duration-200 shadow-lg hover:shadow-xl"
+        >
+          <ArrowPathIcon className="w-6 h-6" />
+          Generate New Password
+        </button>
+        {generatedPassword && selectedWebsite && (
+          <button
+            onClick={() => setShowSaveModal(true)}
+            className="px-6 py-4 bg-green-600 text-white rounded-2xl hover:bg-green-700 font-semibold flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+          >
+            <PlusIcon className="w-5 h-5" />
+            Save to Vault
+          </button>
+        )}
+      </div>
+      {/* Save Password Modal */}
+      {showSaveModal && (
+        <SavePasswordModal
+          website={selectedWebsite}
+          password={generatedPassword}
+          onClose={() => setShowSaveModal(false)}
+          onSave={() => {
+            setShowSaveModal(false);
+            // Reset form
+            setSelectedWebsite('');
+            setGeneratedPassword('');
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+const SavePasswordModal = ({ website, password, onClose, onSave }) => {
+  const [formData, setFormData] = useState({
+    site_name: website.replace('.com', '').replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    site_url: website.startsWith('http') ? website : `https://${website}`,
+    username: '',
+    password: password
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      // Import api here to avoid circular dependency
+      const { api } = await import('../lib/api');
+      await api.passwords.create(formData);
+      onSave();
+    } catch (error) {
+      console.error('Failed to save password:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+        <div className="p-6 border-b">
+          <h3 className="text-xl font-semibold text-gray-900">Save Password to Vault</h3>
+        </div>
+        
+        <form onSubmit={handleSave} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Site Name</label>
+            <input
+              type="text"
+              value={formData.site_name}
+              onChange={(e) => setFormData(prev => ({...prev, site_name: e.target.value}))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Website URL</label>
+            <input
+              type="url"
+              value={formData.site_url}
+              onChange={(e) => setFormData(prev => ({...prev, site_url: e.target.value}))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Username/Email</label>
+            <input
+              type="text"
+              value={formData.username}
+              onChange={(e) => setFormData(prev => ({...prev, username: e.target.value}))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your username or email"
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Generated Password</label>
+            <input
+              type="text"
+              value={formData.password}
+              readOnly
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 font-mono text-sm"
+            />
+          </div>
+          
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            >
+              {loading ? 'Saving...' : 'Save Password'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

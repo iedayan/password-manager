@@ -84,6 +84,7 @@ export default function FAQ() {
               className="faq-item bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 opacity-0"
             >
               <button
+                id={`faq-button-${index}`}
                 className="w-full px-8 py-6 text-left flex items-center justify-between focus:outline-none rounded-2xl group"
                 onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
                 onKeyDown={(e) => {
@@ -120,7 +121,7 @@ export default function FAQ() {
                   openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                 }`}
                 role="region"
-                aria-labelledby={`faq-question-${index}`}
+                aria-labelledby={`faq-button-${index}`}
               >
                 <div className="px-8 pb-6">
                   <p className="text-gray-600 leading-relaxed text-base md:text-lg">
