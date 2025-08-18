@@ -174,27 +174,30 @@ const PasswordGenerator = ({ onGenerate }) => {
           </button>
         </div>
         
-        {/* Length Slider */}
+        {/* Length Selector */}
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <label className="text-sm font-medium text-gray-700">Password Length</label>
-            <span className="text-lg font-bold text-blue-600">{options.length}</span>
+          <label className="text-sm font-medium text-gray-700">Password Length</label>
+          <div className="flex bg-gray-100 rounded-xl p-1">
+            {[8, 12, 16, 20, 24, 32].map(length => (
+              <button
+                key={length}
+                onClick={() => {
+                  const newOptions = {...options, length};
+                  setOptions(newOptions);
+                  setTimeout(() => generatePassword(newOptions), 100);
+                }}
+                className={`flex-1 py-3 px-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                  options.length === length 
+                    ? 'bg-blue-600 text-white shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-200'
+                }`}
+              >
+                {length}
+              </button>
+            ))}
           </div>
-          <input
-            type="range"
-            min="8"
-            max="64"
-            value={options.length}
-            onChange={(e) => {
-              const newOptions = {...options, length: parseInt(e.target.value)};
-              setOptions(newOptions);
-              setTimeout(() => generatePassword(newOptions), 100);
-            }}
-            className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-          />
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>8</span>
-            <span>64</span>
+          <div className="text-xs text-gray-500 text-center">
+            Current: {options.length} characters
           </div>
         </div>
 
