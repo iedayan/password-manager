@@ -33,50 +33,50 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">L</span>
+      <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-xl">L</span>
               </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
                 Lok
               </h1>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowAddForm(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium"
               >
-                <PlusIcon className="w-4 h-4" />
+                <PlusIcon className="w-5 h-5" />
                 Add Password
               </button>
               <div className="relative" ref={dropdownRef}>
                 <button 
                   onClick={() => setShowSettingsDropdown(!showSettingsDropdown)}
-                  className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+                  className="p-3 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-200"
                 >
-                  <Cog6ToothIcon className="w-5 h-5" />
+                  <Cog6ToothIcon className="w-6 h-6" />
                 </button>
                 {showSettingsDropdown && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-1 z-50">
-                    <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                      <UserIcon className="w-4 h-4" />
+                  <div className="absolute right-0 mt-3 w-52 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200/50 py-2 z-50">
+                    <button className="w-full px-5 py-3 text-left text-sm text-gray-700 hover:bg-gray-50/80 flex items-center gap-3 transition-colors">
+                      <UserIcon className="w-5 h-5" />
                       Profile
                     </button>
-                    <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                      <ShieldCheckIcon className="w-4 h-4" />
+                    <button className="w-full px-5 py-3 text-left text-sm text-gray-700 hover:bg-gray-50/80 flex items-center gap-3 transition-colors">
+                      <ShieldCheckIcon className="w-5 h-5" />
                       Security Settings
                     </button>
-                    <hr className="my-1" />
+                    <hr className="my-2 border-gray-200" />
                     <button 
                       onClick={handleLogout}
-                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                      className="w-full px-5 py-3 text-left text-sm text-red-600 hover:bg-red-50/80 flex items-center gap-3 transition-colors"
                     >
-                      <ArrowRightOnRectangleIcon className="w-4 h-4" />
+                      <ArrowRightOnRectangleIcon className="w-5 h-5" />
                       Logout
                     </button>
                   </div>
@@ -86,20 +86,20 @@ const Dashboard = () => {
           </div>
           
           {/* Navigation Tabs */}
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-gray-200/50">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-6 py-3 text-sm font-semibold transition-all duration-200 border-b-2 relative ${
+                className={`px-8 py-4 text-base font-semibold transition-all duration-300 border-b-3 relative ${
                   activeTab === tab.id 
-                    ? 'text-blue-600 border-blue-600' 
-                    : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
+                    ? 'text-blue-600 border-blue-600 bg-blue-50/50' 
+                    : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50/30'
                 }`}
               >
                 {tab.name}
                 {activeTab === tab.id && (
-                  <div className="absolute inset-x-0 bottom-0 h-0.5 bg-blue-600 rounded-full" />
+                  <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full" />
                 )}
               </button>
             ))}
@@ -108,20 +108,24 @@ const Dashboard = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto p-6">
-        <Breadcrumb />
-        {activeTab === 'vault' && <PasswordVault />}
-        {activeTab === 'generator' && (
-          <div className="max-w-md mx-auto">
-            <PasswordGenerator />
-          </div>
-        )}
-        {activeTab === 'security' && (
-          <div className="text-center py-12">
-            <h2 className="text-xl font-semibold mb-4">Security Dashboard</h2>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
-        )}
+      <div className="max-w-7xl mx-auto p-8">
+        <div className="mb-6">
+          <Breadcrumb />
+        </div>
+        <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8">
+          {activeTab === 'vault' && <PasswordVault />}
+          {activeTab === 'generator' && (
+            <div className="max-w-lg mx-auto">
+              <PasswordGenerator />
+            </div>
+          )}
+          {activeTab === 'security' && (
+            <div className="text-center py-16">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Security Dashboard</h2>
+              <p className="text-gray-600 text-lg">Coming soon...</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {showAddForm && (
@@ -157,16 +161,16 @@ const AddPasswordForm = ({ onClose, onAdd }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <h2 className="text-xl font-bold mb-4">Add New Password</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 p-8 w-full max-w-lg">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">Add New Password</h2>
+        <form onSubmit={handleSubmit} className="space-y-5">
           <input
             type="text"
             placeholder="Site Name"
             value={formData.site_name}
             onChange={(e) => setFormData(prev => ({...prev, site_name: e.target.value}))}
-            className="w-full p-2 border rounded"
+            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/80"
             required
           />
           <input
@@ -174,7 +178,7 @@ const AddPasswordForm = ({ onClose, onAdd }) => {
             placeholder="Site URL"
             value={formData.site_url}
             onChange={(e) => setFormData(prev => ({...prev, site_url: e.target.value}))}
-            className="w-full p-2 border rounded"
+            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/80"
             required
           />
           <input
@@ -182,7 +186,7 @@ const AddPasswordForm = ({ onClose, onAdd }) => {
             placeholder="Username"
             value={formData.username}
             onChange={(e) => setFormData(prev => ({...prev, username: e.target.value}))}
-            className="w-full p-2 border rounded"
+            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/80"
             required
           />
           <input
@@ -190,20 +194,20 @@ const AddPasswordForm = ({ onClose, onAdd }) => {
             placeholder="Password"
             value={formData.password}
             onChange={(e) => setFormData(prev => ({...prev, password: e.target.value}))}
-            className="w-full p-2 border rounded"
+            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/80"
             required
           />
-          <div className="flex gap-2">
+          <div className="flex gap-3 pt-2">
             <button
               type="submit"
-              className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+              className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-lg"
             >
               Add Password
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400"
+              className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-300 transition-all duration-200 font-medium"
             >
               Cancel
             </button>
