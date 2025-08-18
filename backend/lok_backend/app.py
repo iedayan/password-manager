@@ -23,7 +23,11 @@ def create_app(config_name='development'):
     limiter.init_app(app)
     
     # Setup CORS
-    CORS(app, origins=app.config.get('CORS_ORIGINS', ['http://localhost:5173']))
+    CORS(app, origins=[
+        'http://localhost:5173',
+        'https://comforting-sunshine-65105a.netlify.app',
+        'https://*.netlify.app'
+    ], supports_credentials=True)
     
     # Setup logging
     setup_logging(app)
