@@ -741,6 +741,108 @@ def behavioral_analysis():
         return jsonify({"error": "Behavioral analysis failed"}), 500
 
 
+@passwords_bp.route("/onboarding/progress", methods=["GET"])
+@jwt_required()
+def get_onboarding_progress():
+    """Get user's onboarding progress."""
+    try:
+        user_id = int(get_jwt_identity())
+        
+        from ...services.onboarding_service import onboarding_service
+        
+        progress = onboarding_service.get_onboarding_progress(user_id)
+        
+        return jsonify(progress), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Onboarding progress failed: {str(e)}")
+        return jsonify({"error": "Failed to get onboarding progress"}), 500
+
+
+@passwords_bp.route("/onboarding/complete-step", methods=["POST"])
+@jwt_required()
+def complete_onboarding_step():
+    """Complete an onboarding step."""
+    try:
+        user_id = int(get_jwt_identity())
+        data = request.get_json(force=True)
+        
+        if not data or "step_id" not in data:
+            return jsonify({"error": "Step ID required"}), 400
+        
+        from ...services.onboarding_service import onboarding_service
+        
+        result = onboarding_service.complete_step(user_id, data["step_id"])
+        
+        return jsonify(result), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Complete onboarding step failed: {str(e)}")
+        return jsonify({"error": "Failed to complete step"}), 500
+
+
+@passwords_bp.route("/security-assessment", methods=["GET"])
+@jwt_required()
+def security_assessment():
+    """Perform security assessment of user's passwords."""
+    try:
+        user_id = int(get_jwt_identity())
+        passwords = Password.query.filter_by(user_id=user_id).all()
+        
+        password_data = []
+        for password in passwords:
+            try:
+                decrypted = encryption_service.decrypt(password.encrypted_password)
+                password_data.append({
+                    'password': decrypted,
+                    'site_name': password.site_name,
+                    'username': password.username,
+                    'created_at': password.created_at.isoformat()
+                })
+            except Exception:
+                continue
+        
+        from ...services.onboarding_service import onboarding_service
+        
+        assessment = onboarding_service.perform_security_assessment(password_data)
+        
+        return jsonify({
+            "assessment": assessment.__dict__,
+            "assessed_at": datetime.now(timezone.utc).isoformat()
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Security assessment failed: {str(e)}")
+        return jsonify({"error": "Security assessment failed"}), 500
+
+
+@passwords_bp.route("/migration-plan", methods=["POST"])
+@jwt_required()
+def generate_migration_plan():
+    """Generate personalized migration plan."""
+    try:
+        user_id = int(get_jwt_identity())
+        data = request.get_json(force=True)
+        
+        if not data or "current_manager" not in data:
+            return jsonify({"error": "Current password manager required"}), 400
+        
+        current_manager = data["current_manager"]
+        password_count = data.get("password_count", 0)
+        
+        from ...services.onboarding_service import onboarding_service
+        
+        migration_plan = onboarding_service.generate_migration_plan(
+            current_manager, password_count
+        )
+        
+        return jsonify(migration_plan), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Migration plan generation failed: {str(e)}")
+        return jsonify({"error": "Failed to generate migration plan"}), 500
+
+
 @passwords_bp.route("/ai/smart-monitoring", methods=["GET"])
 @jwt_required()
 def smart_monitoring():
@@ -775,6 +877,119 @@ def smart_monitoring():
     except Exception as e:
         current_app.logger.error(f"Smart monitoring failed: {str(e)}")
         return jsonify({"error": "Smart monitoring failed"}), 500
+
+
+@passwords_bp.route("/import", methods=["POST"])
+@jwt_required()
+@limiter.limit("5 per minute")
+def import_passwords():
+    """Import passwords from various password managers."""
+    try:
+        user_id = int(get_jwt_identity())
+        
+        # Check if file is provided
+        if 'file' not in request.files:
+            return jsonify({"error": "No file provided"}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "No file selected"}), 400
+        
+        # Get format type from form data
+        format_type = request.form.get('format', '')
+        
+        # Read file content
+        file_content = file.read().decode('utf-8')
+        
+        from ...services.import_service import import_service
+        
+        # Import passwords
+        imported_passwords, stats = import_service.import_passwords(
+            file_content, format_type, file.filename
+        )
+        
+        # Save imported passwords to database
+        saved_count = 0
+        for pwd in imported_passwords:
+            try:
+                # Encrypt password
+                encrypted_password = encryption_service.encrypt(pwd.password)
+                
+                # Create password entry
+                password = Password(
+                    user_id=user_id,
+                    site_name=pwd.site_name,
+                    site_url=pwd.site_url,
+                    username=pwd.username,
+                    encrypted_password=encrypted_password,
+                    notes=pwd.notes,
+                    category=pwd.folder or 'Personal'
+                )
+                
+                db.session.add(password)
+                saved_count += 1
+                
+            except Exception as e:
+                current_app.logger.warning(f"Failed to save password: {str(e)}")
+                continue
+        
+        db.session.commit()
+        
+        current_app.logger.info(f"Imported {saved_count} passwords for user {user_id}")
+        
+        return jsonify({
+            "message": f"Successfully imported {saved_count} passwords",
+            "imported_count": saved_count,
+            "total_processed": len(imported_passwords),
+            "statistics": stats
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Password import failed: {str(e)}")
+        return jsonify({"error": f"Import failed: {str(e)}"}), 500
+
+
+@passwords_bp.route("/export", methods=["GET"])
+@jwt_required()
+@limiter.limit("3 per minute")
+def export_passwords():
+    """Export user passwords in CSV format."""
+    try:
+        user_id = int(get_jwt_identity())
+        passwords = Password.query.filter_by(user_id=user_id).all()
+        
+        export_data = []
+        for password in passwords:
+            try:
+                # Note: In production, consider requiring master password for export
+                decrypted = encryption_service.decrypt(password.encrypted_password)
+                
+                export_data.append({
+                    "name": password.site_name,
+                    "url": password.site_url or "",
+                    "username": password.username,
+                    "password": decrypted,
+                    "notes": password.notes or "",
+                    "category": password.category or "Personal",
+                    "created_at": password.created_at.isoformat()
+                })
+                
+            except Exception:
+                continue
+        
+        current_app.logger.info(f"Exported {len(export_data)} passwords for user {user_id}")
+        
+        return jsonify({
+            "passwords": export_data,
+            "exported_count": len(export_data),
+            "exported_at": datetime.now(timezone.utc).isoformat(),
+            "format": "json"
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Password export failed: {str(e)}")
+        return jsonify({"error": "Export failed"}), 500
 
 
 

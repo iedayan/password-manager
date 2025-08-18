@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { PlusIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon, UserIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon, UserIcon, ShieldCheckIcon, DocumentArrowUpIcon } from '@heroicons/react/24/outline';
 import PasswordVault from './PasswordVault';
 import PasswordGenerator from './PasswordGenerator';
 import AddPasswordModal from './AddPasswordModal';
 import Settings from './Settings';
 import Breadcrumb from './Breadcrumb';
+import OnboardingFlow from './OnboardingFlow';
+import ImportWizard from './ImportWizard';
 import { api } from '../lib/api';
 
 const Dashboard = () => {
@@ -13,7 +15,17 @@ const Dashboard = () => {
   });
   const [showAddForm, setShowAddForm] = useState(false);
   const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showImportWizard, setShowImportWizard] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Check if user needs onboarding
+  useEffect(() => {
+    const hasCompletedOnboarding = localStorage.getItem('onboarding_completed');
+    if (!hasCompletedOnboarding) {
+      setShowOnboarding(true);
+    }
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -85,13 +97,22 @@ const Dashboard = () => {
               </h1>
             </div>
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium text-sm"
-              >
-                <PlusIcon className="w-4 h-4" />
-                Add Password
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowImportWizard(true)}
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium text-sm"
+                >
+                  <DocumentArrowUpIcon className="w-4 h-4" />
+                  Import
+                </button>
+                <button
+                  onClick={() => setShowAddForm(true)}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium text-sm"
+                >
+                  <PlusIcon className="w-4 h-4" />
+                  Add Password
+                </button>
+              </div>
               <div className="relative" ref={dropdownRef}>
                 <button 
                   onClick={() => setShowSettingsDropdown(!showSettingsDropdown)}
@@ -107,12 +128,23 @@ const Dashboard = () => {
                     </button>
                     <button 
                       onClick={() => {
-                        setActiveTab('settings');
-                        localStorage.setItem('activeTab', 'settings');
+                        setShowOnboarding(true);
+                        setShowSettingsDropdown(false);
                       }}
                       className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50/80 flex items-center gap-3 transition-colors"
                     >
                       <ShieldCheckIcon className="w-4 h-4" />
+                      Setup Guide
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setActiveTab('settings');
+                        localStorage.setItem('activeTab', 'settings');
+                        setShowSettingsDropdown(false);
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50/80 flex items-center gap-3 transition-colors"
+                    >
+                      <Cog6ToothIcon className="w-4 h-4" />
                       Settings
                     </button>
                     <hr className="my-1 border-gray-200" />
@@ -162,7 +194,13 @@ const Dashboard = () => {
         <div className="bg-slate-800/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/60 p-8 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-700/20 via-transparent to-slate-900/20 pointer-events-none"></div>
           <div className="relative z-10">
-            {activeTab === 'vault' && <PasswordVault showAddForm={showAddForm} setShowAddForm={setShowAddForm} />}
+            {activeTab === 'vault' && (
+              <PasswordVault 
+                showAddForm={showAddForm} 
+                setShowAddForm={setShowAddForm}
+                onImportClick={() => setShowImportWizard(true)}
+              />
+            )}
             {activeTab === 'generator' && (
               <div className="max-w-3xl mx-auto">
                 <PasswordGenerator />
@@ -259,6 +297,28 @@ const Dashboard = () => {
           }}
         />
       )}
+
+      {/* Onboarding Flow */}
+      <OnboardingFlow
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        onComplete={() => {
+          localStorage.setItem('onboarding_completed', 'true');
+          setShowOnboarding(false);
+        }}
+      />
+
+      {/* Import Wizard */}
+      <ImportWizard
+        isOpen={showImportWizard}
+        onClose={() => setShowImportWizard(false)}
+        onComplete={() => {
+          setShowImportWizard(false);
+          if (activeTab === 'vault') {
+            window.location.reload();
+          }
+        }}
+      />
     </div>
   );
 };

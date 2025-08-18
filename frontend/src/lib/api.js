@@ -103,6 +103,31 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(options),
     }),
+    // Onboarding endpoints
+    getOnboardingProgress: () => api.request('/api/v1/passwords/onboarding/progress'),
+    completeOnboardingStep: (stepId) => api.request('/api/v1/passwords/onboarding/complete-step', {
+      method: 'POST',
+      body: JSON.stringify({ step_id: stepId }),
+    }),
+    getSecurityAssessment: () => api.request('/api/v1/passwords/security-assessment'),
+    generateMigrationPlan: (currentManager, passwordCount) => api.request('/api/v1/passwords/migration-plan', {
+      method: 'POST',
+      body: JSON.stringify({ current_manager: currentManager, password_count: passwordCount }),
+    }),
+  },
+
+  // Import/Export endpoints
+  import: {
+    passwords: (file, format) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('format', format);
+      return api.request('/api/v1/passwords/import', {
+        method: 'POST',
+        body: formData,
+        headers: {} // Remove Content-Type to let browser set it for FormData
+      });
+    }
   },
 
   // User endpoints
