@@ -9,7 +9,7 @@ from .core.extensions import jwt, bcrypt, limiter
 from .core.logging import setup_logging
 
 
-def create_app(config_name='development'):
+def create_app(config_name='production'):
     """Create Flask application using the factory pattern."""
     app = Flask(__name__)
     
@@ -37,7 +37,17 @@ def create_app(config_name='development'):
     
     # Create database tables
     with app.app_context():
+        # Import all models to ensure they're registered
+        from .models.user import User
+        from .models.password import Password
+        try:
+            from .models.login_session import LoginSession
+            from .models.device import Device
+        except ImportError:
+            pass  # These models might not exist yet
+        
         db.create_all()
+        print(f"Database tables created: {db.engine.table_names()}")
     
     return app
 
