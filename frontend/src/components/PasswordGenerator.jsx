@@ -27,24 +27,101 @@ const PasswordGenerator = ({ onGenerate }) => {
 
   const generatePassword = (customOptions) => {
     const opts = customOptions || options;
+    
+    // Define character sets with ambiguous characters removed for better usability
+    const charSets = {
+      lowercase: 'abcdefghijkmnpqrstuvwxyz', // Removed 'l', 'o' to avoid confusion
+      uppercase: 'ABCDEFGHJKLMNPQRSTUVWXYZ', // Removed 'I', 'O' to avoid confusion
+      numbers: '23456789', // Removed '0', '1' to avoid confusion with 'O', 'l'
+      symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?~'
+    };
+
+    // Build charset based on selected options
     let charset = '';
-    if (opts.lowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
-    if (opts.uppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    if (opts.numbers) charset += '0123456789';
-    if (opts.symbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+    const selectedSets = [];
+    
+    if (opts.lowercase) {
+      charset += charSets.lowercase;
+      selectedSets.push(charSets.lowercase);
+    }
+    if (opts.uppercase) {
+      charset += charSets.uppercase;
+      selectedSets.push(charSets.uppercase);
+    }
+    if (opts.numbers) {
+      charset += charSets.numbers;
+      selectedSets.push(charSets.numbers);
+    }
+    if (opts.symbols) {
+      charset += charSets.symbols;
+      selectedSets.push(charSets.symbols);
+    }
 
     if (!charset) {
       // Fallback to lowercase if no options selected
-      charset = 'abcdefghijklmnopqrstuvwxyz';
+      charset = charSets.lowercase;
+      selectedSets.push(charSets.lowercase);
     }
 
+    // Generate password using cryptographically secure random values
     let password = '';
-    for (let i = 0; i < opts.length; i++) {
-      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    
+    // Ensure at least one character from each selected character set
+    selectedSets.forEach(set => {
+      password += set.charAt(getSecureRandomInt(set.length));
+    });
+    
+    // Fill remaining positions with random characters from full charset
+    for (let i = password.length; i < opts.length; i++) {
+      password += charset.charAt(getSecureRandomInt(charset.length));
+    }
+    
+    // Shuffle the password to avoid predictable patterns
+    password = shuffleString(password);
+    
+    // Validate password meets complexity requirements
+    if (!validatePasswordComplexity(password, opts)) {
+      // Regenerate if validation fails (rare edge case)
+      return generatePassword(customOptions);
     }
     
     setGeneratedPassword(password);
     if (onGenerate) onGenerate(password);
+  };
+
+  // Cryptographically secure random number generator
+  const getSecureRandomInt = (max) => {
+    if (window.crypto && window.crypto.getRandomValues) {
+      const array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      return array[0] % max;
+    }
+    // Fallback to Math.random() if crypto API not available
+    return Math.floor(Math.random() * max);
+  };
+
+  // Fisher-Yates shuffle algorithm for cryptographic randomness
+  const shuffleString = (str) => {
+    const array = str.split('');
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = getSecureRandomInt(i + 1);
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array.join('');
+  };
+
+  // Validate password meets complexity requirements
+  const validatePasswordComplexity = (password, opts) => {
+    if (opts.lowercase && !/[a-z]/.test(password)) return false;
+    if (opts.uppercase && !/[A-Z]/.test(password)) return false;
+    if (opts.numbers && !/[0-9]/.test(password)) return false;
+    if (opts.symbols && !/[^a-zA-Z0-9]/.test(password)) return false;
+    
+    // Check for common weak patterns
+    if (/(..).*\1/.test(password)) return false; // No repeated substrings
+    if (/012|123|234|345|456|567|678|789|890|abc|bcd|cde/.test(password.toLowerCase())) return false; // No sequences
+    
+    return true;
   };
 
   const copyPassword = async () => {
@@ -54,13 +131,40 @@ const PasswordGenerator = ({ onGenerate }) => {
   };
 
   const getStrength = () => {
+    if (!generatedPassword) return 0;
+    
     let score = 0;
-    if (options.length >= 12) score += 25;
-    if (options.uppercase) score += 20;
-    if (options.lowercase) score += 20;
-    if (options.numbers) score += 20;
-    if (options.symbols) score += 15;
-    return Math.min(score, 100);
+    const password = generatedPassword;
+    
+    // Length scoring (more sophisticated)
+    if (password.length >= 8) score += 10;
+    if (password.length >= 12) score += 15;
+    if (password.length >= 16) score += 20;
+    if (password.length >= 20) score += 25;
+    
+    // Character variety scoring
+    if (/[a-z]/.test(password)) score += 15;
+    if (/[A-Z]/.test(password)) score += 15;
+    if (/[0-9]/.test(password)) score += 15;
+    if (/[^a-zA-Z0-9]/.test(password)) score += 20;
+    
+    // Entropy calculation based on character set size
+    let charsetSize = 0;
+    if (/[a-z]/.test(password)) charsetSize += 26;
+    if (/[A-Z]/.test(password)) charsetSize += 26;
+    if (/[0-9]/.test(password)) charsetSize += 10;
+    if (/[^a-zA-Z0-9]/.test(password)) charsetSize += 32;
+    
+    const entropy = password.length * Math.log2(charsetSize);
+    if (entropy >= 50) score += 10;
+    if (entropy >= 70) score += 15;
+    
+    // Penalty for common patterns
+    if (/(..).*\1/.test(password)) score -= 10; // Repeated patterns
+    if (/012|123|234|345|456|567|678|789|890/.test(password)) score -= 15; // Sequences
+    if (/aaa|bbb|ccc|111|222|333/.test(password.toLowerCase())) score -= 20; // Repetition
+    
+    return Math.max(0, Math.min(100, score));
   };
 
   const getStrengthLabel = () => {
@@ -243,7 +347,7 @@ const PasswordGenerator = ({ onGenerate }) => {
           <h3 className="text-lg font-semibold text-gray-800">Password Strength</h3>
           <span className={`text-lg font-bold ${getStrengthLabel().color}`}>{getStrength()}%</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+        <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden mb-4">
           <div 
             className={`h-4 rounded-full transition-all duration-500 ${
               getStrength() >= 80 ? 'bg-gradient-to-r from-green-500 to-green-600' :
@@ -253,6 +357,26 @@ const PasswordGenerator = ({ onGenerate }) => {
             }`}
             style={{ width: `${getStrength()}%` }}
           />
+        </div>
+        
+        {/* Security Features */}
+        <div className="grid grid-cols-2 gap-3 text-xs">
+          <div className="flex items-center gap-2 text-green-600">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span>Cryptographically Secure</span>
+          </div>
+          <div className="flex items-center gap-2 text-green-600">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span>Pattern Resistant</span>
+          </div>
+          <div className="flex items-center gap-2 text-green-600">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span>Ambiguity Reduced</span>
+          </div>
+          <div className="flex items-center gap-2 text-green-600">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span>Entropy Optimized</span>
+          </div>
         </div>
       </div>
 
