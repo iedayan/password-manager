@@ -283,9 +283,7 @@ const PasswordGenerator = ({ onGenerate }) => {
           onClose={() => setShowSaveModal(false)}
           onSave={() => {
             setShowSaveModal(false);
-            // Reset form
-            setSelectedWebsite('');
-            setGeneratedPassword('');
+            // Don't clear the generated password, only close modal
           }}
         />
       )}
