@@ -136,7 +136,7 @@ const AuthButtons = () => {
           onClick={() => navigate('/signup')}
           className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl hover:from-blue-700 hover:to-indigo-700 font-medium transition-all shadow-md hover:shadow-lg transform hover:scale-105"
         >
-          Get Started
+          Start Free Trial
         </button>
       </div>
       

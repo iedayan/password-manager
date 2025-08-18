@@ -21,12 +21,30 @@ const Login = () => {
     setLoading(true);
     setError('');
 
+    // Validation for registration
+    if (!isLogin) {
+      if (formData.password !== formData.confirm_password) {
+        setError('Passwords do not match');
+        setLoading(false);
+        return;
+      }
+      if (formData.password.length < 8) {
+        setError('Password must be at least 8 characters');
+        setLoading(false);
+        return;
+      }
+    }
+
     try {
       const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+      const payload = isLogin 
+        ? { email: formData.email, password: formData.password }
+        : { email: formData.email, password: formData.password, confirm_password: formData.confirm_password };
+      
       const response = await fetch(`http://localhost:5000${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       const data = await response.json();

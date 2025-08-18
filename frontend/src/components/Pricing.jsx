@@ -95,7 +95,7 @@ export default function Pricing() {
             <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Pricing</span>
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-            Choose the plan that's right for you. All plans include 30-day free trial.
+            Choose the plan that's right for you. All plans include 14-day free trial.
           </p>
         </div>
 
