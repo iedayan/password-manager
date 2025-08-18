@@ -19,13 +19,7 @@ const Dashboard = () => {
   const [showImportWizard, setShowImportWizard] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Check if user needs onboarding
-  useEffect(() => {
-    const hasCompletedOnboarding = localStorage.getItem('onboarding_completed');
-    if (!hasCompletedOnboarding) {
-      setShowOnboarding(true);
-    }
-  }, []);
+  // Remove automatic onboarding trigger - only show when manually opened
 
   useEffect(() => {
     const handleClickOutside = (event) => {
