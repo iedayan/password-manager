@@ -7,52 +7,59 @@ export default function Pricing() {
   const plans = [
     {
       name: "Personal",
-      price: "$8",
+      price: "$6",
       period: "/month",
       description: "Perfect for individuals",
       features: [
         "Unlimited passwords & secure notes",
-        "Auto-update weak & reused passwords",
+        "AI-powered password strength analysis",
         "Cross-platform sync (iOS, Android, Web)",
-        "AI-powered password generator",
-        "Dark web monitoring",
+        "Smart password generator with ML",
+        "Basic breach monitoring",
         "Two-factor authentication (2FA)",
-        "24/7 email support",
-        "1GB encrypted file storage"
+        "Email support",
+        "1GB encrypted file storage",
+        "Password health dashboard"
       ]
     },
     {
       name: "Family",
-      price: "$12",
+      price: "$15",
       period: "/month",
-      description: "Secure your whole family",
+      description: "AI-powered security for families",
       features: [
         "Everything in Personal",
         "Up to 6 family members",
+        "Advanced AI security analysis",
         "Family dashboard & management",
-        "Shared family vaults",
+        "Shared family vaults with smart categorization",
         "Emergency access for family",
-        "Individual family member vaults",
+        "Behavioral anomaly detection",
         "Priority chat support",
-        "5GB encrypted file storage per member"
+        "5GB encrypted file storage per member",
+        "Real-time breach alerts"
       ],
       popular: true
     },
     {
-      name: "Business",
-      price: "$20",
+      name: "Enterprise",
+      price: "$35",
       period: "/month",
-      description: "Enterprise security for teams",
+      description: "State-of-the-art AI security for business",
       features: [
         "Everything in Family",
         "Unlimited team members",
+        "Advanced ML threat intelligence",
+        "Predictive breach analytics",
+        "Quantum security assessment",
         "Advanced admin dashboard",
-        "Team password policies",
         "SSO integration (SAML, OIDC)",
-        "Advanced reporting & analytics",
+        "Behavioral pattern analysis",
         "API access for integrations",
         "Dedicated customer success manager",
-        "Unlimited encrypted file storage"
+        "Unlimited encrypted file storage",
+        "Custom security policies",
+        "Advanced reporting & compliance"
       ]
     }
   ];
