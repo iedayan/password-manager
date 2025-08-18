@@ -38,10 +38,7 @@ def get_passwords():
         return (
             jsonify(
                 {
-                    "passwords": [
-                        PasswordResponse.model_validate(p).model_dump()
-                        for p in passwords
-                    ],
+                    "passwords": [p.to_dict() for p in passwords],
                     "count": len(passwords),
                 }
             ),
@@ -295,10 +292,7 @@ def bulk_operations():
             return (
                 jsonify(
                     {
-                        "passwords": [
-                            PasswordResponse.model_validate(p).model_dump()
-                            for p in passwords
-                        ],
+                        "passwords": [p.to_dict() for p in passwords],
                         "exported_at": datetime.now(timezone.utc).isoformat(),
                     }
                 ),
@@ -352,6 +346,96 @@ def bulk_operations():
         db.session.rollback()
         current_app.logger.error(f"Error in bulk operation: {str(e)}")
         return jsonify({"error": "Bulk operation failed"}), 500
+
+
+@passwords_bp.route("/<int:password_id>/favorite", methods=["POST"])
+@jwt_required()
+def toggle_favorite(password_id):
+    """Toggle favorite status of a password."""
+    try:
+        user_id = int(get_jwt_identity())
+        password = Password.query.filter_by(id=password_id, user_id=user_id).first()
+        
+        if not password:
+            return jsonify({"error": "Password not found"}), 404
+            
+        password.is_favorite = not password.is_favorite
+        password.updated_at = datetime.now(timezone.utc)
+        db.session.commit()
+        
+        return jsonify({
+            "message": "Favorite status updated",
+            "is_favorite": password.is_favorite
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error toggling favorite {password_id}: {str(e)}")
+        return jsonify({"error": "Failed to update favorite status"}), 500
+
+
+@passwords_bp.route("/stats", methods=["GET"])
+@jwt_required()
+def get_password_stats():
+    """Get password statistics for dashboard."""
+    try:
+        user_id = int(get_jwt_identity())
+        passwords = Password.query.filter_by(user_id=user_id).all()
+        
+        stats = {
+            "total": len(passwords),
+            "weak": 0,
+            "medium": 0, 
+            "strong": 0,
+            "favorites": 0,
+            "duplicates": 0,
+            "old": 0,
+            "categories": {}
+        }
+        
+        password_values = []
+        
+        for password in passwords:
+            # Count favorites
+            if password.is_favorite:
+                stats["favorites"] += 1
+                
+            # Count categories
+            category = password.category or 'Personal'
+            stats["categories"][category] = stats["categories"].get(category, 0) + 1
+            
+            # Check age (90+ days old)
+            if password.created_at:
+                days_old = (datetime.now(timezone.utc) - password.created_at).days
+                if days_old > 90:
+                    stats["old"] += 1
+            
+            # Analyze password strength and duplicates
+            try:
+                decrypted = encryption_service.decrypt(password.encrypted_password)
+                password_values.append(decrypted)
+                
+                strength = calculate_password_strength(decrypted)
+                if strength < 60:
+                    stats["weak"] += 1
+                elif strength < 80:
+                    stats["medium"] += 1
+                else:
+                    stats["strong"] += 1
+                    
+            except Exception:
+                stats["weak"] += 1  # Count undecryptable as weak
+        
+        # Count duplicates
+        from collections import Counter
+        password_counts = Counter(password_values)
+        stats["duplicates"] = sum(1 for count in password_counts.values() if count > 1)
+        
+        return jsonify(stats), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Error getting password stats: {str(e)}")
+        return jsonify({"error": "Failed to get statistics"}), 500
 
 
 # ============================================================================

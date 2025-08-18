@@ -29,8 +29,17 @@ class Password(db.Model):
     auto_update_enabled = db.Column(db.Boolean, default=True, nullable=False)
     is_compromised = db.Column(db.Boolean, default=False, nullable=False)
 
+    # New fields for enhanced features
+    category = db.Column(db.String(50), default='Personal')
+    is_favorite = db.Column(db.Boolean, default=False, nullable=False)
+    tags = db.Column(db.Text)  # JSON string for tags
+    
     # Indexes for better query performance
-    __table_args__ = (db.Index("idx_user_site", "user_id", "site_name"),)
+    __table_args__ = (
+        db.Index("idx_user_site", "user_id", "site_name"),
+        db.Index("idx_user_category", "user_id", "category"),
+        db.Index("idx_user_favorite", "user_id", "is_favorite"),
+    )
 
     def __repr__(self):
         safe_site_name = "".join(
@@ -41,12 +50,24 @@ class Password(db.Model):
 
     def to_dict(self):
         """Convert password to dictionary (excluding encrypted data)"""
+        from ..services.password_strength import calculate_password_strength
+        from ..services.encryption_service import encryption_service
+        
+        # Calculate strength score if possible
+        strength_score = 0
+        try:
+            if self.encrypted_password:
+                decrypted = encryption_service.decrypt(self.encrypted_password)
+                strength_score = calculate_password_strength(decrypted)
+        except Exception:
+            pass
+            
         return {
             "id": self.id,
             "site_name": self.site_name,
             "site_url": self.site_url,
             "username": self.username,
-            "strength_score": 0,  # Default value for compatibility
+            "strength_score": strength_score,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
             "last_accessed": (
@@ -54,6 +75,9 @@ class Password(db.Model):
             ),
             "auto_update_enabled": self.auto_update_enabled,
             "is_compromised": self.is_compromised,
+            "category": self.category or 'Personal',
+            "is_favorite": self.is_favorite,
+            "tags": self.tags,
         }
 
 

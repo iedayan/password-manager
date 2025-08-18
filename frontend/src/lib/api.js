@@ -81,10 +81,27 @@ export const api = {
     delete: (id) => api.request(`/api/v1/passwords/${id}`, {
       method: 'DELETE',
     }),
-    export: () => api.request('/api/v1/passwords/export'),
-    import: (passwords) => api.request('/api/v1/passwords/import', {
+    toggleFavorite: (id) => api.request(`/api/v1/passwords/${id}/favorite`, {
       method: 'POST',
-      body: JSON.stringify({ passwords }),
+    }),
+    getStats: () => api.request('/api/v1/passwords/stats'),
+    bulkDelete: (ids) => api.request('/api/v1/passwords/bulk', {
+      method: 'POST',
+      body: JSON.stringify({ operation: 'delete', password_ids: ids }),
+    }),
+    export: () => api.request('/api/v1/passwords/bulk', {
+      method: 'POST',
+      body: JSON.stringify({ operation: 'export' }),
+    }),
+    import: (passwords) => api.request('/api/v1/passwords/bulk', {
+      method: 'POST',
+      body: JSON.stringify({ operation: 'import', passwords }),
+    }),
+    search: (query) => api.request(`/api/v1/passwords/search?q=${encodeURIComponent(query)}`),
+    analyze: () => api.request('/api/v1/passwords/analyze'),
+    generate: (options = {}) => api.request('/api/v1/passwords/generate', {
+      method: 'POST',
+      body: JSON.stringify(options),
     }),
   },
 
