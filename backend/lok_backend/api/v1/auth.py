@@ -37,12 +37,21 @@ def register():
         data = request.get_json(force=True)
         if not data:
             return jsonify({"error": "Invalid JSON data"}), 400
+        
+        # Debug logging (remove in production)
+        current_app.logger.info(f"Registration attempt with data keys: {list(data.keys())}")
 
         # Validate input using Pydantic
         try:
             user_data = UserRegistration(**data)
         except ValidationError as e:
-            return jsonify({"error": str(e)}), 400
+            # Format validation errors properly
+            errors = []
+            for error in e.errors():
+                field = error['loc'][0] if error['loc'] else 'unknown'
+                message = error['msg']
+                errors.append(f"{field}: {message}")
+            return jsonify({"error": "; ".join(errors)}), 400
 
         # Check if user exists
         if User.query.filter_by(email=user_data.email).first():
@@ -96,12 +105,21 @@ def login():
         data = request.get_json(force=True)
         if not data:
             return jsonify({"error": "Invalid JSON data"}), 400
+        
+        # Debug logging (remove in production)
+        current_app.logger.info(f"Login attempt with data keys: {list(data.keys())}")
 
         # Validate input using Pydantic
         try:
             login_data = UserLogin(**data)
         except ValidationError as e:
-            return jsonify({"error": str(e)}), 400
+            # Format validation errors properly
+            errors = []
+            for error in e.errors():
+                field = error['loc'][0] if error['loc'] else 'unknown'
+                message = error['msg']
+                errors.append(f"{field}: {message}")
+            return jsonify({"error": "; ".join(errors)}), 400
 
         # Find user
         user = User.query.filter_by(email=login_data.email).first()

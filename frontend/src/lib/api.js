@@ -17,10 +17,21 @@ export const api = {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
       
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ 
-          error: `HTTP ${response.status}: ${response.statusText}` 
-        }));
-        throw new Error(error.error || `Request failed with status ${response.status}`);
+        let errorData;
+        try {
+          errorData = await response.json();
+          console.error('API Error Response:', errorData);
+        } catch {
+          errorData = { error: `HTTP ${response.status}: ${response.statusText}` };
+        }
+        
+        // Handle validation errors from Pydantic
+        if (errorData.detail && Array.isArray(errorData.detail)) {
+          const validationErrors = errorData.detail.map(err => err.msg).join(', ');
+          throw new Error(validationErrors);
+        }
+        
+        throw new Error(errorData.error || errorData.message || `Request failed with status ${response.status}`);
       }
 
       return response.json();

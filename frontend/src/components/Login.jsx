@@ -41,6 +41,8 @@ const Login = () => {
         ? { email: formData.email, password: formData.password }
         : { email: formData.email, password: formData.password, confirm_password: formData.confirm_password };
       
+      console.log('Sending payload:', { ...payload, password: '[REDACTED]', confirm_password: '[REDACTED]' });
+      
       const data = isLogin 
         ? await api.auth.login(payload)
         : await api.auth.register(payload);
