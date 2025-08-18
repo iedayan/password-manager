@@ -21,8 +21,41 @@ const Dashboard = () => {
         setShowSettingsDropdown(false);
       }
     };
+    
+    // Global keyboard shortcuts for tab navigation
+    const handleKeyPress = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case '1':
+            e.preventDefault();
+            setActiveTab('vault');
+            localStorage.setItem('activeTab', 'vault');
+            break;
+          case '2':
+            e.preventDefault();
+            setActiveTab('generator');
+            localStorage.setItem('activeTab', 'generator');
+            break;
+          case '3':
+            e.preventDefault();
+            setActiveTab('security');
+            localStorage.setItem('activeTab', 'security');
+            break;
+          case '4':
+            e.preventDefault();
+            setActiveTab('settings');
+            localStorage.setItem('activeTab', 'settings');
+            break;
+        }
+      }
+    };
+    
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyPress);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyPress);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -123,74 +156,107 @@ const Dashboard = () => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto p-6">
-        <div className="mb-4">
+        <div className="mb-6">
           <Breadcrumb />
         </div>
-        <div className="bg-slate-800/95 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-700/50 p-6">
-          {activeTab === 'vault' && <PasswordVault showAddForm={showAddForm} setShowAddForm={setShowAddForm} />}
-          {activeTab === 'generator' && (
-            <div className="max-w-2xl mx-auto">
-              <PasswordGenerator />
-            </div>
-          )}
-          {activeTab === 'settings' && <Settings />}
-          {activeTab === 'security' && (
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-10">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <ShieldCheckIcon className="w-8 h-8 text-white" />
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-3">Security Dashboard</h2>
-                <p className="text-slate-300 max-w-xl mx-auto">
-                  Advanced security monitoring and analysis tools to keep your passwords safe and secure.
-                </p>
+        <div className="bg-slate-800/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/60 p-8 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-700/20 via-transparent to-slate-900/20 pointer-events-none"></div>
+          <div className="relative z-10">
+            {activeTab === 'vault' && <PasswordVault showAddForm={showAddForm} setShowAddForm={setShowAddForm} />}
+            {activeTab === 'generator' && (
+              <div className="max-w-3xl mx-auto">
+                <PasswordGenerator />
               </div>
-
-              <div className="grid md:grid-cols-2 gap-4 mb-6">
-                <div className="group bg-gradient-to-br from-green-900/80 to-emerald-900/60 border border-green-500/30 rounded-2xl p-6 hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4 shadow-lg group-hover:shadow-green-500/50 transition-shadow">
-                    <div className="w-6 h-6 bg-white rounded-full opacity-90"></div>
+            )}
+            {activeTab === 'settings' && <Settings />}
+            {activeTab === 'security' && (
+              <div className="max-w-5xl mx-auto">
+                <div className="text-center mb-12">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-500/30 animate-pulse">
+                    <ShieldCheckIcon className="w-10 h-10 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3 group-hover:text-green-100 transition-colors">Password Health Check</h3>
-                  <p className="text-green-100/80 text-sm mb-4 leading-relaxed">Analyze all your passwords for strength, reuse, and security vulnerabilities.</p>
-                  <div className="inline-flex items-center px-3 py-1 bg-green-500/20 border border-green-400/30 rounded-full text-xs text-green-300 font-medium">Coming Q1 2024</div>
+                  <h2 className="text-3xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">Security Dashboard</h2>
+                  <p className="text-slate-300 max-w-2xl mx-auto text-lg leading-relaxed">
+                    Advanced security monitoring and analysis tools to keep your passwords safe and secure.
+                  </p>
                 </div>
 
-                <div className="group bg-gradient-to-br from-orange-900/80 to-red-900/60 border border-orange-500/30 rounded-2xl p-6 hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
-                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4 shadow-lg group-hover:shadow-orange-500/50 transition-shadow">
-                    <div className="w-6 h-6 bg-white rounded-full opacity-90"></div>
+                <div className="grid md:grid-cols-2 gap-8 mb-8">
+                <div className="group relative bg-gradient-to-br from-green-900/90 to-emerald-900/70 border-2 border-green-400/40 rounded-2xl p-6 hover:shadow-2xl hover:shadow-green-500/30 transition-all duration-500 hover:scale-[1.02] backdrop-blur-xl before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-green-400/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-500">
+                  <div className="relative z-10">
+                    <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mb-5 shadow-xl group-hover:shadow-green-400/60 transition-all duration-300 group-hover:rotate-3">
+                      <div className="w-7 h-7 bg-white rounded-full opacity-95 animate-pulse"></div>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-green-100 transition-colors">Password Health Check</h3>
+                    <p className="text-green-100/90 text-sm mb-5 leading-relaxed">Analyze all your passwords for strength, reuse, and security vulnerabilities.</p>
+                    <div className="inline-flex items-center px-4 py-2 bg-green-400/20 border border-green-300/40 rounded-full text-xs text-green-200 font-semibold backdrop-blur-sm">Coming Q1 2024</div>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3 group-hover:text-orange-100 transition-colors">Breach Monitoring</h3>
-                  <p className="text-orange-100/80 text-sm mb-4 leading-relaxed">Get instant alerts when your passwords appear in data breaches.</p>
-                  <div className="inline-flex items-center px-3 py-1 bg-orange-500/20 border border-orange-400/30 rounded-full text-xs text-orange-300 font-medium">Coming Q1 2024</div>
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-400/20 via-transparent to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
 
-                <div className="group bg-gradient-to-br from-purple-900/80 to-indigo-900/60 border border-purple-500/30 rounded-2xl p-6 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4 shadow-lg group-hover:shadow-purple-500/50 transition-shadow">
-                    <div className="w-6 h-6 bg-white rounded-full opacity-90"></div>
+                <div className="group relative bg-gradient-to-br from-orange-900/90 to-red-900/70 border-2 border-orange-400/40 rounded-2xl p-6 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] backdrop-blur-xl before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-orange-400/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-500">
+                  <div className="relative z-10">
+                    <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center mb-5 shadow-xl group-hover:shadow-orange-400/60 transition-all duration-300 group-hover:rotate-3">
+                      <div className="w-7 h-7 bg-white rounded-full opacity-95 animate-pulse"></div>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-orange-100 transition-colors">Breach Monitoring</h3>
+                    <p className="text-orange-100/90 text-sm mb-5 leading-relaxed">Get instant alerts when your passwords appear in data breaches.</p>
+                    <div className="inline-flex items-center px-4 py-2 bg-orange-400/20 border border-orange-300/40 rounded-full text-xs text-orange-200 font-semibold backdrop-blur-sm">Coming Q1 2024</div>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3 group-hover:text-purple-100 transition-colors">Two-Factor Authentication</h3>
-                  <p className="text-purple-100/80 text-sm mb-4 leading-relaxed">Enhanced security with TOTP and biometric authentication options.</p>
-                  <div className="inline-flex items-center px-3 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full text-xs text-purple-300 font-medium">Coming Q2 2024</div>
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-400/20 via-transparent to-red-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
 
-                <div className="group bg-gradient-to-br from-blue-900/80 to-cyan-900/60 border border-blue-500/30 rounded-2xl p-6 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mb-4 shadow-lg group-hover:shadow-blue-500/50 transition-shadow">
-                    <div className="w-6 h-6 bg-white rounded-full opacity-90"></div>
+                <div className="group relative bg-gradient-to-br from-purple-900/90 to-indigo-900/70 border-2 border-purple-400/40 rounded-2xl p-6 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-500 hover:scale-[1.02] backdrop-blur-xl before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-purple-400/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-500">
+                  <div className="relative z-10">
+                    <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-2xl flex items-center justify-center mb-5 shadow-xl group-hover:shadow-purple-400/60 transition-all duration-300 group-hover:rotate-3">
+                      <div className="w-7 h-7 bg-white rounded-full opacity-95 animate-pulse"></div>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-purple-100 transition-colors">Two-Factor Authentication</h3>
+                    <p className="text-purple-100/90 text-sm mb-5 leading-relaxed">Enhanced security with TOTP and biometric authentication options.</p>
+                    <div className="inline-flex items-center px-4 py-2 bg-purple-400/20 border border-purple-300/40 rounded-full text-xs text-purple-200 font-semibold backdrop-blur-sm">Coming Q2 2024</div>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-100 transition-colors">Advanced Analytics</h3>
-                  <p className="text-blue-100/80 text-sm mb-4 leading-relaxed">Comprehensive security insights and detailed password analytics.</p>
-                  <div className="inline-flex items-center px-3 py-1 bg-blue-500/20 border border-blue-400/30 rounded-full text-xs text-blue-300 font-medium">Coming Q2 2024</div>
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-400/20 via-transparent to-indigo-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                </div>
+
+                <div className="group relative bg-gradient-to-br from-blue-900/90 to-cyan-900/70 border-2 border-blue-400/40 rounded-2xl p-6 hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-500 hover:scale-[1.02] backdrop-blur-xl before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-blue-400/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-500">
+                  <div className="relative z-10">
+                    <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl flex items-center justify-center mb-5 shadow-xl group-hover:shadow-blue-400/60 transition-all duration-300 group-hover:rotate-3">
+                      <div className="w-7 h-7 bg-white rounded-full opacity-95 animate-pulse"></div>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-100 transition-colors">Advanced Analytics</h3>
+                    <p className="text-blue-100/90 text-sm mb-5 leading-relaxed">Comprehensive security insights and detailed password analytics.</p>
+                    <div className="inline-flex items-center px-4 py-2 bg-blue-400/20 border border-blue-300/40 rounded-full text-xs text-blue-200 font-semibold backdrop-blur-sm">Coming Q2 2024</div>
+                  </div>
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-400/20 via-transparent to-cyan-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
               </div>
             </div>
-          )}
+            )}
+          </div>
         </div>
+      </div>
+
+      {/* Floating Action Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={() => setShowAddForm(true)}
+          className="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-110 flex items-center justify-center group"
+          title="Add Password (⌘N)"
+        >
+          <PlusIcon className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" />
+        </button>
       </div>
 
       {showAddForm && (
         <AddPasswordModal 
+          isOpen={showAddForm}
           onClose={() => setShowAddForm(false)}
+          onAdd={() => {
+            // Refresh the vault if we're on the vault tab
+            if (activeTab === 'vault') {
+              window.location.reload();
+            }
+          }}
         />
       )}
     </div>

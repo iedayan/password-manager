@@ -184,23 +184,24 @@ const PasswordGenerator = ({ onGenerate }) => {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="text-center">
-        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <ArrowPathIcon className="w-8 h-8 text-white" />
+        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-500/30 animate-pulse">
+          <ArrowPathIcon className="w-10 h-10 text-white" />
         </div>
-        <h2 className="text-3xl font-bold text-white mb-2">Password Generator</h2>
-        <p className="text-slate-300">Create strong, secure passwords tailored for your accounts</p>
+        <h2 className="text-4xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">Password Generator</h2>
+        <p className="text-slate-300 text-lg">Create strong, secure passwords tailored for your accounts</p>
       </div>
 
       {/* Website Selection */}
-      <div className="bg-slate-700/80 border border-slate-600/60 rounded-2xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-          <GlobeAltIcon className="w-5 h-5" />
+      <div className="bg-gradient-to-br from-slate-700/90 to-slate-800/80 border-2 border-slate-600/40 rounded-3xl shadow-xl p-8 backdrop-blur-xl">
+        <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+            <GlobeAltIcon className="w-5 h-5 text-white" />
+          </div>
           Generate Password For
         </h3>
-        
-        <div className="space-y-4">
+        <div className="space-y-6">
           <input
             type="text"
             placeholder="Enter website or service name (e.g., google.com)"
@@ -230,7 +231,7 @@ const PasswordGenerator = ({ onGenerate }) => {
       
       {/* Generated Password Display */}
       {generatedPassword && (
-        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-2xl p-6 shadow-lg">
+        <div className="bg-gradient-to-r from-slate-700/90 to-slate-600/90 border border-slate-500/60 rounded-2xl p-6 shadow-lg backdrop-blur-sm">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-white">Generated Password</h3>
@@ -238,19 +239,19 @@ const PasswordGenerator = ({ onGenerate }) => {
                 <p className="text-sm text-slate-300">For: {selectedWebsite}</p>
               )}
             </div>
-            <div className={`flex items-center gap-2 ${getStrengthLabel().color}`}>
+            <div className={`flex items-center gap-2 ${getStrengthLabel().color.replace('text-', 'text-')}`}>
               <div className="w-3 h-3 rounded-full bg-current"></div>
-              <span className="text-sm font-medium">{getStrengthLabel().label}</span>
+              <span className="text-sm font-medium text-white">{getStrengthLabel().label}</span>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-4 bg-white rounded-xl border shadow-sm">
-            <code className="font-mono text-lg flex-1 break-all text-gray-800">{generatedPassword}</code>
+          <div className="flex items-center gap-3 p-4 bg-slate-800/80 rounded-xl border border-slate-600/60 shadow-sm">
+            <code className="font-mono text-lg flex-1 break-all text-white">{generatedPassword}</code>
             <button
               onClick={copyPassword}
               className={`p-3 rounded-lg transition-all duration-200 ${
                 copied 
-                  ? 'bg-green-100 text-green-600' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600'
+                  ? 'bg-green-600/20 text-green-400 border border-green-500/30' 
+                  : 'bg-slate-600/60 text-slate-300 hover:bg-blue-600/20 hover:text-blue-400 border border-slate-500/30'
               }`}
               title="Copy password"
             >
@@ -259,7 +260,7 @@ const PasswordGenerator = ({ onGenerate }) => {
             {selectedWebsite && (
               <button
                 onClick={() => setShowSaveModal(true)}
-                className="p-3 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
+                className="p-3 rounded-lg bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors border border-blue-500/30"
                 title="Save to vault"
               >
                 <PlusIcon className="w-5 h-5" />
@@ -270,14 +271,14 @@ const PasswordGenerator = ({ onGenerate }) => {
       )}
 
       {/* Password Options */}
-      <div className="bg-slate-700/80 border border-slate-600/60 rounded-2xl shadow-sm p-6 space-y-6">
+      <div className="bg-gradient-to-br from-slate-700/90 to-slate-800/80 border-2 border-slate-600/40 rounded-3xl shadow-xl p-8 space-y-8 backdrop-blur-xl">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-white">Password Options</h3>
+          <h3 className="text-2xl font-bold text-white">Password Options</h3>
           <button
             onClick={generatePassword}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
-            <ArrowPathIcon className="w-4 h-4" />
+            <ArrowPathIcon className="w-5 h-5" />
             Regenerate
           </button>
         </div>
@@ -285,7 +286,7 @@ const PasswordGenerator = ({ onGenerate }) => {
         {/* Length Selector */}
         <div className="space-y-3">
           <label className="text-sm font-medium text-slate-300">Password Length</label>
-          <div className="flex bg-gray-100 rounded-xl p-1">
+          <div className="flex bg-slate-600/60 rounded-xl p-1">
             {[8, 12, 16, 20, 24, 32].map(length => (
               <button
                 key={length}
@@ -297,7 +298,7 @@ const PasswordGenerator = ({ onGenerate }) => {
                 className={`flex-1 py-3 px-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   options.length === length 
                     ? 'bg-blue-600 text-white shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-200'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-500/60'
                 }`}
               >
                 {length}
@@ -312,32 +313,52 @@ const PasswordGenerator = ({ onGenerate }) => {
         {/* Character Options */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { key: 'uppercase', label: 'Uppercase Letters', example: 'ABCDEF' },
-            { key: 'lowercase', label: 'Lowercase Letters', example: 'abcdef' },
-            { key: 'numbers', label: 'Numbers', example: '123456' },
-            { key: 'symbols', label: 'Special Characters', example: '!@#$%^' }
+            { key: 'uppercase', label: 'Uppercase Letters', example: 'ABCDEF', icon: 'Aa', color: 'blue' },
+            { key: 'lowercase', label: 'Lowercase Letters', example: 'abcdef', icon: 'aa', color: 'green' },
+            { key: 'numbers', label: 'Numbers', example: '123456', icon: '123', color: 'purple' },
+            { key: 'symbols', label: 'Special Characters', example: '!@#$%^', icon: '!@#', color: 'orange' }
           ].map(option => (
-            <label key={option.key} className={`group flex items-center p-5 rounded-2xl border transition-all duration-200 cursor-pointer hover:shadow-md hover:-translate-y-0.5 ${
+            <label key={option.key} className={`group relative flex items-center p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:shadow-xl hover:scale-[1.02] backdrop-blur-sm ${
               options[option.key] 
-                ? 'border-blue-500 bg-blue-900/60 shadow-sm' 
-                : 'border-slate-600/60 bg-slate-600/60 hover:border-blue-400 hover:bg-slate-500/60'
+                ? `border-${option.color}-400/60 bg-gradient-to-br from-${option.color}-900/80 to-${option.color}-800/60 shadow-lg shadow-${option.color}-500/20` 
+                : 'border-slate-500/40 bg-gradient-to-br from-slate-600/80 to-slate-700/60 hover:border-slate-400/60 hover:shadow-slate-500/20'
+            } before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 ${
+              options[option.key] 
+                ? `before:from-${option.color}-400/10 before:to-transparent`
+                : 'before:from-slate-400/10 before:to-transparent'
             }`}>
-              <input
-                type="checkbox"
-                checked={options[option.key]}
-                onChange={(e) => {
-                  const newOptions = {...options, [option.key]: e.target.checked};
-                  setOptions(newOptions);
-                  // Auto-regenerate when options change
-                  setTimeout(() => generatePassword(newOptions), 100);
-                }}
-                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 mr-4"
-              />
-              <div className="flex-1">
-                <div className={`text-sm font-semibold transition-colors ${
-                  options[option.key] ? 'text-blue-200' : 'text-slate-200 group-hover:text-blue-300'
-                }`}>{option.label}</div>
-                <div className="text-xs text-slate-400 font-mono mt-1 bg-slate-800/60 px-2 py-1 rounded inline-block">{option.example}</div>
+              <div className="relative z-10 flex items-center w-full">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 font-bold text-lg transition-all duration-300 group-hover:scale-110 ${
+                  options[option.key]
+                    ? `bg-${option.color}-500/30 text-${option.color}-200 shadow-lg`
+                    : 'bg-slate-500/30 text-slate-300'
+                }`}>
+                  {option.icon}
+                </div>
+                <div className="flex-1">
+                  <div className={`text-sm font-bold transition-colors mb-2 ${
+                    options[option.key] ? 'text-white' : 'text-slate-200 group-hover:text-white'
+                  }`}>{option.label}</div>
+                  <div className={`text-xs font-mono px-3 py-1.5 rounded-lg inline-block transition-all ${
+                    options[option.key] 
+                      ? `bg-${option.color}-500/20 text-${option.color}-200 border border-${option.color}-400/30`
+                      : 'bg-slate-800/80 text-slate-400 border border-slate-600/40'
+                  }`}>{option.example}</div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={options[option.key]}
+                  onChange={(e) => {
+                    const newOptions = {...options, [option.key]: e.target.checked};
+                    setOptions(newOptions);
+                    setTimeout(() => generatePassword(newOptions), 100);
+                  }}
+                  className={`w-6 h-6 rounded-lg transition-all duration-200 ${
+                    options[option.key]
+                      ? `text-${option.color}-500 bg-${option.color}-500/20 border-${option.color}-400/60`
+                      : 'text-slate-500 bg-slate-700/60 border-slate-500/40'
+                  } focus:ring-2 focus:ring-blue-500`}
+                />
               </div>
             </label>
           ))}
@@ -345,12 +366,12 @@ const PasswordGenerator = ({ onGenerate }) => {
       </div>
 
       {/* Strength Indicator */}
-      <div className="bg-slate-700/80 border border-slate-600/60 rounded-2xl shadow-sm p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-white">Password Strength</h3>
-          <span className={`text-lg font-bold ${getStrengthLabel().color}`}>{getStrength()}%</span>
+      <div className="bg-gradient-to-br from-slate-700/90 to-slate-800/80 border-2 border-slate-600/40 rounded-3xl shadow-xl p-8 backdrop-blur-xl">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold text-white">Password Strength</h3>
+          <span className="text-2xl font-bold text-white bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">{getStrength()}%</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden mb-4">
+        <div className="w-full bg-slate-600/60 rounded-full h-4 overflow-hidden mb-4">
           <div 
             className={`h-4 rounded-full transition-all duration-500 ${
               getStrength() >= 80 ? 'bg-gradient-to-r from-green-500 to-green-600' :
@@ -364,30 +385,30 @@ const PasswordGenerator = ({ onGenerate }) => {
         
         {/* Security Features */}
         <div className="grid grid-cols-2 gap-3 text-xs">
-          <div className="flex items-center gap-2 text-green-600">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <div className="flex items-center gap-2 text-green-400">
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
             <span>Cryptographically Secure</span>
           </div>
-          <div className="flex items-center gap-2 text-green-600">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <div className="flex items-center gap-2 text-green-400">
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
             <span>Pattern Resistant</span>
           </div>
-          <div className="flex items-center gap-2 text-green-600">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <div className="flex items-center gap-2 text-green-400">
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
             <span>Ambiguity Reduced</span>
           </div>
-          <div className="flex items-center gap-2 text-green-600">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <div className="flex items-center gap-2 text-green-400">
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
             <span>Entropy Optimized</span>
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="flex gap-3">
+      <div className="flex gap-4">
         <button
           onClick={generatePassword}
-          className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 rounded-2xl hover:from-blue-700 hover:to-cyan-700 font-semibold text-lg flex items-center justify-center gap-3 transition-all duration-200 shadow-lg hover:shadow-xl"
+          className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-5 rounded-2xl hover:from-blue-700 hover:to-cyan-700 font-bold text-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-2xl hover:shadow-blue-500/30 transform hover:scale-[1.02]"
         >
           <ArrowPathIcon className="w-6 h-6" />
           Generate New Password
@@ -395,7 +416,7 @@ const PasswordGenerator = ({ onGenerate }) => {
         {generatedPassword && selectedWebsite && (
           <button
             onClick={() => setShowSaveModal(true)}
-            className="px-6 py-4 bg-green-600 text-white rounded-2xl hover:bg-green-700 font-semibold flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="px-8 py-5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl hover:from-green-700 hover:to-emerald-700 font-bold flex items-center gap-3 transition-all duration-300 shadow-2xl hover:shadow-green-500/30 transform hover:scale-[1.02]"
           >
             <PlusIcon className="w-5 h-5" />
             Save to Vault
