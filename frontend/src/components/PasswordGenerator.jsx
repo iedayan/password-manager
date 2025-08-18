@@ -15,14 +15,14 @@ const PasswordGenerator = ({ onGenerate }) => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   
   const popularWebsites = [
-    { name: 'Google', url: 'google.com', icon: '🔍' },
-    { name: 'Facebook', url: 'facebook.com', icon: '📘' },
-    { name: 'Twitter', url: 'twitter.com', icon: '🐦' },
-    { name: 'Instagram', url: 'instagram.com', icon: '📷' },
-    { name: 'LinkedIn', url: 'linkedin.com', icon: '💼' },
-    { name: 'GitHub', url: 'github.com', icon: '🐙' },
-    { name: 'Netflix', url: 'netflix.com', icon: '🎬' },
-    { name: 'Amazon', url: 'amazon.com', icon: '📦' },
+    { name: 'Google', url: 'google.com' },
+    { name: 'Facebook', url: 'facebook.com' },
+    { name: 'Twitter', url: 'twitter.com' },
+    { name: 'Instagram', url: 'instagram.com' },
+    { name: 'LinkedIn', url: 'linkedin.com' },
+    { name: 'GitHub', url: 'github.com' },
+    { name: 'Netflix', url: 'netflix.com' },
+    { name: 'Amazon', url: 'amazon.com' },
   ];
 
   const generatePassword = (customOptions = options) => {
@@ -86,7 +86,7 @@ const PasswordGenerator = ({ onGenerate }) => {
       </div>
 
       {/* Website Selection */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
           <GlobeAltIcon className="w-5 h-5" />
           Generate Password For
@@ -106,14 +106,14 @@ const PasswordGenerator = ({ onGenerate }) => {
               <button
                 key={site.url}
                 onClick={() => setSelectedWebsite(site.url)}
-                className={`p-3 rounded-xl border-2 transition-all hover:shadow-md ${
+                className={`group p-4 rounded-2xl border transition-all duration-200 hover:shadow-lg hover:-translate-y-1 ${
                   selectedWebsite === site.url
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                    ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-700 shadow-md'
+                    : 'border-gray-200 bg-white hover:border-blue-300 text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                <div className="text-2xl mb-1">{site.icon}</div>
-                <div className="text-sm font-medium">{site.name}</div>
+                <div className="text-sm font-semibold group-hover:text-blue-600 transition-colors">{site.name}</div>
+                <div className="text-xs text-gray-500 mt-1">{site.url}</div>
               </button>
             ))}
           </div>
@@ -122,7 +122,7 @@ const PasswordGenerator = ({ onGenerate }) => {
       
       {/* Generated Password Display */}
       {generatedPassword && (
-        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-2xl p-6">
+        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-2xl p-6 shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-800">Generated Password</h3>
@@ -135,7 +135,7 @@ const PasswordGenerator = ({ onGenerate }) => {
               <span className="text-sm font-medium">{getStrengthLabel().label}</span>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-4 bg-white rounded-xl border">
+          <div className="flex items-center gap-3 p-4 bg-white rounded-xl border shadow-sm">
             <code className="font-mono text-lg flex-1 break-all text-gray-800">{generatedPassword}</code>
             <button
               onClick={copyPassword}
@@ -162,7 +162,7 @@ const PasswordGenerator = ({ onGenerate }) => {
       )}
 
       {/* Password Options */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-6">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-semibold text-gray-800">Password Options</h3>
           <button
@@ -199,17 +199,17 @@ const PasswordGenerator = ({ onGenerate }) => {
         </div>
 
         {/* Character Options */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { key: 'uppercase', label: 'Uppercase Letters', example: 'ABCDEF', icon: '🔤' },
-            { key: 'lowercase', label: 'Lowercase Letters', example: 'abcdef', icon: '🔡' },
-            { key: 'numbers', label: 'Numbers', example: '123456', icon: '🔢' },
-            { key: 'symbols', label: 'Special Characters', example: '!@#$%^', icon: '🔣' }
+            { key: 'uppercase', label: 'Uppercase Letters', example: 'ABCDEF' },
+            { key: 'lowercase', label: 'Lowercase Letters', example: 'abcdef' },
+            { key: 'numbers', label: 'Numbers', example: '123456' },
+            { key: 'symbols', label: 'Special Characters', example: '!@#$%^' }
           ].map(option => (
-            <label key={option.key} className={`flex items-center p-4 rounded-xl border-2 transition-all cursor-pointer ${
+            <label key={option.key} className={`group flex items-center p-5 rounded-2xl border transition-all duration-200 cursor-pointer hover:shadow-md hover:-translate-y-0.5 ${
               options[option.key] 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300 bg-gray-50'
+                ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm' 
+                : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-gray-50'
             }`}>
               <input
                 type="checkbox"
@@ -220,22 +220,21 @@ const PasswordGenerator = ({ onGenerate }) => {
                   // Auto-regenerate when options change
                   setTimeout(() => generatePassword(newOptions), 100);
                 }}
-                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-3"
+                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 mr-4"
               />
-              <div className="flex items-center gap-3 flex-1">
-                <span className="text-2xl">{option.icon}</span>
-                <div>
-                  <div className="text-sm font-medium text-gray-800">{option.label}</div>
-                  <div className="text-xs text-gray-500 font-mono">{option.example}</div>
-                </div>
+              <div className="flex-1">
+                <div className={`text-sm font-semibold transition-colors ${
+                  options[option.key] ? 'text-blue-700' : 'text-gray-800 group-hover:text-blue-600'
+                }`}>{option.label}</div>
+                <div className="text-xs text-gray-500 font-mono mt-1 bg-gray-100 px-2 py-1 rounded inline-block">{option.example}</div>
               </div>
             </label>
-          ))}
+          ))
         </div>
       </div>
 
       {/* Strength Indicator */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-800">Password Strength</h3>
           <span className={`text-lg font-bold ${getStrengthLabel().color}`}>{getStrength()}%</span>
