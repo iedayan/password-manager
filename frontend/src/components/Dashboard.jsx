@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { PlusIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon, UserIcon, ShieldCheckIcon, DocumentArrowUpIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon, UserIcon, ShieldCheckIcon, DocumentArrowUpIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import PasswordVault from './PasswordVault';
 import PasswordGenerator from './PasswordGenerator';
 import AddPasswordModal from './AddPasswordModal';
@@ -98,6 +98,13 @@ const Dashboard = () => {
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowOnboarding(true)}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium text-sm"
+                >
+                  <SparklesIcon className="w-4 h-4" />
+                  Setup Guide
+                </button>
                 <button
                   onClick={() => setShowImportWizard(true)}
                   className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium text-sm"
