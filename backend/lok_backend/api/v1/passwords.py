@@ -504,27 +504,42 @@ def decrypt_password(password_id):
 @passwords_bp.route("/analyze", methods=["GET"])
 @jwt_required()
 def analyze_passwords():
-    """Analyze password strength and security issues."""
+    """AI-powered password analysis with advanced security insights."""
     try:
         user_id = int(get_jwt_identity())
         passwords = Password.query.filter_by(user_id=user_id).all()
 
+        # Import AI services
+        from ...services.ai_security_service import ai_security_service
+        from ...services.breach_detection_service import breach_detection_service
+
+        password_data = []
         weak_passwords = []
         duplicate_passwords = {}
 
         for password in passwords:
             try:
                 decrypted = encryption_service.decrypt(password.encrypted_password)
-                strength = calculate_password_strength(decrypted)
+                
+                # AI-enhanced strength analysis
+                ai_analysis = ai_security_service.analyze_password_strength_ml(decrypted)
+                
+                pwd_data = {
+                    'password': decrypted,
+                    'site_name': password.site_name,
+                    'username': password.username,
+                    'created_at': password.created_at.isoformat()
+                }
+                password_data.append(pwd_data)
 
-                if strength < 60:
-                    weak_passwords.append(
-                        {
-                            "id": password.id,
-                            "site_name": password.site_name,
-                            "strength": strength,
-                        }
-                    )
+                if ai_analysis['score'] < 60:
+                    weak_passwords.append({
+                        "id": password.id,
+                        "site_name": password.site_name,
+                        "strength": ai_analysis['score'],
+                        "ai_feedback": ai_analysis['feedback'],
+                        "risk_level": ai_analysis['risk_level']
+                    })
 
                 if decrypted in duplicate_passwords:
                     duplicate_passwords[decrypted].append(password.site_name)
@@ -538,6 +553,12 @@ def analyze_passwords():
             sites[0]: sites for sites in duplicate_passwords.values() if len(sites) > 1
         }
 
+        # AI-powered breach risk prediction
+        breach_risk = ai_security_service.predict_breach_risk(password_data)
+        
+        # Breach pattern analysis
+        breach_analysis = breach_detection_service.analyze_breach_patterns(password_data)
+
         return (
             jsonify(
                 {
@@ -545,6 +566,9 @@ def analyze_passwords():
                     "duplicate_count": len(duplicates),
                     "duplicates": list(duplicates.values()),
                     "total_passwords": len(passwords),
+                    "breach_risk": breach_risk,
+                    "breach_analysis": breach_analysis,
+                    "ai_recommendations": breach_risk.get('recommendations', []),
                     "analysis_date": datetime.now(timezone.utc).isoformat(),
                 }
             ),
@@ -565,7 +589,7 @@ def analyze_passwords():
 @jwt_required()
 @limiter.limit("30 per minute")
 def generate_password():
-    """Generate secure password with custom rules."""
+    """AI-enhanced password generation with smart suggestions."""
     try:
         data = request.get_json() or {}
         length = min(max(data.get("length", 16), 8), 128)
@@ -573,6 +597,10 @@ def generate_password():
         include_lowercase = data.get("lowercase", True)
         include_numbers = data.get("numbers", True)
         include_symbols = data.get("symbols", True)
+        
+        # AI context for smart generation
+        site_name = data.get("site_name", "")
+        username = data.get("username", "")
 
         charset = ""
         if include_lowercase:
@@ -590,17 +618,163 @@ def generate_password():
                 400,
             )
 
-        password = "".join(secrets.choice(charset) for _ in range(length))
-        strength = calculate_password_strength(password)
+        # Generate multiple password options
+        passwords = []
+        
+        # Standard secure password
+        standard_password = "".join(secrets.choice(charset) for _ in range(length))
+        
+        # Import AI service for smart suggestions
+        from ...services.ai_security_service import ai_security_service
+        
+        # AI-enhanced analysis
+        ai_analysis = ai_security_service.analyze_password_strength_ml(standard_password)
+        
+        passwords.append({
+            "password": standard_password,
+            "type": "secure_random",
+            "strength": ai_analysis['score'],
+            "entropy": ai_analysis['entropy'],
+            "feedback": ai_analysis['feedback']
+        })
+        
+        # Smart context-aware suggestions if site info provided
+        if site_name:
+            smart_suggestions = ai_security_service.smart_password_suggestions(site_name, username)
+            for suggestion in smart_suggestions:
+                suggestion_analysis = ai_security_service.analyze_password_strength_ml(suggestion)
+                passwords.append({
+                    "password": suggestion,
+                    "type": "smart_suggestion",
+                    "strength": suggestion_analysis['score'],
+                    "entropy": suggestion_analysis['entropy'],
+                    "feedback": suggestion_analysis['feedback']
+                })
 
         return (
-            jsonify({"password": password, "strength": strength, "length": length}),
+            jsonify({
+                "passwords": passwords,
+                "recommended": max(passwords, key=lambda x: x['strength']),
+                "generation_date": datetime.now(timezone.utc).isoformat()
+            }),
             200,
         )
 
     except Exception as e:
         current_app.logger.error(f"Error generating password: {str(e).replace(chr(10), ' ').replace(chr(13), ' ')[:200]}")
         return jsonify({"error": "Password generation failed"}), 500
+
+
+@passwords_bp.route("/ai/breach-check", methods=["POST"])
+@jwt_required()
+@limiter.limit("10 per minute")
+def ai_breach_check():
+    """AI-powered breach detection for specific passwords."""
+    try:
+        user_id = int(get_jwt_identity())
+        data = request.get_json(force=True)
+        
+        if not data or "password_ids" not in data:
+            return jsonify({"error": "Password IDs required"}), 400
+        
+        from ...services.breach_detection_service import breach_detection_service
+        
+        results = []
+        for password_id in data["password_ids"]:
+            password = Password.query.filter_by(id=password_id, user_id=user_id).first()
+            if password:
+                try:
+                    decrypted = encryption_service.decrypt(password.encrypted_password)
+                    breach_result = breach_detection_service.check_password_breach(decrypted)
+                    
+                    results.append({
+                        "password_id": password_id,
+                        "site_name": password.site_name,
+                        "breach_status": breach_result
+                    })
+                except Exception:
+                    continue
+        
+        return jsonify({
+            "results": results,
+            "checked_at": datetime.now(timezone.utc).isoformat()
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"AI breach check failed: {str(e)}")
+        return jsonify({"error": "Breach check failed"}), 500
+
+
+@passwords_bp.route("/ai/behavioral-analysis", methods=["POST"])
+@jwt_required()
+@limiter.limit("5 per minute")
+def behavioral_analysis():
+    """AI behavioral analysis for anomaly detection."""
+    try:
+        user_id = int(get_jwt_identity())
+        
+        # Collect login data
+        login_data = {
+            'ip_address': request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr),
+            'user_agent': request.headers.get('User-Agent', ''),
+            'timestamp': datetime.now(timezone.utc).isoformat()
+        }
+        
+        from ...services.ai_security_service import ai_security_service
+        
+        # Perform behavioral analysis
+        analysis = ai_security_service.detect_anomalous_behavior(user_id, login_data)
+        
+        # Log security events if anomalies detected
+        if analysis['anomalies']:
+            current_app.logger.warning(
+                f"Behavioral anomalies detected for user {user_id}: {analysis['anomalies']}"
+            )
+        
+        return jsonify({
+            "analysis": analysis,
+            "analyzed_at": datetime.now(timezone.utc).isoformat()
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Behavioral analysis failed: {str(e)}")
+        return jsonify({"error": "Behavioral analysis failed"}), 500
+
+
+@passwords_bp.route("/ai/smart-monitoring", methods=["GET"])
+@jwt_required()
+def smart_monitoring():
+    """AI-powered smart monitoring dashboard."""
+    try:
+        user_id = int(get_jwt_identity())
+        passwords = Password.query.filter_by(user_id=user_id).all()
+        
+        password_data = []
+        for password in passwords:
+            try:
+                decrypted = encryption_service.decrypt(password.encrypted_password)
+                password_data.append({
+                    'password': decrypted,
+                    'site_name': password.site_name,
+                    'username': password.username,
+                    'created_at': password.created_at.isoformat()
+                })
+            except Exception:
+                continue
+        
+        from ...services.breach_detection_service import breach_detection_service
+        
+        # Get smart monitoring insights
+        monitoring_results = breach_detection_service.smart_breach_monitoring(password_data)
+        
+        return jsonify({
+            "monitoring": monitoring_results,
+            "generated_at": datetime.now(timezone.utc).isoformat()
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Smart monitoring failed: {str(e)}")
+        return jsonify({"error": "Smart monitoring failed"}), 500
 
 
 
