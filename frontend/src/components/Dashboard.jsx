@@ -79,8 +79,8 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
-      <div className="bg-white/90 backdrop-blur-xl border-b border-gray-200/60 shadow-lg">
-        <div className="max-w-7xl mx-auto px-6">
+      <div className="bg-white/90 backdrop-blur-xl border-b border-gray-200/60 shadow-lg relative z-50">
+        <div className="max-w-7xl mx-auto px-6 relative">
           <div className="flex justify-between items-center py-5 border-b-2 border-gray-300/80">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -122,40 +122,84 @@ const Dashboard = () => {
                   <Cog6ToothIcon className="w-5 h-5" />
                 </button>
                 {showSettingsDropdown && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/60 py-1 z-50">
-                    <button className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50/80 flex items-center gap-3 transition-colors">
-                      <UserIcon className="w-4 h-4" />
-                      Profile
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setShowOnboarding(true);
-                        setShowSettingsDropdown(false);
-                      }}
-                      className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50/80 flex items-center gap-3 transition-colors"
-                    >
-                      <ShieldCheckIcon className="w-4 h-4" />
-                      Setup Guide
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setActiveTab('settings');
-                        localStorage.setItem('activeTab', 'settings');
-                        setShowSettingsDropdown(false);
-                      }}
-                      className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50/80 flex items-center gap-3 transition-colors"
-                    >
-                      <Cog6ToothIcon className="w-4 h-4" />
-                      Settings
-                    </button>
-                    <hr className="my-1 border-gray-200" />
-                    <button 
-                      onClick={handleLogout}
-                      className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50/80 flex items-center gap-3 transition-colors"
-                    >
-                      <ArrowRightOnRectangleIcon className="w-4 h-4" />
-                      Logout
-                    </button>
+                  <div className="fixed right-6 top-20 w-56 bg-white backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/60 py-2 z-[9999] animate-in slide-in-from-top-2 duration-200">
+                    {/* User Info Section */}
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                          <UserIcon className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">Account</div>
+                          <div className="text-xs text-gray-500">Manage your profile</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="py-1">
+                      <button className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 flex items-center gap-3 transition-all duration-200 group">
+                        <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+                          <UserIcon className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Profile</div>
+                          <div className="text-xs text-gray-500 group-hover:text-blue-600">Account settings</div>
+                        </div>
+                      </button>
+                      
+                      <button 
+                        onClick={() => {
+                          setShowOnboarding(true);
+                          setShowSettingsDropdown(false);
+                        }}
+                        className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-700 flex items-center gap-3 transition-all duration-200 group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-purple-100 flex items-center justify-center transition-colors">
+                          <ShieldCheckIcon className="w-4 h-4 text-gray-600 group-hover:text-purple-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Setup Guide</div>
+                          <div className="text-xs text-gray-500 group-hover:text-purple-600">AI-powered onboarding</div>
+                        </div>
+                      </button>
+                      
+                      <button 
+                        onClick={() => {
+                          setActiveTab('settings');
+                          localStorage.setItem('activeTab', 'settings');
+                          setShowSettingsDropdown(false);
+                        }}
+                        className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 hover:text-gray-900 flex items-center gap-3 transition-all duration-200 group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-gray-200 flex items-center justify-center transition-colors">
+                          <Cog6ToothIcon className="w-4 h-4 text-gray-600 group-hover:text-gray-700" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Settings</div>
+                          <div className="text-xs text-gray-500 group-hover:text-gray-700">Preferences & security</div>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="my-1 border-t border-gray-100"></div>
+
+                    {/* Logout Section */}
+                    <div className="py-1">
+                      <button 
+                        onClick={handleLogout}
+                        className="w-full px-4 py-3 text-left text-sm text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 flex items-center gap-3 transition-all duration-200 group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-red-50 group-hover:bg-red-100 flex items-center justify-center transition-colors">
+                          <ArrowRightOnRectangleIcon className="w-4 h-4 text-red-500 group-hover:text-red-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Sign Out</div>
+                          <div className="text-xs text-red-400 group-hover:text-red-500">End your session</div>
+                        </div>
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
