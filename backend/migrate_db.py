@@ -33,8 +33,9 @@ def migrate_database():
             
             # Test database connection
             try:
-                result = db.engine.execute(text('SELECT version()'))
-                version = result.fetchone()[0]
+                with db.engine.connect() as conn:
+                    result = conn.execute(text('SELECT version()'))
+                    version = result.fetchone()[0]
                 print(f"✅ Database connected: {version}")
             except Exception as e:
                 print(f"❌ Database connection failed: {e}")

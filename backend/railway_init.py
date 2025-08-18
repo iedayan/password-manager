@@ -36,7 +36,8 @@ def init_railway_database():
             
             # Check if database is accessible
             try:
-                db.engine.execute(text('SELECT 1'))
+                with db.engine.connect() as conn:
+                    conn.execute(text('SELECT 1'))
                 logger.info("✅ Database connection successful")
             except Exception as e:
                 logger.error(f"❌ Database connection failed: {e}")
