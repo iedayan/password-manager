@@ -9,7 +9,7 @@ import ErrorMessage from './ErrorMessage';
 import Toast from './Toast';
 import { api } from '../lib/api';
 
-const PasswordVault = ({ showAddForm, setShowAddForm }) => {
+const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassword, refreshTrigger }) => {
   const [passwords, setPasswords] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
@@ -55,6 +55,10 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
     if (['netflix', 'spotify', 'youtube', 'disney'].some(s => site.includes(s))) return 'Entertainment';
     return 'Personal';
   };
+
+  useEffect(() => {
+    fetchPasswords();
+  }, [refreshTrigger]);
 
   useEffect(() => {
     fetchPasswords();
@@ -453,7 +457,7 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
             isDuplicate={duplicates.has(password.password)}
             daysOld={getDaysOld(password.created_at)}
             onReveal={setShowMasterKeyModal}
-            onEdit={setEditingPassword}
+            onEdit={onEditPassword || setEditingPassword}
             onDelete={setDeletingPassword}
             onToggleSelect={() => togglePasswordSelection(password.id)}
             onToggleFavorite={() => toggleFavorite(password.id)}

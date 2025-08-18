@@ -3,6 +3,7 @@ import { PlusIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon, UserIcon, ShieldChe
 import PasswordVault from './PasswordVault';
 import PasswordGenerator from './PasswordGenerator';
 import AddPasswordModal from './AddPasswordModal';
+import EditPasswordModal from './EditPasswordModal';
 import Settings from './Settings';
 import Breadcrumb from './Breadcrumb';
 import OnboardingFlow from './OnboardingFlow';
@@ -14,9 +15,11 @@ const Dashboard = () => {
     return localStorage.getItem('activeTab') || 'vault';
   });
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingPassword, setEditingPassword] = useState(null);
   const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showImportWizard, setShowImportWizard] = useState(false);
+  const [refreshVault, setRefreshVault] = useState(0);
   const dropdownRef = useRef(null);
 
   // Remove automatic onboarding trigger - only show when manually opened
@@ -244,6 +247,8 @@ const Dashboard = () => {
                 showAddForm={showAddForm} 
                 setShowAddForm={setShowAddForm}
                 onImportClick={() => setShowImportWizard(true)}
+                onEditPassword={setEditingPassword}
+                refreshTrigger={refreshVault}
               />
             )}
             {activeTab === 'generator' && (
@@ -335,10 +340,20 @@ const Dashboard = () => {
           isOpen={showAddForm}
           onClose={() => setShowAddForm(false)}
           onAdd={() => {
-            // Refresh the vault if we're on the vault tab
-            if (activeTab === 'vault') {
-              window.location.reload();
-            }
+            setShowAddForm(false);
+            setRefreshVault(prev => prev + 1);
+          }}
+        />
+      )}
+
+      {/* Edit Password Modal */}
+      {editingPassword && (
+        <EditPasswordModal
+          password={editingPassword}
+          onClose={() => setEditingPassword(null)}
+          onUpdate={() => {
+            setEditingPassword(null);
+            setRefreshVault(prev => prev + 1);
           }}
         />
       )}
@@ -359,9 +374,7 @@ const Dashboard = () => {
         onClose={() => setShowImportWizard(false)}
         onComplete={() => {
           setShowImportWizard(false);
-          if (activeTab === 'vault') {
-            window.location.reload();
-          }
+          setRefreshVault(prev => prev + 1);
         }}
       />
     </div>

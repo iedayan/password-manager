@@ -11,14 +11,70 @@ const ImportWizard = ({ isOpen, onClose, onComplete }) => {
   const [error, setError] = useState('');
 
   const passwordManagers = [
-    { id: '1password', name: '1Password', icon: '🔐', format: 'csv' },
-    { id: 'lastpass', name: 'LastPass', icon: '🔒', format: 'csv' },
-    { id: 'chrome', name: 'Google Chrome', icon: '🌐', format: 'csv' },
-    { id: 'firefox', name: 'Mozilla Firefox', icon: '🦊', format: 'csv' },
-    { id: 'bitwarden', name: 'Bitwarden', icon: '🛡️', format: 'json' },
-    { id: 'dashlane', name: 'Dashlane', icon: '🔑', format: 'csv' },
-    { id: 'csv', name: 'Generic CSV', icon: '📄', format: 'csv' },
-    { id: 'json', name: 'Generic JSON', icon: '📋', format: 'json' }
+    { 
+      id: '1password', 
+      name: '1Password', 
+      format: 'csv',
+      colors: 'from-blue-600 to-blue-800',
+      borderColor: 'border-blue-500',
+      description: 'The world\'s most-loved password manager'
+    },
+    { 
+      id: 'lastpass', 
+      name: 'LastPass', 
+      format: 'csv',
+      colors: 'from-red-600 to-red-800',
+      borderColor: 'border-red-500',
+      description: 'Simplify your digital life'
+    },
+    { 
+      id: 'chrome', 
+      name: 'Google Chrome', 
+      format: 'csv',
+      colors: 'from-green-500 to-blue-600',
+      borderColor: 'border-blue-400',
+      description: 'Built-in browser password manager'
+    },
+    { 
+      id: 'firefox', 
+      name: 'Mozilla Firefox', 
+      format: 'csv',
+      colors: 'from-orange-500 to-red-600',
+      borderColor: 'border-orange-500',
+      description: 'Privacy-focused browser passwords'
+    },
+    { 
+      id: 'bitwarden', 
+      name: 'Bitwarden', 
+      format: 'json',
+      colors: 'from-blue-700 to-indigo-800',
+      borderColor: 'border-indigo-500',
+      description: 'Open source password management'
+    },
+    { 
+      id: 'dashlane', 
+      name: 'Dashlane', 
+      format: 'csv',
+      colors: 'from-green-600 to-teal-700',
+      borderColor: 'border-green-500',
+      description: 'Password manager with VPN'
+    },
+    { 
+      id: 'csv', 
+      name: 'Generic CSV', 
+      format: 'csv',
+      colors: 'from-gray-600 to-gray-800',
+      borderColor: 'border-gray-500',
+      description: 'Standard comma-separated values'
+    },
+    { 
+      id: 'json', 
+      name: 'Generic JSON', 
+      format: 'json',
+      colors: 'from-purple-600 to-purple-800',
+      borderColor: 'border-purple-500',
+      description: 'JavaScript Object Notation format'
+    }
   ];
 
   const handleFileSelect = (event) => {
@@ -123,7 +179,7 @@ const ImportWizard = ({ isOpen, onClose, onComplete }) => {
               <h3 className="text-xl font-semibold text-white mb-4">
                 Which password manager are you using?
               </h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {passwordManagers.map((manager) => (
                   <button
                     key={manager.id}
@@ -131,19 +187,36 @@ const ImportWizard = ({ isOpen, onClose, onComplete }) => {
                       setSelectedManager(manager.id);
                       setStep(2);
                     }}
-                    className="p-4 border-2 border-slate-600 rounded-xl hover:border-blue-500 hover:bg-slate-700/50 transition-all duration-200 text-left group"
+                    className={`relative p-5 border-2 ${manager.borderColor} rounded-xl hover:scale-105 transition-all duration-300 text-left group overflow-hidden`}
                   >
-                    <div className="flex items-center space-x-3">
-                      <span className="text-2xl">{manager.icon}</span>
-                      <div>
-                        <div className="text-white font-medium group-hover:text-blue-400 transition-colors">
-                          {manager.name}
-                        </div>
-                        <div className="text-slate-400 text-sm">
-                          {manager.format.toUpperCase()} format
+                    {/* Background Gradient */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${manager.colors} opacity-10 group-hover:opacity-20 transition-opacity`}></div>
+                    
+                    {/* Content */}
+                    <div className="relative z-10">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className={`px-2 py-1 bg-gradient-to-r ${manager.colors} rounded-full text-xs text-white font-medium`}>
+                          {manager.format.toUpperCase()}
                         </div>
                       </div>
+                      
+                      <div className="mb-2">
+                        <h3 className="text-white font-semibold text-lg group-hover:text-blue-300 transition-colors">
+                          {manager.name}
+                        </h3>
+                        <p className="text-slate-400 text-sm leading-relaxed">
+                          {manager.description}
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-center text-xs text-slate-500">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                        Supported format
+                      </div>
                     </div>
+                    
+                    {/* Hover Effect */}
+                    <div className={`absolute inset-0 border-2 ${manager.borderColor} rounded-xl opacity-0 group-hover:opacity-100 transition-opacity`}></div>
                   </button>
                 ))}
               </div>

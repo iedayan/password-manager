@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { EyeIcon, EyeSlashIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, EyeSlashIcon, XMarkIcon, KeyIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from './LoadingSpinner';
+import PasswordStrengthIndicator from './PasswordStrengthIndicator';
+import { validatePasswordForm, sanitizeFormData } from '../utils/validation';
 import { api } from '../lib/api';
 
 const EditPasswordModal = ({ password, onClose, onUpdate }) => {
@@ -13,6 +15,33 @@ const EditPasswordModal = ({ password, onClose, onUpdate }) => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [passwordStrength, setPasswordStrength] = useState({ score: 0, feedback: [], level: 'none' });
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [hasPasswordChange, setHasPasswordChange] = useState(false);
+
+
+
+  const generatePassword = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await api.passwords.generate({ length: 16, include_symbols: true });
+      const newPassword = response.password || response;
+      setFormData(prev => ({ ...prev, password: newPassword }));
+      setHasPasswordChange(true);
+    } catch (error) {
+      // Fallback to client-side generation
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+      let password = '';
+      for (let i = 0; i < 16; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      setFormData(prev => ({ ...prev, password }));
+      setHasPasswordChange(true);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   useEffect(() => {
     if (password) {
@@ -22,21 +51,57 @@ const EditPasswordModal = ({ password, onClose, onUpdate }) => {
         username: password.username || '',
         password: ''
       });
+      setHasPasswordChange(false);
     }
   }, [password]);
+
+  useEffect(() => {
+    if (formData.password) {
+      setHasPasswordChange(true);
+    }
+  }, [formData.password]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setFieldErrors({});
+
+    // Prepare update data
+    const updateData = { ...formData };
+    if (!updateData.password) {
+      delete updateData.password; // Don't update password if empty
+    }
+
+    // Validate form data (skip password validation if not changing)
+    const sanitizedData = sanitizeFormData(updateData);
+    const validation = validatePasswordForm({
+      ...sanitizedData,
+      password: sanitizedData.password || 'dummy' // Skip password validation if not provided
+    });
+    
+    // Only validate non-password fields
+    const relevantErrors = {};
+    if (validation.errors.site_name) relevantErrors.site_name = validation.errors.site_name;
+    if (validation.errors.site_url) relevantErrors.site_url = validation.errors.site_url;
+    if (validation.errors.username) relevantErrors.username = validation.errors.username;
+    if (sanitizedData.password && validation.errors.password) relevantErrors.password = validation.errors.password;
+    
+    if (Object.keys(relevantErrors).length > 0) {
+      setFieldErrors(relevantErrors);
+      setLoading(false);
+      return;
+    }
+
+    // Check password strength if changing password
+    if (hasPasswordChange && passwordStrength.score < 40) {
+      setError('New password is too weak. Please use a stronger password.');
+      setLoading(false);
+      return;
+    }
 
     try {
-      const updateData = { ...formData };
-      if (!updateData.password) {
-        delete updateData.password; // Don't update password if empty
-      }
-
-      const response = await api.passwords.update(password.id, updateData);
+      const response = await api.passwords.update(password.id, sanitizedData);
       onUpdate(response.password);
       onClose();
     } catch (error) {
@@ -76,9 +141,14 @@ const EditPasswordModal = ({ password, onClose, onUpdate }) => {
               type="text"
               value={formData.site_name}
               onChange={(e) => setFormData(prev => ({...prev, site_name: e.target.value}))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                fieldErrors.site_name ? 'border-red-300 bg-red-50' : 'border-gray-300'
+              }`}
               required
             />
+            {fieldErrors.site_name && (
+              <p className="text-red-600 text-xs mt-1">{fieldErrors.site_name}</p>
+            )}
           </div>
 
           <div>
@@ -89,9 +159,14 @@ const EditPasswordModal = ({ password, onClose, onUpdate }) => {
               type="url"
               value={formData.site_url}
               onChange={(e) => setFormData(prev => ({...prev, site_url: e.target.value}))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                fieldErrors.site_url ? 'border-red-300 bg-red-50' : 'border-gray-300'
+              }`}
               placeholder="https://example.com"
             />
+            {fieldErrors.site_url && (
+              <p className="text-red-600 text-xs mt-1">{fieldErrors.site_url}</p>
+            )}
           </div>
 
           <div>
@@ -102,9 +177,14 @@ const EditPasswordModal = ({ password, onClose, onUpdate }) => {
               type="text"
               value={formData.username}
               onChange={(e) => setFormData(prev => ({...prev, username: e.target.value}))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                fieldErrors.username ? 'border-red-300 bg-red-50' : 'border-gray-300'
+              }`}
               required
             />
+            {fieldErrors.username && (
+              <p className="text-red-600 text-xs mt-1">{fieldErrors.username}</p>
+            )}
           </div>
 
           <div>
@@ -116,17 +196,39 @@ const EditPasswordModal = ({ password, onClose, onUpdate }) => {
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => setFormData(prev => ({...prev, password: e.target.value}))}
-                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full px-3 py-2 pr-20 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  fieldErrors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                }`}
                 placeholder="Enter new password"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
-              </button>
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
+                <button
+                  type="button"
+                  onClick={generatePassword}
+                  disabled={isGenerating}
+                  className="p-1 text-gray-400 hover:text-blue-600 transition-colors disabled:opacity-50"
+                  title="Generate secure password"
+                >
+                  <KeyIcon className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Toggle visibility"
+                >
+                  {showPassword ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
+            {fieldErrors.password && (
+              <p className="text-red-600 text-xs mt-1">{fieldErrors.password}</p>
+            )}
+            
+            <PasswordStrengthIndicator 
+              password={formData.password}
+              onStrengthChange={setPasswordStrength}
+            />
           </div>
 
           <div className="flex gap-3 pt-4">
@@ -139,10 +241,20 @@ const EditPasswordModal = ({ password, onClose, onUpdate }) => {
             </button>
             <button
               type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              disabled={loading || (hasPasswordChange && passwordStrength.score < 40)}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
             >
-              {loading ? 'Updating...' : 'Update'}
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Updating...
+                </>
+              ) : (
+                <>
+                  {(!hasPasswordChange || passwordStrength.score >= 60) && <CheckCircleIcon className="w-4 h-4" />}
+                  Update Password
+                </>
+              )}
             </button>
           </div>
         </form>

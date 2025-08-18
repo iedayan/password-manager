@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { EyeIcon, EyeSlashIcon, XMarkIcon, KeyIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect } from 'react';
+import { EyeIcon, EyeSlashIcon, XMarkIcon, KeyIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from './LoadingSpinner';
+import PasswordStrengthIndicator from './PasswordStrengthIndicator';
+import { validatePasswordForm, sanitizeFormData } from '../utils/validation';
 import { api } from '../lib/api';
 
 const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
@@ -13,23 +15,58 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [passwordStrength, setPasswordStrength] = useState({ score: 0, feedback: [], level: 'none' });
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const generatePassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    let password = '';
-    for (let i = 0; i < 16; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
+
+
+  const generatePassword = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await api.passwords.generate({ length: 16, include_symbols: true });
+      const newPassword = response.password || response;
+      setFormData(prev => ({ ...prev, password: newPassword }));
+    } catch (error) {
+      // Fallback to client-side generation
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+      let password = '';
+      for (let i = 0; i < 16; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      setFormData(prev => ({ ...prev, password }));
+    } finally {
+      setIsGenerating(false);
     }
-    setFormData(prev => ({ ...prev, password }));
   };
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setFieldErrors({});
+
+    // Validate form data
+    const sanitizedData = sanitizeFormData(formData);
+    const validation = validatePasswordForm(sanitizedData);
+    
+    if (!validation.isValid) {
+      setFieldErrors(validation.errors);
+      setLoading(false);
+      return;
+    }
+
+    // Check password strength
+    if (passwordStrength.score < 40) {
+      setError('Password is too weak. Please use a stronger password.');
+      setLoading(false);
+      return;
+    }
 
     try {
-      const response = await api.passwords.create(formData);
+      const response = await api.passwords.create(sanitizedData);
       onAdd(response.password);
       onClose();
       setFormData({ site_name: '', site_url: '', username: '', password: '' });
@@ -72,10 +109,15 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
               type="text"
               value={formData.site_name}
               onChange={(e) => setFormData(prev => ({...prev, site_name: e.target.value}))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                fieldErrors.site_name ? 'border-red-300 bg-red-50' : 'border-gray-300'
+              }`}
               placeholder="e.g., Google, Facebook"
               required
             />
+            {fieldErrors.site_name && (
+              <p className="text-red-600 text-xs mt-1">{fieldErrors.site_name}</p>
+            )}
           </div>
 
           <div>
@@ -86,9 +128,14 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
               type="url"
               value={formData.site_url}
               onChange={(e) => setFormData(prev => ({...prev, site_url: e.target.value}))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                fieldErrors.site_url ? 'border-red-300 bg-red-50' : 'border-gray-300'
+              }`}
               placeholder="https://example.com"
             />
+            {fieldErrors.site_url && (
+              <p className="text-red-600 text-xs mt-1">{fieldErrors.site_url}</p>
+            )}
           </div>
 
           <div>
@@ -99,10 +146,15 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
               type="text"
               value={formData.username}
               onChange={(e) => setFormData(prev => ({...prev, username: e.target.value}))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                fieldErrors.username ? 'border-red-300 bg-red-50' : 'border-gray-300'
+              }`}
               placeholder="your@email.com"
               required
             />
+            {fieldErrors.username && (
+              <p className="text-red-600 text-xs mt-1">{fieldErrors.username}</p>
+            )}
           </div>
 
           <div>
@@ -114,7 +166,9 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => setFormData(prev => ({...prev, password: e.target.value}))}
-                className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full px-3 py-2 pr-20 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  fieldErrors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                }`}
                 placeholder="Enter password"
                 required
               />
@@ -122,10 +176,11 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
                 <button
                   type="button"
                   onClick={generatePassword}
-                  className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                  title="Generate password"
+                  disabled={isGenerating}
+                  className="p-1 text-gray-400 hover:text-blue-600 transition-colors disabled:opacity-50"
+                  title="Generate secure password"
                 >
-                  <KeyIcon className="w-4 h-4" />
+                  <KeyIcon className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
                 </button>
                 <button
                   type="button"
@@ -137,6 +192,14 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
                 </button>
               </div>
             </div>
+            {fieldErrors.password && (
+              <p className="text-red-600 text-xs mt-1">{fieldErrors.password}</p>
+            )}
+            
+            <PasswordStrengthIndicator 
+              password={formData.password}
+              onStrengthChange={setPasswordStrength}
+            />
           </div>
 
           <div className="flex gap-3 pt-4">
@@ -149,10 +212,20 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
             </button>
             <button
               type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              disabled={loading || (formData.password && passwordStrength.score < 40)}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
             >
-              {loading ? 'Adding...' : 'Add Password'}
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Adding...
+                </>
+              ) : (
+                <>
+                  {passwordStrength.score >= 60 && <CheckCircleIcon className="w-4 h-4" />}
+                  Add Password
+                </>
+              )}
             </button>
           </div>
         </form>
