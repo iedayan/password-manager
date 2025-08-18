@@ -42,10 +42,7 @@ export function useDebounce(value, delay) {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      // Sanitize value to prevent XSS if it's a string
-      const sanitizedValue = typeof value === 'string' ? 
-        value.replace(/<script[^>]*>.*?<\/script>/gi, '') : value;
-      setDebouncedValue(sanitizedValue);
+      setDebouncedValue(value);
     }, delay);
 
     return () => {

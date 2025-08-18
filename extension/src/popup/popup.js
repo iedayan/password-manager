@@ -107,12 +107,15 @@ class LokPopup {
     loginBtn.style.opacity = '0.7';
 
     try {
-      console.log('Attempting login...', { email });
+      console.log('Attempting login...');
       
       // Try registration first (for new users)
       let response = await fetch(`${this.apiUrl}/auth/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
         body: JSON.stringify({ email, password })
       });
 
@@ -123,7 +126,10 @@ class LokPopup {
         console.log('User exists, trying login...');
         response = await fetch(`${this.apiUrl}/auth/login`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           body: JSON.stringify({ email, password })
         });
         data = await response.json();
@@ -206,11 +212,14 @@ class LokPopup {
 
   async loadPasswords() {
     const token = await this.getStoredToken();
-    if (!token) return;
+    if (!token || !this.isValidToken(token)) return;
 
     try {
       const response = await fetch(`${this.apiUrl}/passwords`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
       });
 
       if (response.ok) {
@@ -383,7 +392,7 @@ class LokPopup {
   async copyPassword(passwordData) {
     const token = await this.getStoredToken();
     
-    if (!token) {
+    if (!token || !this.isValidToken(token)) {
       this.showNotification('Please login first', 'error');
       this.showLogin();
       return;
@@ -392,7 +401,10 @@ class LokPopup {
     try {
       // Get the actual password from the API
       const response = await fetch(`${this.apiUrl}/passwords/${passwordData.id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
       });
       
       if (response.ok) {
@@ -468,6 +480,16 @@ class LokPopup {
   async getStoredToken() {
     const result = await chrome.storage.local.get(['token']);
     return result.token;
+  }
+
+  isValidToken(token) {
+    if (!token || typeof token !== 'string') return false;
+    try {
+      const parts = token.split('.');
+      return parts.length === 3;
+    } catch {
+      return false;
+    }
   }
 
   showLogin() {

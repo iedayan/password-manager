@@ -25,4 +25,5 @@ class Device(db.Model):
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     
     def __repr__(self):
-        return f'<Device {self.device_name} ({self.device_type})>'
+        safe_name = ''.join(c for c in self.device_name if c.isprintable() and c not in '<>"\'')
+        return f'<Device {safe_name} ({self.device_type})>'

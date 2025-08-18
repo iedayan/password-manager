@@ -13,5 +13,6 @@ if __name__ == "__main__":
     except (ValueError, TypeError):
         port = 8080
     
-    # Always bind to 0.0.0.0 in production
-    app.run(host='0.0.0.0', port=port)
+    # Use secure host binding
+    host = os.environ.get('HOST', '127.0.0.1' if config_name == 'development' else '0.0.0.0')
+    app.run(host=host, port=port)
