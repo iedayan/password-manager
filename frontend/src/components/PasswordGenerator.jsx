@@ -71,8 +71,11 @@ const PasswordGenerator = ({ onGenerate }) => {
       password += set.charAt(getSecureRandomInt(set.length));
     });
     
+    // Ensure minimum length of 8 characters
+    const targetLength = Math.max(8, opts.length || 16);
+    
     // Fill remaining positions with random characters from full charset
-    for (let i = password.length; i < opts.length; i++) {
+    for (let i = password.length; i < targetLength; i++) {
       password += charset.charAt(getSecureRandomInt(charset.length));
     }
     

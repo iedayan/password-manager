@@ -40,7 +40,7 @@ const Dashboard = () => {
       {/* Header */}
       <div className="bg-white/90 backdrop-blur-xl border-b border-gray-200/60 shadow-lg">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex justify-between items-center py-5">
+          <div className="flex justify-between items-center py-5 border-b-2 border-gray-300/80">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-lg">L</span>
@@ -92,7 +92,7 @@ const Dashboard = () => {
           </div>
           
           {/* Navigation Tabs */}
-          <div className="flex border-b border-gray-200/60">
+          <div className="flex bg-gray-50/60 border-b border-gray-200/60">
             {tabs.map(tab => (
               <button
                 key={tab.id}
@@ -118,7 +118,7 @@ const Dashboard = () => {
         <div className="mb-4">
           <Breadcrumb />
         </div>
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/30 p-6">
+        <div className="bg-slate-800/95 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-700/50 p-6">
           {activeTab === 'vault' && <PasswordVault showAddForm={showAddForm} setShowAddForm={setShowAddForm} />}
           {activeTab === 'generator' && (
             <div className="max-w-2xl mx-auto">

@@ -104,8 +104,8 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
           <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <ShieldExclamationIcon className="w-10 h-10 text-blue-600" />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-3">Your vault is empty</h2>
-          <p className="text-gray-600 mb-8 max-w-lg mx-auto text-sm leading-relaxed">
+          <h2 className="text-2xl font-semibold text-white mb-3">Your vault is empty</h2>
+          <p className="text-slate-300 mb-8 max-w-lg mx-auto text-sm leading-relaxed">
             Start securing your digital life by adding your first password. All passwords are encrypted with military-grade security and stored safely.
           </p>
           <button 
@@ -127,58 +127,58 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
       <div className="mb-6">
         <div className="flex justify-between items-center mb-5">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Password Vault</h1>
-            <p className="text-gray-500 text-sm mt-1">Secure storage for all your passwords</p>
+            <h1 className="text-2xl font-bold text-white">Password Vault</h1>
+            <p className="text-slate-300 text-sm mt-1">Secure storage for all your passwords</p>
           </div>
           <div className="text-right">
-            <span className="text-2xl font-bold text-blue-600">{stats.total}</span>
-            <p className="text-xs text-gray-500">Total passwords</p>
+            <span className="text-2xl font-bold text-blue-400">{stats.total}</span>
+            <p className="text-xs text-slate-400">Total passwords</p>
           </div>
         </div>
         
         {/* Password Health Stats */}
         <div className="grid grid-cols-4 gap-3 mb-6">
-          <div className="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/60 rounded-xl p-4">
+          <div className="bg-slate-700/80 border border-slate-600/60 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Total</p>
-                <p className="text-xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-xs font-medium text-slate-300 uppercase tracking-wide">Total</p>
+                <p className="text-xl font-bold text-white">{stats.total}</p>
               </div>
-              <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center">
-                <ShieldExclamationIcon className="w-5 h-5 text-gray-500" />
+              <div className="w-8 h-8 bg-slate-600 rounded-lg flex items-center justify-center">
+                <ShieldExclamationIcon className="w-5 h-5 text-slate-300" />
               </div>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-green-50 to-emerald-100 border border-green-200/60 rounded-xl p-4">
+          <div className="bg-green-900/60 border border-green-700/60 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-green-700 uppercase tracking-wide">Strong</p>
-                <p className="text-xl font-bold text-green-700">{stats.strong}</p>
+                <p className="text-xs font-medium text-green-300 uppercase tracking-wide">Strong</p>
+                <p className="text-xl font-bold text-green-200">{stats.strong}</p>
               </div>
-              <div className="w-8 h-8 bg-green-200 rounded-lg flex items-center justify-center">
-                <CheckCircleIcon className="w-5 h-5 text-green-600" />
+              <div className="w-8 h-8 bg-green-800 rounded-lg flex items-center justify-center">
+                <CheckCircleIcon className="w-5 h-5 text-green-400" />
               </div>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-yellow-50 to-amber-100 border border-yellow-200/60 rounded-xl p-4">
+          <div className="bg-yellow-900/60 border border-yellow-700/60 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-yellow-700 uppercase tracking-wide">Medium</p>
-                <p className="text-xl font-bold text-yellow-700">{stats.medium}</p>
+                <p className="text-xs font-medium text-yellow-300 uppercase tracking-wide">Medium</p>
+                <p className="text-xl font-bold text-yellow-200">{stats.medium}</p>
               </div>
-              <div className="w-8 h-8 bg-yellow-200 rounded-lg flex items-center justify-center">
-                <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" />
+              <div className="w-8 h-8 bg-yellow-800 rounded-lg flex items-center justify-center">
+                <ExclamationTriangleIcon className="w-5 h-5 text-yellow-400" />
               </div>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-red-50 to-rose-100 border border-red-200/60 rounded-xl p-4">
+          <div className="bg-red-900/60 border border-red-700/60 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-red-700 uppercase tracking-wide">Weak</p>
-                <p className="text-xl font-bold text-red-700">{stats.weak}</p>
+                <p className="text-xs font-medium text-red-300 uppercase tracking-wide">Weak</p>
+                <p className="text-xl font-bold text-red-200">{stats.weak}</p>
               </div>
-              <div className="w-8 h-8 bg-red-200 rounded-lg flex items-center justify-center">
-                <ExclamationTriangleIcon className="w-5 h-5 text-red-600" />
+              <div className="w-8 h-8 bg-red-800 rounded-lg flex items-center justify-center">
+                <ExclamationTriangleIcon className="w-5 h-5 text-red-400" />
               </div>
             </div>
           </div>
@@ -192,22 +192,22 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
       <div className="mb-6 space-y-3">
         <div className="flex gap-3">
           <div className="relative flex-1">
-            <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
               type="text"
               placeholder="Search passwords... (⌘K)"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-16 py-3 border border-gray-200/60 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-sm transition-all"
+              className="w-full pl-12 pr-16 py-3 border border-slate-600/60 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-slate-700/80 backdrop-blur-sm text-sm transition-all text-white placeholder-slate-400"
             />
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 bg-gray-100/80 px-2 py-1 rounded-md">
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-slate-400 bg-slate-600/80 px-2 py-1 rounded-md">
               ⌘K
             </div>
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`px-4 py-3 border border-gray-200/60 rounded-xl hover:bg-gray-50/80 flex items-center gap-2 text-sm transition-all ${
-              showFilters ? 'bg-blue-50 border-blue-200 text-blue-700' : 'text-gray-600'
+            className={`px-4 py-3 border border-slate-600/60 rounded-xl hover:bg-slate-600/80 flex items-center gap-2 text-sm transition-all ${
+              showFilters ? 'bg-blue-900/60 border-blue-600 text-blue-300' : 'text-slate-300'
             }`}
           >
             <FunnelIcon className="w-4 h-4" />
@@ -217,14 +217,14 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
         </div>
         
         {showFilters && (
-          <div className="bg-white/90 backdrop-blur-sm border border-gray-200/60 rounded-xl p-4">
+          <div className="bg-slate-700/90 backdrop-blur-sm border border-slate-600/60 rounded-xl p-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-2 uppercase tracking-wide">Sort by</label>
+                <label className="block text-xs font-medium text-slate-300 mb-2 uppercase tracking-wide">Sort by</label>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full p-2.5 border border-gray-200/60 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-white/80"
+                  className="w-full p-2.5 border border-slate-600/60 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-slate-800/80 text-white"
                 >
                   <option value="name">Name (A-Z)</option>
                   <option value="strength">Password Strength</option>
@@ -232,11 +232,11 @@ const PasswordVault = ({ showAddForm, setShowAddForm }) => {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-2 uppercase tracking-wide">Filter by strength</label>
+                <label className="block text-xs font-medium text-slate-300 mb-2 uppercase tracking-wide">Filter by strength</label>
                 <select
                   value={filterBy}
                   onChange={(e) => setFilterBy(e.target.value)}
-                  className="w-full p-2.5 border border-gray-200/60 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-white/80"
+                  className="w-full p-2.5 border border-slate-600/60 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-slate-800/80 text-white"
                 >
                   <option value="all">All passwords</option>
                   <option value="strong">Strong (80%+)</option>
@@ -333,7 +333,7 @@ const PasswordCard = ({ password, onCopy, onReveal, onEdit, onDelete }) => {
   const faviconUrl = getFaviconUrl(password.site_url);
 
   return (
-    <div className="bg-white/90 backdrop-blur-sm border border-gray-200/60 rounded-xl p-4 hover:shadow-lg hover:bg-white transition-all duration-200 hover:border-blue-200/80 group">
+    <div className="bg-slate-700/80 backdrop-blur-sm border border-slate-600/60 rounded-xl p-4 hover:shadow-lg hover:bg-slate-600/80 transition-all duration-200 hover:border-blue-500/60 group">
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-3">
@@ -355,14 +355,14 @@ const PasswordCard = ({ password, onCopy, onReveal, onEdit, onDelete }) => {
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-gray-900 truncate text-sm">{password.site_name}</h3>
+                <h3 className="font-semibold text-white truncate text-sm">{password.site_name}</h3>
                 <span className={`text-xs px-2 py-0.5 rounded-md border font-medium ${getStrengthColor(password.strength_score || 0)}`}>
                   {getStrengthLabel(password.strength_score || 0)}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 truncate">{password.username}</p>
+              <p className="text-xs text-slate-300 truncate">{password.username}</p>
               {password.site_url && (
-                <p className="text-xs text-gray-400 truncate mt-0.5">{password.site_url}</p>
+                <p className="text-xs text-slate-400 truncate mt-0.5">{password.site_url}</p>
               )}
             </div>
           </div>
@@ -371,28 +371,28 @@ const PasswordCard = ({ password, onCopy, onReveal, onEdit, onDelete }) => {
         <div className="flex items-center gap-0.5 ml-3 opacity-60 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onCopy(password.username)}
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50/80 rounded-lg transition-colors"
+            className="p-2 text-slate-400 hover:text-blue-400 hover:bg-blue-900/40 rounded-lg transition-colors"
             title="Copy username"
           >
             <ClipboardIcon className="w-4 h-4" />
           </button>
           <button
             onClick={() => onReveal(password.id)}
-            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50/80 rounded-lg transition-colors"
+            className="p-2 text-slate-400 hover:text-green-400 hover:bg-green-900/40 rounded-lg transition-colors"
             title="Copy password"
           >
             <EyeIcon className="w-4 h-4" />
           </button>
           <button
             onClick={() => onEdit(password)}
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50/80 rounded-lg transition-colors"
+            className="p-2 text-slate-400 hover:text-blue-400 hover:bg-blue-900/40 rounded-lg transition-colors"
             title="Edit password"
           >
             <PencilIcon className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(password.id)}
-            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50/80 rounded-lg transition-colors"
+            className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-900/40 rounded-lg transition-colors"
             title="Delete password"
           >
             <TrashIcon className="w-4 h-4" />
