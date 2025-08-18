@@ -66,7 +66,9 @@ def register_blueprints(app):
     from .api.v1.auth import auth_bp
     from .api.v1.passwords import passwords_bp
     from .api.v1.health import health_bp
+    from .api.v1.admin import admin_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
     app.register_blueprint(passwords_bp, url_prefix='/api/v1/passwords')
     app.register_blueprint(health_bp, url_prefix='/api/v1/health')
+    app.register_blueprint(admin_bp, url_prefix='/api/v1/admin')
