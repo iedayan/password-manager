@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MagnifyingGlassIcon, PlusIcon, EyeIcon, EyeSlashIcon, ClipboardIcon, PencilIcon, TrashIcon, FunnelIcon, ChevronDownIcon, ShieldExclamationIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, EyeIcon, ClipboardIcon, PencilIcon, TrashIcon, FunnelIcon, ChevronDownIcon, ShieldExclamationIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import QuickActions from './QuickActions';
 import EditPasswordModal from './EditPasswordModal';
 import DeleteConfirmModal from './DeleteConfirmModal';
@@ -213,7 +213,7 @@ const PasswordVault = () => {
                   <option value="all">All passwords</option>
                   <option value="strong">Strong (80%+)</option>
                   <option value="medium">Medium (60-79%)</option>
-                  <option value="weak">Weak (<60%)</option>
+                  <option value="weak">Weak (&lt;60%)</option>
                 </select>
               </div>
             </div>
