@@ -29,9 +29,9 @@ class Device(db.Model):
 
     def __repr__(self):
         safe_name = ''.join(
-            c for c in (self.device_name or '') if c.isprintable() and c not in '<>"\'
+            c for c in (self.device_name or '') if c.isprintable() and c not in '<>"\\'
         )
         safe_type = ''.join(
-            c for c in (self.device_type or '') if c.isprintable() and c not in '<>"\'
+            c for c in (self.device_type or '') if c.isprintable() and c not in '<>"\\'
         )
         return f"<Device {safe_name} ({safe_type})>"
