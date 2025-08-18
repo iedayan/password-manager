@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { MagnifyingGlassIcon, PlusIcon, EyeIcon, EyeSlashIcon, ClipboardIcon, PencilIcon, TrashIcon, FunnelIcon, ChevronDownIcon, ShieldExclamationIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import QuickActions from './QuickActions';
 import EditPasswordModal from './EditPasswordModal';
+import DeleteConfirmModal from './DeleteConfirmModal';
 import { api } from '../lib/api';
 
 const PasswordVault = () => {
