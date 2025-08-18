@@ -4,15 +4,25 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime, timezone
 from pydantic import ValidationError
+from sqlalchemy import or_
+import secrets
+import string
+import re
 
 from ...models.password import Password
 from ...models.user import User
 from ...core.database import db
 from ...core.extensions import bcrypt, limiter
 from ...services.encryption_service import encryption_service
+from ...services.password_strength import calculate_password_strength
 from ...schemas.password import PasswordCreate, PasswordUpdate, PasswordResponse
 
 passwords_bp = Blueprint("passwords", __name__)
+
+
+# ============================================================================
+# BASIC CRUD OPERATIONS
+# ============================================================================
 
 
 @passwords_bp.route("", methods=["GET"])
@@ -29,7 +39,8 @@ def get_passwords():
             jsonify(
                 {
                     "passwords": [
-                        PasswordResponse.from_orm(p).dict() for p in passwords
+                        PasswordResponse.model_validate(p).model_dump()
+                        for p in passwords
                     ],
                     "count": len(passwords),
                 }
@@ -42,6 +53,26 @@ def get_passwords():
             f"Error fetching passwords for user {get_jwt_identity()}: {str(e)}"
         )
         return jsonify({"error": "Failed to fetch passwords"}), 500
+
+
+@passwords_bp.route("/<int:password_id>", methods=["GET"])
+@jwt_required()
+def get_password(password_id):
+    """Get individual password details (without decryption)."""
+    try:
+        user_id = int(get_jwt_identity())
+        password = Password.query.filter_by(id=password_id, user_id=user_id).first()
+
+        if not password:
+            return jsonify({"error": "Password not found"}), 404
+
+        return jsonify(PasswordResponse.model_validate(password).model_dump()), 200
+
+    except Exception as e:
+        current_app.logger.error(
+            f"Error fetching password {int(password_id)}: {str(e)}"
+        )
+        return jsonify({"error": "Failed to fetch password"}), 500
 
 
 @passwords_bp.route("", methods=["POST"])
@@ -89,7 +120,7 @@ def add_password():
             jsonify(
                 {
                     "message": "Password added successfully",
-                    "password": PasswordResponse.from_orm(password).dict(),
+                    "password": PasswordResponse.model_validate(password).model_dump(),
                 }
             ),
             201,
@@ -148,7 +179,7 @@ def update_password(password_id):
             jsonify(
                 {
                     "message": "Password updated successfully",
-                    "password": PasswordResponse.from_orm(password).dict(),
+                    "password": PasswordResponse.model_validate(password).model_dump(),
                 }
             ),
             200,
@@ -156,7 +187,9 @@ def update_password(password_id):
 
     except Exception as e:
         db.session.rollback()
-        current_app.logger.error(f"Error updating password {password_id}: {str(e)}")
+        current_app.logger.error(
+            f"Error updating password {int(password_id)}: {str(e)}"
+        )
         return jsonify({"error": "Failed to update password"}), 500
 
 
@@ -188,6 +221,142 @@ def delete_password(password_id):
         db.session.rollback()
         current_app.logger.error(f"Error deleting password {password_id}: {str(e)}")
         return jsonify({"error": "Failed to delete password"}), 500
+
+
+# ============================================================================
+# SEARCH & FILTERING
+# ============================================================================
+
+
+@passwords_bp.route("/search", methods=["GET"])
+@jwt_required()
+def search_passwords():
+    """Search passwords by site name, username, or URL."""
+    try:
+        user_id = int(get_jwt_identity())
+        query = request.args.get("q", "").strip()
+
+        if not query:
+            return jsonify({"error": "Search query required"}), 400
+
+        passwords = (
+            Password.query.filter(
+                Password.user_id == user_id,
+                or_(
+                    Password.site_name.ilike(f"%{query}%"),
+                    Password.username.ilike(f"%{query}%"),
+                    Password.site_url.ilike(f"%{query}%"),
+                ),
+            )
+            .order_by(Password.site_name)
+            .all()
+        )
+
+        return (
+            jsonify(
+                {
+                    "passwords": [
+                        PasswordResponse.model_validate(p).model_dump()
+                        for p in passwords
+                    ],
+                    "count": len(passwords),
+                    "query": query,
+                }
+            ),
+            200,
+        )
+
+    except Exception as e:
+        current_app.logger.error(f"Error searching passwords: {str(e).replace(chr(10), ' ').replace(chr(13), ' ')[:200]}")
+        return jsonify({"error": "Search failed"}), 500
+
+
+# ============================================================================
+# BULK OPERATIONS
+# ============================================================================
+
+
+@passwords_bp.route("/bulk", methods=["POST"])
+@jwt_required()
+@limiter.limit("5 per minute")
+def bulk_operations():
+    """Handle bulk operations: import, export, bulk delete."""
+    try:
+        user_id = int(get_jwt_identity())
+        data = request.get_json(force=True)
+
+        if not data or "operation" not in data:
+            return jsonify({"error": "Operation type required"}), 400
+
+        operation = data["operation"]
+
+        if operation == "export":
+            passwords = Password.query.filter_by(user_id=user_id).all()
+            return (
+                jsonify(
+                    {
+                        "passwords": [
+                            PasswordResponse.model_validate(p).model_dump()
+                            for p in passwords
+                        ],
+                        "exported_at": datetime.now(timezone.utc).isoformat(),
+                    }
+                ),
+                200,
+            )
+
+        elif operation == "import":
+            if "passwords" not in data:
+                return jsonify({"error": "Passwords data required"}), 400
+
+            imported_count = 0
+            for pwd_data in data["passwords"]:
+                try:
+                    password_data = PasswordCreate(**pwd_data)
+                    password = Password(
+                        user_id=user_id,
+                        site_name=password_data.site_name,
+                        site_url=(
+                            str(password_data.site_url)
+                            if password_data.site_url
+                            else None
+                        ),
+                        username=password_data.username,
+                        encrypted_password=encryption_service.encrypt(
+                            password_data.password
+                        ),
+                        notes=password_data.notes,
+                    )
+                    db.session.add(password)
+                    imported_count += 1
+                except Exception:
+                    continue
+
+            db.session.commit()
+            return jsonify({"message": f"Imported {imported_count} passwords"}), 201
+
+        elif operation == "delete":
+            if "password_ids" not in data:
+                return jsonify({"error": "Password IDs required"}), 400
+
+            deleted_count = Password.query.filter(
+                Password.user_id == user_id, Password.id.in_(data["password_ids"])
+            ).delete(synchronize_session=False)
+
+            db.session.commit()
+            return jsonify({"message": f"Deleted {deleted_count} passwords"}), 200
+
+        return jsonify({"error": "Invalid operation"}), 400
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error in bulk operation: {str(e)}")
+        return jsonify({"error": "Bulk operation failed"}), 500
+
+
+# ============================================================================
+# SECURITY & ENCRYPTION
+# ============================================================================
 
 
 @passwords_bp.route("/<int:password_id>/decrypt", methods=["POST"])
@@ -246,3 +415,108 @@ def decrypt_password(password_id):
     except Exception as e:
         current_app.logger.error(f"Error decrypting password {password_id}: {str(e)}")
         return jsonify({"error": "Failed to decrypt password"}), 500
+
+
+@passwords_bp.route("/analyze", methods=["GET"])
+@jwt_required()
+def analyze_passwords():
+    """Analyze password strength and security issues."""
+    try:
+        user_id = int(get_jwt_identity())
+        passwords = Password.query.filter_by(user_id=user_id).all()
+
+        weak_passwords = []
+        duplicate_passwords = {}
+
+        for password in passwords:
+            try:
+                decrypted = encryption_service.decrypt(password.encrypted_password)
+                strength = calculate_password_strength(decrypted)
+
+                if strength < 60:
+                    weak_passwords.append(
+                        {
+                            "id": password.id,
+                            "site_name": password.site_name,
+                            "strength": strength,
+                        }
+                    )
+
+                if decrypted in duplicate_passwords:
+                    duplicate_passwords[decrypted].append(password.site_name)
+                else:
+                    duplicate_passwords[decrypted] = [password.site_name]
+
+            except Exception:
+                continue
+
+        duplicates = {
+            sites[0]: sites for sites in duplicate_passwords.values() if len(sites) > 1
+        }
+
+        return (
+            jsonify(
+                {
+                    "weak_passwords": weak_passwords,
+                    "duplicate_count": len(duplicates),
+                    "duplicates": list(duplicates.values()),
+                    "total_passwords": len(passwords),
+                    "analysis_date": datetime.now(timezone.utc).isoformat(),
+                }
+            ),
+            200,
+        )
+
+    except Exception as e:
+        current_app.logger.error(f"Error analyzing passwords: {str(e)}")
+        return jsonify({"error": "Analysis failed"}), 500
+
+
+# ============================================================================
+# PASSWORD GENERATION
+# ============================================================================
+
+
+@passwords_bp.route("/generate", methods=["POST"])
+@jwt_required()
+@limiter.limit("30 per minute")
+def generate_password():
+    """Generate secure password with custom rules."""
+    try:
+        data = request.get_json() or {}
+        length = min(max(data.get("length", 16), 8), 128)
+        include_uppercase = data.get("uppercase", True)
+        include_lowercase = data.get("lowercase", True)
+        include_numbers = data.get("numbers", True)
+        include_symbols = data.get("symbols", True)
+
+        charset = ""
+        if include_lowercase:
+            charset += string.ascii_lowercase
+        if include_uppercase:
+            charset += string.ascii_uppercase
+        if include_numbers:
+            charset += string.digits
+        if include_symbols:
+            charset += "!@#$%^&*()_+-=[]{}|;:,.<>?"
+
+        if not charset:
+            return (
+                jsonify({"error": "At least one character type must be selected"}),
+                400,
+            )
+
+        password = "".join(secrets.choice(charset) for _ in range(length))
+        strength = calculate_password_strength(password)
+
+        return (
+            jsonify({"password": password, "strength": strength, "length": length}),
+            200,
+        )
+
+    except Exception as e:
+        current_app.logger.error(f"Error generating password: {str(e).replace(chr(10), ' ').replace(chr(13), ' ')[:200]}")
+        return jsonify({"error": "Password generation failed"}), 500
+
+
+

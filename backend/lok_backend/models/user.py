@@ -1,6 +1,6 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from ..core.database import db
-import uuid
+from uuid import uuid4
 
 
 class User(db.Model):
@@ -13,7 +13,7 @@ class User(db.Model):
         db.String(36),
         unique=True,
         nullable=False,
-        default=lambda: str(uuid.uuid4()),
+        default=lambda: str(uuid4()),
         index=True,
     )
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
@@ -27,12 +27,17 @@ class User(db.Model):
     backup_codes = db.Column(db.Text)  # JSON array of backup codes
 
     # Timestamps
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(
+        db.DateTime, default=datetime.now(timezone.utc), nullable=False
+    )
     updated_at = db.Column(
-        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        db.DateTime,
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
+        nullable=False,
     )
     last_login = db.Column(db.DateTime)
-    last_password_change = db.Column(db.DateTime, default=datetime.utcnow)
+    last_password_change = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
     # Status
     is_active = db.Column(db.Boolean, default=True, nullable=False)
@@ -51,7 +56,10 @@ class User(db.Model):
     )
 
     def __repr__(self):
-        return f"<User {self.email}>"
+        safe_email = "".join(
+            c for c in (self.email or "") if c.isprintable() and c not in "<>\"'"
+        )
+        return f"<User {safe_email}>"
 
     @property
     def is_locked(self):
@@ -64,7 +72,9 @@ class User(db.Model):
         """Lock user account for specified duration"""
         from datetime import timedelta
 
-        self.locked_until = datetime.utcnow() + timedelta(minutes=duration_minutes)
+        self.locked_until = datetime.now(timezone.utc) + timedelta(
+            minutes=duration_minutes
+        )
         db.session.commit()
 
     def unlock_account(self):

@@ -36,7 +36,7 @@ const Login = () => {
     }
 
     try {
-      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+      const endpoint = isLogin ? '/api/v1/auth/login' : '/api/v1/auth/register';
       const payload = isLogin 
         ? { email: formData.email, password: formData.password }
         : { email: formData.email, password: formData.password, confirm_password: formData.confirm_password };

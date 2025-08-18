@@ -128,14 +128,25 @@ class SecurityAnalyzer {
       const text = await response.text();
       
       const lines = text.split('\n');
+      const hashMap = new Map();
+      
+      // Build hash map for O(1) lookup
       for (const line of lines) {
-        const [hash, count] = line.split(':');
-        if (this.constantTimeEquals(hash, suffix)) {
-          return {
-            breached: true,
-            count: parseInt(count)
-          };
+        if (!line.trim()) continue;
+        const colonIndex = line.indexOf(':');
+        if (colonIndex > 0) {
+          const hash = line.substring(0, colonIndex);
+          const count = parseInt(line.substring(colonIndex + 1));
+          hashMap.set(hash, count);
         }
+      }
+      
+      // Check if suffix exists in map
+      if (hashMap.has(suffix)) {
+        return {
+          breached: true,
+          count: hashMap.get(suffix)
+        };
       }
       
       return { breached: false, count: 0 };
@@ -228,10 +239,15 @@ class SecurityAnalyzer {
 
     let charset = '';
     
-    if (includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
-    if (includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    if (includeNumbers) charset += '0123456789';
-    if (includeSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+    const lowercase = Array.from({length: 26}, (_, i) => String.fromCharCode(97 + i)).join('');
+    const uppercase = Array.from({length: 26}, (_, i) => String.fromCharCode(65 + i)).join('');
+    const numbers = Array.from({length: 10}, (_, i) => i.toString()).join('');
+    const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+    
+    if (includeLowercase) charset += lowercase;
+    if (includeUppercase) charset += uppercase;
+    if (includeNumbers) charset += numbers;
+    if (includeSymbols) charset += symbols;
 
     if (excludeSimilar) {
       charset = charset.replace(/[il1Lo0O]/g, '');
@@ -245,10 +261,10 @@ class SecurityAnalyzer {
     let password = '';
     const categories = [];
     
-    if (includeLowercase) categories.push('abcdefghijklmnopqrstuvwxyz');
-    if (includeUppercase) categories.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-    if (includeNumbers) categories.push('0123456789');
-    if (includeSymbols) categories.push('!@#$%^&*');
+    if (includeLowercase) categories.push(lowercase);
+    if (includeUppercase) categories.push(uppercase);
+    if (includeNumbers) categories.push(numbers);
+    if (includeSymbols) categories.push(symbols.substring(0, 8));
 
     // Add one character from each category
     categories.forEach(category => {

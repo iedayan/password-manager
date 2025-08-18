@@ -1,17 +1,32 @@
 """Authentication API endpoints."""
 
 from flask import Blueprint, request, jsonify, current_app
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import (
+    create_access_token,
+    jwt_required,
+    get_jwt_identity,
+    get_jwt,
+)
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timezone
 from pydantic import ValidationError
+from secrets import choice
+from string import ascii_letters, digits
 
 from ...models.user import User
 from ...core.database import db
 from ...core.extensions import bcrypt, limiter
-from ...schemas.auth import UserRegistration, UserLogin, AuthResponse
+from ...schemas.auth import UserRegistration, UserLogin
 
 auth_bp = Blueprint("auth", __name__)
+
+# Token blacklist for logout functionality
+blacklisted_tokens = set()
+
+
+# ============================================================================
+# USER REGISTRATION & LOGIN
+# ============================================================================
 
 
 @auth_bp.route("/register", methods=["POST"])
@@ -34,7 +49,9 @@ def register():
             return jsonify({"error": "Email already registered"}), 409
 
         # Hash password
-        password_hash = bcrypt.generate_password_hash(user_data.password).decode("utf-8")
+        password_hash = bcrypt.generate_password_hash(user_data.password).decode(
+            "utf-8"
+        )
 
         # Create user
         user = User(
@@ -48,13 +65,19 @@ def register():
         # Generate token
         access_token = create_access_token(identity=str(user.id))
 
-        current_app.logger.info(f"User registered successfully: {user_data.email}")
-        
-        return jsonify({
-            "access_token": access_token,
-            "user_id": user.id,
-            "message": "User registered successfully",
-        }), 201
+        sanitized_email = user_data.email.split("@")[0] + "@***"
+        current_app.logger.info(f"User registered successfully: {sanitized_email}")
+
+        return (
+            jsonify(
+                {
+                    "access_token": access_token,
+                    "user_id": user.id,
+                    "message": "User registered successfully",
+                }
+            ),
+            201,
+        )
 
     except IntegrityError:
         db.session.rollback()
@@ -82,10 +105,13 @@ def login():
 
         # Find user
         user = User.query.filter_by(email=login_data.email).first()
-        
+
         # Check account lockout
         if user and user.is_locked:
-            current_app.logger.warning(f"Login attempt on locked account: {login_data.email}")
+            sanitized_email = login_data.email.split("@")[0] + "@***"
+            current_app.logger.warning(
+                f"Login attempt on locked account: {sanitized_email}"
+            )
             return jsonify({"error": "Account temporarily locked"}), 423
 
         # Verify credentials
@@ -94,25 +120,313 @@ def login():
             user.reset_failed_login()
             user.last_login = datetime.now(timezone.utc)
             db.session.commit()
-            
+
             access_token = create_access_token(identity=str(user.id))
-            
-            current_app.logger.info(f"Successful login: {login_data.email}")
-            
-            return jsonify({
-                "access_token": access_token,
-                "user_id": user.id,
-                "message": "Login successful",
-            }), 200
-        
+
+            sanitized_email = login_data.email.split("@")[0] + "@***"
+            current_app.logger.info(f"Successful login: {sanitized_email}")
+
+            return (
+                jsonify(
+                    {
+                        "access_token": access_token,
+                        "user_id": user.id,
+                        "message": "Login successful",
+                    }
+                ),
+                200,
+            )
+
         # Handle failed login
         if user:
             user.increment_failed_login()
             db.session.commit()
-            
-        current_app.logger.warning(f"Failed login attempt: {login_data.email}")
+
+        sanitized_email = login_data.email.split("@")[0] + "@***"
+        current_app.logger.warning(f"Failed login attempt: {sanitized_email}")
         return jsonify({"error": "Invalid credentials"}), 401
 
     except Exception as e:
         current_app.logger.error(f"Login error: {type(e).__name__}: {str(e)}")
         return jsonify({"error": "Login failed"}), 500
+
+
+# ============================================================================
+# TOKEN MANAGEMENT
+# ============================================================================
+
+
+@auth_bp.route("/logout", methods=["POST"])
+@jwt_required()
+def logout():
+    """Logout user and blacklist token."""
+    try:
+        jti = get_jwt()["jti"]
+        blacklisted_tokens.add(jti)
+
+        user_id = int(get_jwt_identity())
+        current_app.logger.info(f"User logged out: {user_id}")
+
+        return jsonify({"message": "Successfully logged out"}), 200
+
+    except Exception as e:
+        current_app.logger.error(f"Logout error: {str(e)}")
+        return jsonify({"error": "Logout failed"}), 500
+
+
+@auth_bp.route("/verify", methods=["GET"])
+@jwt_required()
+def verify_token():
+    """Verify JWT token validity."""
+    try:
+        user_id = int(get_jwt_identity())
+        user = User.query.get(user_id)
+
+        if not user or not user.is_active:
+            return jsonify({"error": "Invalid user"}), 401
+
+        return jsonify({"valid": True, "user_id": user.id, "email": user.email}), 200
+
+    except Exception as e:
+        current_app.logger.error(f"Token verification error: {str(e)}")
+        return jsonify({"error": "Token verification failed"}), 401
+
+
+@auth_bp.route("/refresh", methods=["POST"])
+@jwt_required()
+def refresh_token():
+    """Refresh JWT token."""
+    try:
+        user_id = int(get_jwt_identity())
+        user = User.query.get(user_id)
+
+        if not user or not user.is_active:
+            return jsonify({"error": "Invalid user"}), 401
+
+        # Blacklist old token
+        jti = get_jwt()["jti"]
+        blacklisted_tokens.add(jti)
+
+        # Create new token
+        new_token = create_access_token(identity=str(user.id))
+
+        return (
+            jsonify(
+                {"access_token": new_token, "message": "Token refreshed successfully"}
+            ),
+            200,
+        )
+
+    except Exception as e:
+        current_app.logger.error(f"Token refresh error: {str(e)}")
+        return jsonify({"error": "Token refresh failed"}), 500
+
+
+# ============================================================================
+# PASSWORD MANAGEMENT
+# ============================================================================
+
+
+@auth_bp.route("/change-password", methods=["POST"])
+@jwt_required()
+@limiter.limit("5 per minute")
+def change_password():
+    """Change user password."""
+    try:
+        user_id = int(get_jwt_identity())
+        user = User.query.get(user_id)
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        data = request.get_json(force=True)
+        if not data:
+            return jsonify({"error": "Invalid JSON data"}), 400
+
+        current_password = data.get("current_password")
+        new_password = data.get("new_password")
+
+        if not current_password or not new_password:
+            return jsonify({"error": "Current and new passwords required"}), 400
+
+        # Verify current password
+        if not bcrypt.check_password_hash(user.password_hash, current_password):
+            return jsonify({"error": "Invalid current password"}), 401
+
+        # Validate new password strength
+        if len(new_password) < 8:
+            return jsonify({"error": "Password must be at least 8 characters"}), 400
+
+        # Update password
+        user.password_hash = bcrypt.generate_password_hash(new_password).decode("utf-8")
+        user.last_password_change = datetime.now(timezone.utc)
+        db.session.commit()
+
+        current_app.logger.info(f"Password changed for user: {user_id}")
+
+        return jsonify({"message": "Password changed successfully"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Password change error: {str(e)}")
+        return jsonify({"error": "Password change failed"}), 500
+
+
+@auth_bp.route("/reset-password", methods=["POST"])
+@limiter.limit("3 per minute")
+def reset_password():
+    """Initiate password reset (placeholder for email-based reset)."""
+    try:
+        data = request.get_json(force=True)
+        if not data:
+            return jsonify({"error": "Invalid JSON data"}), 400
+
+        email = data.get("email")
+        if not email:
+            return jsonify({"error": "Email required"}), 400
+
+        user = User.query.filter_by(email=email).first()
+
+        # Always return success to prevent email enumeration
+        sanitized_email = email.split("@")[0] + "@***"
+        current_app.logger.info(f"Password reset requested for: {sanitized_email}")
+
+        # TODO: Implement email-based password reset
+        # For now, just log the request
+
+        return (
+            jsonify({"message": "If the email exists, a reset link has been sent"}),
+            200,
+        )
+
+    except Exception as e:
+        current_app.logger.error(f"Password reset error: {str(e)}")
+        return jsonify({"error": "Password reset failed"}), 500
+
+
+# ============================================================================
+# ACCOUNT MANAGEMENT
+# ============================================================================
+
+
+@auth_bp.route("/profile", methods=["GET"])
+@jwt_required()
+def get_profile():
+    """Get user profile information."""
+    try:
+        user_id = int(get_jwt_identity())
+        user = User.query.get(user_id)
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify(user.to_dict()), 200
+
+    except Exception as e:
+        current_app.logger.error(f"Profile fetch error: {str(e)}")
+        return jsonify({"error": "Failed to fetch profile"}), 500
+
+
+@auth_bp.route("/profile", methods=["PUT"])
+@jwt_required()
+@limiter.limit("10 per minute")
+def update_profile():
+    """Update user profile settings."""
+    try:
+        user_id = int(get_jwt_identity())
+        user = User.query.get(user_id)
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        data = request.get_json(force=True)
+        if not data:
+            return jsonify({"error": "Invalid JSON data"}), 400
+
+        # Update allowed fields
+        if "auto_lock_timeout" in data:
+            timeout = data["auto_lock_timeout"]
+            if isinstance(timeout, int) and 1 <= timeout <= 1440:  # 1 min to 24 hours
+                user.auto_lock_timeout = timeout
+
+        if "password_strength_requirement" in data:
+            strength = data["password_strength_requirement"]
+            if strength in ["weak", "medium", "strong"]:
+                user.password_strength_requirement = strength
+
+        user.updated_at = datetime.now(timezone.utc)
+        db.session.commit()
+
+        current_app.logger.info(f"Profile updated for user: {user_id}")
+
+        return (
+            jsonify(
+                {"message": "Profile updated successfully", "profile": user.to_dict()}
+            ),
+            200,
+        )
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Profile update error: {str(e)}")
+        return jsonify({"error": "Profile update failed"}), 500
+
+
+@auth_bp.route("/deactivate", methods=["POST"])
+@jwt_required()
+@limiter.limit("2 per minute")
+def deactivate_account():
+    """Deactivate user account."""
+    try:
+        user_id = int(get_jwt_identity())
+        user = User.query.get(user_id)
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        data = request.get_json(force=True)
+        if not data:
+            return jsonify({"error": "Invalid JSON data"}), 400
+
+        password = data.get("password")
+        if not password:
+            return jsonify({"error": "Password required for account deactivation"}), 400
+
+        # Verify password
+        if not bcrypt.check_password_hash(user.password_hash, password):
+            return jsonify({"error": "Invalid password"}), 401
+
+        # Deactivate account
+        user.is_active = False
+        user.updated_at = datetime.now(timezone.utc)
+        db.session.commit()
+
+        # Blacklist current token
+        jti = get_jwt()["jti"]
+        blacklisted_tokens.add(jti)
+
+        current_app.logger.info(f"Account deactivated for user: {user_id}")
+
+        return jsonify({"message": "Account deactivated successfully"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Account deactivation error: {str(e)}")
+        return jsonify({"error": "Account deactivation failed"}), 500
+
+
+# ============================================================================
+# UTILITY FUNCTIONS
+# ============================================================================
+
+
+def check_if_token_revoked(jwt_header, jwt_payload):
+    """Check if JWT token is blacklisted."""
+    jti = jwt_payload["jti"]
+    return jti in blacklisted_tokens
+
+
+def generate_secure_token(length=32):
+    """Generate cryptographically secure random token."""
+    alphabet = ascii_letters + digits
+    return "".join(choice(alphabet) for _ in range(length))
