@@ -132,7 +132,7 @@ export function useScrollPosition() {
         x: window.scrollX,
         y: window.scrollY
       });
-    }, 10);
+    }, 50);
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -166,17 +166,20 @@ export function useAsync(asyncFunction) {
     error: null
   });
 
+  const asyncFunctionRef = useRef(asyncFunction);
+  asyncFunctionRef.current = asyncFunction;
+
   const execute = useCallback(async (...args) => {
     setState({ data: null, loading: true, error: null });
     try {
-      const data = await asyncFunction(...args);
+      const data = await asyncFunctionRef.current(...args);
       setState({ data, loading: false, error: null });
       return data;
     } catch (error) {
       setState({ data: null, loading: false, error });
       throw error;
     }
-  }, [asyncFunction]);
+  }, []);
 
   return { ...state, execute };
 }

@@ -80,8 +80,6 @@ async function generateIcons() {
     ctx.beginPath();
     const centerX = size / 2;
     const centerY = size / 2;
-    const shieldWidth = size * 0.8;
-    const shieldHeight = size * 0.85;
     
     // Draw shield path
     ctx.moveTo(centerX, size * 0.1);

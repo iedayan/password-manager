@@ -159,7 +159,10 @@ class LokContentScript {
 
     try {
       const response = await fetch(`${this.apiUrl}/passwords`, {
-        headers: { 'Authorization': `Bearer ${result.token}` }
+        headers: { 
+          'Authorization': `Bearer ${result.token}`,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
       });
 
       if (response.ok) {
@@ -244,7 +247,7 @@ class LokContentScript {
 
       option.addEventListener('click', async () => {
         const passwordId = option.dataset.id;
-        const password = passwords.find(p => p.id == passwordId);
+        const password = passwords.find(p => p.id === parseInt(passwordId));
         await this.fillPasswordSecurely(password);
         dropdown.remove();
       });
@@ -344,7 +347,8 @@ class LokContentScript {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${result.token}`
+          'Authorization': `Bearer ${result.token}`,
+          'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify({
           site_name: siteName,
@@ -370,7 +374,10 @@ class LokContentScript {
 
     try {
       const response = await fetch(`${this.apiUrl}/passwords/${passwordData.id}`, {
-        headers: { 'Authorization': `Bearer ${result.token}` }
+        headers: { 
+          'Authorization': `Bearer ${result.token}`,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
       });
 
       if (response.ok) {
@@ -387,7 +394,10 @@ class LokContentScript {
   async fillPassword(username, passwordId, token) {
     try {
       const response = await fetch(`${this.apiUrl}/passwords/${passwordId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
       });
 
       if (response.ok) {

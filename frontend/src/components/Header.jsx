@@ -156,14 +156,20 @@ const AuthButtons = () => {
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  const sectionsRef = useRef({});
 
   useEffect(() => {
+    // Cache DOM elements
+    const sections = ['hero', 'features', 'pricing', 'about', 'faq'];
+    sections.forEach(section => {
+      sectionsRef.current[section] = document.getElementById(section);
+    });
+
     const handleScroll = () => {
-      const sections = ['hero', 'features', 'pricing', 'about', 'faq'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
-        const element = document.getElementById(section);
+        const element = sectionsRef.current[section];
         if (element) {
           const { offsetTop, offsetHeight } = element;
           if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {

@@ -23,6 +23,9 @@ class LokBackground {
         case 'autoLock':
           this.handleAutoLock();
           break;
+        case 'resetAutoLock':
+          this.resetAutoLockTimer();
+          break;
       }
     });
   }
@@ -81,13 +84,6 @@ class LokBackground {
     chrome.alarms.onAlarm.addListener((alarm) => {
       if (alarm.name === 'autoLock') {
         this.handleAutoLock();
-      }
-    });
-
-    // Reset auto-lock timer on user activity
-    chrome.runtime.onMessage.addListener((message) => {
-      if (message.action === 'resetAutoLock') {
-        this.resetAutoLockTimer();
       }
     });
   }
@@ -168,8 +164,13 @@ class LokBackground {
       password += charset.charAt(Math.floor(Math.random() * charset.length));
     }
     
-    // Shuffle the password
-    return password.split('').sort(() => Math.random() - 0.5).join('');
+    // Shuffle using Fisher-Yates algorithm
+    const chars = password.split('');
+    for (let i = chars.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [chars[i], chars[j]] = [chars[j], chars[i]];
+    }
+    return chars.join('');
   }
 }
 

@@ -9,7 +9,13 @@ const QuickActions = ({ onAddPassword }) => {
       name: 'Add Password',
       description: 'Save a new password',
       icon: PlusIcon,
-      onClick: onAddPassword,
+      onClick: () => {
+        try {
+          onAddPassword?.();
+        } catch (error) {
+          console.error('Error in onAddPassword:', error);
+        }
+      },
       color: 'bg-blue-500 hover:bg-blue-600'
     },
     {

@@ -1,4 +1,11 @@
 class LokPopup {
+  // Constants for password strength thresholds
+  static STRENGTH_THRESHOLDS = {
+    STRONG: 80,
+    GOOD: 60,
+    FAIR: 40
+  };
+
   constructor() {
     this.apiUrl = 'http://localhost:5000/api';
     this.init();
@@ -162,38 +169,47 @@ class LokPopup {
   }
 
   showNotification(message, type = 'info') {
-    // Simple notification system - could be enhanced with a toast component
-    const existingNotification = document.querySelector('.notification');
-    if (existingNotification) {
-      existingNotification.remove();
-    }
+    try {
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
 
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: ${type === 'error' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(16, 185, 129, 0.9)'};
-      color: white;
-      padding: 12px 20px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      z-index: 1000;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      animation: slideDown 0.3s ease;
-    `;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      notification.style.animation = 'slideUp 0.3s ease';
-      setTimeout(() => notification.remove(), 300);
-    }, 3000);
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${type === 'error' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(16, 185, 129, 0.9)'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        animation: slideDown 0.3s ease;
+      `;
+      notification.textContent = message;
+      
+      if (document.body) {
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.style.animation = 'slideUp 0.3s ease';
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.remove();
+            }
+          }, 300);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Failed to show notification:', error);
+    }
   }
 
   async logout() {
@@ -369,16 +385,18 @@ class LokPopup {
   }
 
   getStrengthColor(score) {
-    if (score >= 80) return 'linear-gradient(90deg, #10b981, #059669)';
-    if (score >= 60) return 'linear-gradient(90deg, #f59e0b, #d97706)';
-    if (score >= 40) return 'linear-gradient(90deg, #f97316, #ea580c)';
+    const { STRONG, GOOD, FAIR } = LokPopup.STRENGTH_THRESHOLDS;
+    if (score >= STRONG) return 'linear-gradient(90deg, #10b981, #059669)';
+    if (score >= GOOD) return 'linear-gradient(90deg, #f59e0b, #d97706)';
+    if (score >= FAIR) return 'linear-gradient(90deg, #f97316, #ea580c)';
     return 'linear-gradient(90deg, #ef4444, #dc2626)';
   }
 
   getStrengthText(score) {
-    if (score >= 80) return 'Strong';
-    if (score >= 60) return 'Good';
-    if (score >= 40) return 'Fair';
+    const { STRONG, GOOD, FAIR } = LokPopup.STRENGTH_THRESHOLDS;
+    if (score >= STRONG) return 'Strong';
+    if (score >= GOOD) return 'Good';
+    if (score >= FAIR) return 'Fair';
     return 'Weak';
   }
 
