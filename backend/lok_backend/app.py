@@ -9,7 +9,7 @@ from .core.extensions import jwt, bcrypt, limiter
 from .core.logging import setup_logging
 
 
-def create_app(config_name='production'):
+def create_app(config_name='development'):
     """Create Flask application using the factory pattern."""
     app = Flask(__name__)
     
@@ -47,7 +47,11 @@ def create_app(config_name='production'):
         # Skip device model for now due to syntax issues
         
         db.create_all()
-        print(f"Database tables created: {db.engine.table_names()}")
+        # Get table names using inspector
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        tables = inspector.get_table_names()
+        print(f"Database tables created: {tables}")
     
     return app
 
