@@ -37,21 +37,26 @@ def create_app(config_name='development'):
     
     # Create database tables
     with app.app_context():
-        # Import all models to ensure they're registered
-        from .models.user import User
-        from .models.password import Password
         try:
+            # Import all models to ensure they're registered
+            from .models.user import User
+            from .models.password import Password, PasswordUpdateLog
             from .models.login_session import LoginSession
-        except ImportError:
-            pass  # These models might not exist yet
-        # Skip device model for now due to syntax issues
-        
-        db.create_all()
-        # Get table names using inspector
-        from sqlalchemy import inspect
-        inspector = inspect(db.engine)
-        tables = inspector.get_table_names()
-        print(f"Database tables created: {tables}")
+            from .models.device import Device
+            
+            # Create all tables
+            db.create_all()
+            
+            # Get table names using inspector
+            from sqlalchemy import inspect
+            inspector = inspect(db.engine)
+            tables = inspector.get_table_names()
+            app.logger.info(f"Database tables ready: {len(tables)} tables - {', '.join(sorted(tables))}")
+            
+        except Exception as e:
+            app.logger.error(f"Database initialization error: {e}")
+            # Don't fail the app startup, just log the error
+            pass
     
     return app
 
