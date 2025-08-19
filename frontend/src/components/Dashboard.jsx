@@ -80,16 +80,16 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800">
       {/* Header */}
-      <div className="bg-white/90 backdrop-blur-xl border-b border-gray-200/60 shadow-lg relative z-50">
+      <div className="bg-white border-b border-gray-200 shadow-sm relative z-50">
         <div className="max-w-7xl mx-auto px-6 relative">
-          <div className="flex justify-between items-center py-5 border-b-2 border-gray-300/80">
+          <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">L</span>
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-semibold text-lg">L</span>
               </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-semibold text-gray-900">
                 Lok
               </h1>
             </div>
@@ -97,21 +97,21 @@ const Dashboard = () => {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setShowOnboarding(true)}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium text-sm"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg font-medium text-sm"
                 >
                   <SparklesIcon className="w-4 h-4" />
                   Setup Guide
                 </button>
                 <button
                   onClick={() => setShowImportWizard(true)}
-                  className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium text-sm"
+                  className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:from-emerald-700 hover:to-teal-700 transition-all shadow-md hover:shadow-lg font-medium text-sm"
                 >
                   <DocumentArrowUpIcon className="w-4 h-4" />
                   Import
                 </button>
                 <button
                   onClick={() => setShowAddForm(true)}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium text-sm"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors font-medium text-sm"
                 >
                   <PlusIcon className="w-4 h-4" />
                   Add Password
@@ -120,16 +120,16 @@ const Dashboard = () => {
               <div className="relative" ref={dropdownRef}>
                 <button 
                   onClick={() => setShowSettingsDropdown(!showSettingsDropdown)}
-                  className="p-2.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-xl transition-all duration-200"
+                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <Cog6ToothIcon className="w-5 h-5" />
                 </button>
                 {showSettingsDropdown && (
-                  <div className="fixed right-6 top-20 w-56 bg-white backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/60 py-2 z-[9999] animate-in slide-in-from-top-2 duration-200">
+                  <div className="fixed right-6 top-16 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-[9999]">
                     {/* User Info Section */}
                     <div className="px-4 py-3 border-b border-gray-100">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                           <UserIcon className="w-4 h-4 text-white" />
                         </div>
                         <div>
@@ -141,14 +141,9 @@ const Dashboard = () => {
 
                     {/* Menu Items */}
                     <div className="py-1">
-                      <button className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 flex items-center gap-3 transition-all duration-200 group">
-                        <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
-                          <UserIcon className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
-                        </div>
-                        <div>
-                          <div className="font-medium">Profile</div>
-                          <div className="text-xs text-gray-500 group-hover:text-blue-600">Account settings</div>
-                        </div>
+                      <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                        <UserIcon className="w-4 h-4 text-gray-500" />
+                        <span className="font-medium">Profile</span>
                       </button>
                       
                       <button 
@@ -156,15 +151,10 @@ const Dashboard = () => {
                           setShowOnboarding(true);
                           setShowSettingsDropdown(false);
                         }}
-                        className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-700 flex items-center gap-3 transition-all duration-200 group"
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-purple-100 flex items-center justify-center transition-colors">
-                          <ShieldCheckIcon className="w-4 h-4 text-gray-600 group-hover:text-purple-600" />
-                        </div>
-                        <div>
-                          <div className="font-medium">Setup Guide</div>
-                          <div className="text-xs text-gray-500 group-hover:text-purple-600">AI-powered onboarding</div>
-                        </div>
+                        <ShieldCheckIcon className="w-4 h-4 text-gray-500" />
+                        <span className="font-medium">Setup Guide</span>
                       </button>
                       
                       <button 
@@ -173,15 +163,10 @@ const Dashboard = () => {
                           localStorage.setItem('activeTab', 'settings');
                           setShowSettingsDropdown(false);
                         }}
-                        className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 hover:text-gray-900 flex items-center gap-3 transition-all duration-200 group"
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-gray-200 flex items-center justify-center transition-colors">
-                          <Cog6ToothIcon className="w-4 h-4 text-gray-600 group-hover:text-gray-700" />
-                        </div>
-                        <div>
-                          <div className="font-medium">Settings</div>
-                          <div className="text-xs text-gray-500 group-hover:text-gray-700">Preferences & security</div>
-                        </div>
+                        <Cog6ToothIcon className="w-4 h-4 text-gray-500" />
+                        <span className="font-medium">Settings</span>
                       </button>
                     </div>
 
@@ -192,15 +177,10 @@ const Dashboard = () => {
                     <div className="py-1">
                       <button 
                         onClick={handleLogout}
-                        className="w-full px-4 py-3 text-left text-sm text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 flex items-center gap-3 transition-all duration-200 group"
+                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-red-50 group-hover:bg-red-100 flex items-center justify-center transition-colors">
-                          <ArrowRightOnRectangleIcon className="w-4 h-4 text-red-500 group-hover:text-red-600" />
-                        </div>
-                        <div>
-                          <div className="font-medium">Sign Out</div>
-                          <div className="text-xs text-red-400 group-hover:text-red-500">End your session</div>
-                        </div>
+                        <ArrowRightOnRectangleIcon className="w-4 h-4 text-red-500" />
+                        <span className="font-medium">Sign Out</span>
                       </button>
                     </div>
                   </div>
@@ -210,7 +190,7 @@ const Dashboard = () => {
           </div>
           
           {/* Navigation Tabs */}
-          <div className="flex bg-gray-50/60 border-b border-gray-200/60">
+          <div className="border-b border-gray-200">
             {tabs.map(tab => (
               <button
                 key={tab.id}
@@ -218,16 +198,13 @@ const Dashboard = () => {
                   setActiveTab(tab.id);
                   localStorage.setItem('activeTab', tab.id);
                 }}
-                className={`px-6 py-3 text-sm font-semibold transition-all duration-300 border-b-2 relative ${
+                className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === tab.id 
-                    ? 'text-blue-600 border-blue-600 bg-blue-50/60' 
-                    : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50/40'
+                    ? 'text-blue-600 border-blue-600' 
+                    : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 {tab.name}
-                {activeTab === tab.id && (
-                  <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full" />
-                )}
               </button>
             ))}
           </div>
@@ -239,7 +216,7 @@ const Dashboard = () => {
         <div className="mb-6">
           <Breadcrumb />
         </div>
-        <div className="bg-slate-800/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/60 p-8 relative overflow-hidden">
+        <div className="bg-slate-800/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/60 p-8 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-700/20 via-transparent to-slate-900/20 pointer-events-none"></div>
           <div className="relative z-10">
             {activeTab === 'vault' && (
@@ -260,62 +237,50 @@ const Dashboard = () => {
             {activeTab === 'security' && (
               <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-12">
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-500/30 animate-pulse">
-                    <ShieldCheckIcon className="w-10 h-10 text-white" />
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl">
+                    <ShieldCheckIcon className="w-8 h-8 text-white" />
                   </div>
-                  <h2 className="text-3xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">Security Dashboard</h2>
-                  <p className="text-slate-300 max-w-2xl mx-auto text-lg leading-relaxed">
+                  <h2 className="text-2xl font-semibold text-white mb-4">Security Dashboard</h2>
+                  <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed">
                     Advanced security monitoring and analysis tools to keep your passwords safe and secure.
                   </p>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-8 mb-8">
-                <div className="group relative bg-gradient-to-br from-green-900/90 to-emerald-900/70 border-2 border-green-400/40 rounded-2xl p-6 hover:shadow-2xl hover:shadow-green-500/30 transition-all duration-500 hover:scale-[1.02] backdrop-blur-xl before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-green-400/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-500">
-                  <div className="relative z-10">
-                    <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mb-5 shadow-xl group-hover:shadow-green-400/60 transition-all duration-300 group-hover:rotate-3">
-                      <div className="w-7 h-7 bg-white rounded-full opacity-95 animate-pulse"></div>
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-green-100 transition-colors">Password Health Check</h3>
-                    <p className="text-green-100/90 text-sm mb-5 leading-relaxed">Analyze all your passwords for strength, reuse, and security vulnerabilities.</p>
-                    <div className="inline-flex items-center px-4 py-2 bg-green-400/20 border border-green-300/40 rounded-full text-xs text-green-200 font-semibold backdrop-blur-sm">Coming Q1 2024</div>
+                <div className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-6 hover:shadow-xl hover:bg-slate-700/70 transition-all backdrop-blur-sm">
+                  <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
+                    <ShieldCheckIcon className="w-6 h-6 text-green-400" />
                   </div>
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-400/20 via-transparent to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Password Health Check</h3>
+                  <p className="text-slate-300 text-sm mb-4 leading-relaxed">Analyze all your passwords for strength, reuse, and security vulnerabilities.</p>
+                  <div className="inline-flex items-center px-3 py-1 bg-green-500/20 border border-green-400/30 rounded-full text-xs text-green-300 font-medium">Coming Q1 2024</div>
                 </div>
 
-                <div className="group relative bg-gradient-to-br from-orange-900/90 to-red-900/70 border-2 border-orange-400/40 rounded-2xl p-6 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] backdrop-blur-xl before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-orange-400/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-500">
-                  <div className="relative z-10">
-                    <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center mb-5 shadow-xl group-hover:shadow-orange-400/60 transition-all duration-300 group-hover:rotate-3">
-                      <div className="w-7 h-7 bg-white rounded-full opacity-95 animate-pulse"></div>
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-orange-100 transition-colors">Breach Monitoring</h3>
-                    <p className="text-orange-100/90 text-sm mb-5 leading-relaxed">Get instant alerts when your passwords appear in data breaches.</p>
-                    <div className="inline-flex items-center px-4 py-2 bg-orange-400/20 border border-orange-300/40 rounded-full text-xs text-orange-200 font-semibold backdrop-blur-sm">Coming Q1 2024</div>
+                <div className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-6 hover:shadow-xl hover:bg-slate-700/70 transition-all backdrop-blur-sm">
+                  <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mb-4">
+                    <ShieldCheckIcon className="w-6 h-6 text-orange-400" />
                   </div>
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-400/20 via-transparent to-red-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Breach Monitoring</h3>
+                  <p className="text-slate-300 text-sm mb-4 leading-relaxed">Get instant alerts when your passwords appear in data breaches.</p>
+                  <div className="inline-flex items-center px-3 py-1 bg-orange-500/20 border border-orange-400/30 rounded-full text-xs text-orange-300 font-medium">Coming Q1 2024</div>
                 </div>
 
-                <div className="group relative bg-gradient-to-br from-purple-900/90 to-indigo-900/70 border-2 border-purple-400/40 rounded-2xl p-6 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-500 hover:scale-[1.02] backdrop-blur-xl before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-purple-400/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-500">
-                  <div className="relative z-10">
-                    <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-2xl flex items-center justify-center mb-5 shadow-xl group-hover:shadow-purple-400/60 transition-all duration-300 group-hover:rotate-3">
-                      <div className="w-7 h-7 bg-white rounded-full opacity-95 animate-pulse"></div>
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-purple-100 transition-colors">Two-Factor Authentication</h3>
-                    <p className="text-purple-100/90 text-sm mb-5 leading-relaxed">Enhanced security with TOTP and biometric authentication options.</p>
-                    <div className="inline-flex items-center px-4 py-2 bg-purple-400/20 border border-purple-300/40 rounded-full text-xs text-purple-200 font-semibold backdrop-blur-sm">Coming Q2 2024</div>
+                <div className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-6 hover:shadow-xl hover:bg-slate-700/70 transition-all backdrop-blur-sm">
+                  <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
+                    <ShieldCheckIcon className="w-6 h-6 text-purple-400" />
                   </div>
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-400/20 via-transparent to-indigo-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Two-Factor Authentication</h3>
+                  <p className="text-slate-300 text-sm mb-4 leading-relaxed">Enhanced security with TOTP and biometric authentication options.</p>
+                  <div className="inline-flex items-center px-3 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full text-xs text-purple-300 font-medium">Coming Q2 2024</div>
                 </div>
 
-                <div className="group relative bg-gradient-to-br from-blue-900/90 to-cyan-900/70 border-2 border-blue-400/40 rounded-2xl p-6 hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-500 hover:scale-[1.02] backdrop-blur-xl before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-blue-400/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-500">
-                  <div className="relative z-10">
-                    <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl flex items-center justify-center mb-5 shadow-xl group-hover:shadow-blue-400/60 transition-all duration-300 group-hover:rotate-3">
-                      <div className="w-7 h-7 bg-white rounded-full opacity-95 animate-pulse"></div>
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-100 transition-colors">Advanced Analytics</h3>
-                    <p className="text-blue-100/90 text-sm mb-5 leading-relaxed">Comprehensive security insights and detailed password analytics.</p>
-                    <div className="inline-flex items-center px-4 py-2 bg-blue-400/20 border border-blue-300/40 rounded-full text-xs text-blue-200 font-semibold backdrop-blur-sm">Coming Q2 2024</div>
+                <div className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-6 hover:shadow-xl hover:bg-slate-700/70 transition-all backdrop-blur-sm">
+                  <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+                    <ShieldCheckIcon className="w-6 h-6 text-blue-400" />
                   </div>
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-400/20 via-transparent to-cyan-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Advanced Analytics</h3>
+                  <p className="text-slate-300 text-sm mb-4 leading-relaxed">Comprehensive security insights and detailed password analytics.</p>
+                  <div className="inline-flex items-center px-3 py-1 bg-blue-500/20 border border-blue-400/30 rounded-full text-xs text-blue-300 font-medium">Coming Q2 2024</div>
                 </div>
               </div>
             </div>
@@ -328,10 +293,10 @@ const Dashboard = () => {
       <div className="fixed bottom-6 right-6 z-50">
         <button
           onClick={() => setShowAddForm(true)}
-          className="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-110 flex items-center justify-center group"
+          className="w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transition-colors flex items-center justify-center group"
           title="Add Password (⌘N)"
         >
-          <PlusIcon className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" />
+          <PlusIcon className="w-6 h-6" />
         </button>
       </div>
 

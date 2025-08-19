@@ -131,7 +131,7 @@ const ImportWizard = ({ isOpen, onClose, onComplete }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-5xl max-h-[80vh] overflow-y-auto">
         {/* Header */}
         <div className="p-6 border-b border-slate-700">
           <div className="flex items-center justify-between">
@@ -179,7 +179,7 @@ const ImportWizard = ({ isOpen, onClose, onComplete }) => {
               <h3 className="text-xl font-semibold text-white mb-4">
                 Which password manager are you using?
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {passwordManagers.map((manager) => (
                   <button
                     key={manager.id}

@@ -12,47 +12,106 @@ const OnboardingFlow = ({ isOpen, onClose, onComplete }) => {
 
   useEffect(() => {
     if (isOpen) {
-      fetchOnboardingProgress();
+      // Initialize with mock data for now
+      const mockProgress = {
+        progress: {
+          completed_steps: 0,
+          total_steps: 5,
+          percentage: 0,
+          estimated_time_remaining: 10
+        },
+        current_step: 'welcome',
+        is_complete: false,
+        steps: [
+          {
+            id: 'welcome',
+            title: 'Welcome to Lok',
+            description: 'Get started with your secure password manager',
+            completed: false,
+            required: true,
+            estimated_time: 1
+          },
+          {
+            id: 'import_passwords',
+            title: 'Import Your Passwords',
+            description: 'Bring your existing passwords from other managers',
+            completed: false,
+            required: false,
+            estimated_time: 5
+          },
+          {
+            id: 'security_assessment',
+            title: 'Security Assessment',
+            description: 'Analyze your password security and get recommendations',
+            completed: false,
+            required: true,
+            estimated_time: 2
+          },
+          {
+            id: 'setup_2fa',
+            title: 'Enable Two-Factor Authentication',
+            description: 'Add an extra layer of security to your account',
+            completed: false,
+            required: false,
+            estimated_time: 3
+          },
+          {
+            id: 'master_password',
+            title: 'Set Master Password',
+            description: 'Create a strong master password for encryption',
+            completed: false,
+            required: true,
+            estimated_time: 2
+          }
+        ]
+      };
+      setProgress(mockProgress);
+      setCurrentStep('welcome');
+      setLoading(false);
     }
   }, [isOpen]);
 
-  const fetchOnboardingProgress = async () => {
-    try {
-      const response = await api.request('/api/v1/passwords/onboarding/progress');
-      setProgress(response);
-      setCurrentStep(response.current_step);
-      setLoading(false);
-    } catch (error) {
-      console.error('Failed to fetch onboarding progress:', error);
-      setLoading(false);
-    }
+  const completeStep = (stepId) => {
+    setProgress(prev => {
+      const updatedSteps = prev.steps.map(step => 
+        step.id === stepId ? { ...step, completed: true } : step
+      );
+      const completedCount = updatedSteps.filter(s => s.completed).length;
+      const nextIncompleteStep = updatedSteps.find(s => !s.completed);
+      
+      return {
+        ...prev,
+        steps: updatedSteps,
+        current_step: nextIncompleteStep?.id || null,
+        is_complete: completedCount === prev.steps.length,
+        progress: {
+          ...prev.progress,
+          completed_steps: completedCount,
+          percentage: (completedCount / prev.steps.length) * 100,
+          estimated_time_remaining: Math.max(0, (prev.steps.length - completedCount) * 2)
+        }
+      };
+    });
   };
 
-  const completeStep = async (stepId) => {
-    try {
-      await api.request('/api/v1/passwords/onboarding/complete-step', {
-        method: 'POST',
-        body: JSON.stringify({ step_id: stepId })
-      });
-      await fetchOnboardingProgress();
-    } catch (error) {
-      console.error('Failed to complete step:', error);
-    }
+  const fetchSecurityAssessment = () => {
+    // Mock security assessment
+    setSecurityAssessment({
+      overall_score: 75,
+      risk_level: 'medium',
+      recommendations: [
+        'Enable two-factor authentication',
+        'Update weak passwords',
+        'Remove duplicate passwords',
+        'Set up master password recovery'
+      ]
+    });
   };
 
-  const fetchSecurityAssessment = async () => {
-    try {
-      const response = await api.request('/api/v1/passwords/security-assessment');
-      setSecurityAssessment(response.assessment);
-    } catch (error) {
-      console.error('Failed to fetch security assessment:', error);
-    }
-  };
-
-  const handleImportComplete = async () => {
+  const handleImportComplete = () => {
     setShowImportWizard(false);
-    await completeStep('import_passwords');
-    await fetchSecurityAssessment();
+    completeStep('import_passwords');
+    fetchSecurityAssessment();
   };
 
   const handleStepAction = (stepId) => {
