@@ -15,7 +15,7 @@ from ...models.password import Password
 from ...core.database import db
 from ...core.extensions import limiter
 from ...services.encryption_service import encryption_service
-from ...utils.password_utils import analyze_password_health
+from ...services.security_analyzer import SecurityAnalyzer, BreachChecker
 
 security_bp = Blueprint("security", __name__)
 
@@ -276,90 +276,44 @@ def security_dashboard():
         user = User.query.get(user_id)
         passwords = Password.query.filter_by(user_id=user_id).all()
         
-        # Basic metrics
-        total_passwords = len(passwords)
-        weak_count = 0
-        strong_count = 0
-        duplicates = {}
-        old_count = 0
-        
-        # Analyze passwords
+        # Prepare password data for analysis
+        password_data = []
         for password in passwords:
             try:
                 decrypted = encryption_service.decrypt(password.encrypted_password)
-                
-                # Strength analysis
-                from ...services.password_strength import calculate_password_strength
-                strength = calculate_password_strength(decrypted)
-                
-                if strength < 60:
-                    weak_count += 1
-                elif strength >= 80:
-                    strong_count += 1
-                
-                # Check for duplicates
-                if decrypted in duplicates:
-                    duplicates[decrypted] += 1
-                else:
-                    duplicates[decrypted] = 1
-                
-                # Check age (90+ days)
-                if password.created_at:
-                    days_old = (datetime.now(timezone.utc) - password.created_at).days
-                    if days_old > 90:
-                        old_count += 1
-                        
+                password_data.append({
+                    'id': password.id,
+                    'site_name': password.site_name,
+                    'username': password.username,
+                    'password': decrypted,
+                    'created_at': password.created_at,
+                    'strength_score': SecurityAnalyzer.calculate_password_strength(decrypted)
+                })
             except Exception:
-                weak_count += 1  # Count undecryptable as weak
+                continue
         
-        duplicate_count = sum(1 for count in duplicates.values() if count > 1)
+        # Perform comprehensive analysis
+        analysis = SecurityAnalyzer.analyze_password_health(password_data)
         
-        # Calculate overall score
-        issues = weak_count + duplicate_count + old_count
-        overall_score = max(0, 100 - (issues / max(total_passwords, 1)) * 100)
+        # Add user-specific data
+        analysis['is_2fa_enabled'] = getattr(user, 'is_2fa_enabled', False)
+        analysis['last_login'] = user.last_login.isoformat() if hasattr(user, 'last_login') and user.last_login else None
         
-        # Security level
-        if overall_score >= 90:
-            security_level = "Excellent"
-        elif overall_score >= 75:
-            security_level = "Good"
-        elif overall_score >= 60:
-            security_level = "Fair"
-        else:
-            security_level = "Poor"
-        
-        # Recent activity (mock data for now)
-        recent_activity = [
+        # Recent activity
+        analysis['recent_activity'] = [
             {
                 "action": "Password added",
-                "details": "New password for example.com",
+                "details": "New password added",
                 "timestamp": datetime.now(timezone.utc).isoformat()
             },
             {
                 "action": "Security scan completed",
-                "details": f"Analyzed {total_passwords} passwords",
-                "timestamp": (datetime.now(timezone.utc)).isoformat()
+                "details": f"Analyzed {analysis['total_passwords']} passwords",
+                "timestamp": datetime.now(timezone.utc).isoformat()
             }
         ]
         
-        return jsonify({
-            "overall_score": round(overall_score),
-            "security_level": security_level,
-            "total_passwords": total_passwords,
-            "weak_passwords": weak_count,
-            "strong_passwords": strong_count,
-            "duplicate_passwords": duplicate_count,
-            "old_passwords": old_count,
-            "is_2fa_enabled": user.is_2fa_enabled or False,
-            "last_login": user.last_login.isoformat() if user.last_login else None,
-            "recent_activity": recent_activity,
-            "recommendations": [
-                f"Update {weak_count} weak passwords" if weak_count > 0 else None,
-                f"Replace {duplicate_count} reused passwords" if duplicate_count > 0 else None,
-                f"Refresh {old_count} old passwords" if old_count > 0 else None,
-                "Enable two-factor authentication" if not user.is_2fa_enabled else None
-            ]
-        }), 200
+        return jsonify(analysis), 200
         
     except Exception as e:
         current_app.logger.error(f"Security dashboard failed: {str(e)}")
@@ -382,36 +336,80 @@ def breach_check():
         if not data or "password_ids" not in data:
             return jsonify({"error": "Password IDs required"}), 400
         
-        results = []
+        password_data = []
         for password_id in data["password_ids"]:
             password = Password.query.filter_by(id=password_id, user_id=user_id).first()
             if password:
                 try:
                     decrypted = encryption_service.decrypt(password.encrypted_password)
-                    
-                    # Mock breach check (in production, use HaveIBeenPwned API)
-                    is_breached = decrypted.lower() in [
-                        'password', '123456', 'qwerty', 'abc123', 'password123'
-                    ]
-                    
-                    results.append({
-                        "password_id": password_id,
-                        "site_name": password.site_name,
-                        "is_breached": is_breached,
-                        "breach_count": 1 if is_breached else 0,
-                        "last_breach": "2023-01-01" if is_breached else None
+                    password_data.append({
+                        'id': password.id,
+                        'site_name': password.site_name,
+                        'password': decrypted
                     })
                 except Exception:
                     continue
         
+        # Use BreachChecker service
+        breach_results = BreachChecker.bulk_breach_check(password_data)
+        
         return jsonify({
-            "results": results,
+            **breach_results,
             "checked_at": datetime.now(timezone.utc).isoformat()
         }), 200
         
     except Exception as e:
         current_app.logger.error(f"Breach check failed: {str(e)}")
         return jsonify({"error": "Breach check failed"}), 500
+
+
+# ============================================================================
+# SECURITY SCANNING
+# ============================================================================
+
+@security_bp.route("/scan", methods=["POST"])
+@jwt_required()
+@limiter.limit("5 per minute")
+def security_scan():
+    """Run comprehensive security scan."""
+    try:
+        user_id = int(get_jwt_identity())
+        passwords = Password.query.filter_by(user_id=user_id).all()
+        
+        # Prepare password data
+        password_data = []
+        for password in passwords:
+            try:
+                decrypted = encryption_service.decrypt(password.encrypted_password)
+                password_data.append({
+                    'id': password.id,
+                    'site_name': password.site_name,
+                    'username': password.username,
+                    'password': decrypted,
+                    'created_at': password.created_at
+                })
+            except Exception:
+                continue
+        
+        # Comprehensive analysis
+        health_analysis = SecurityAnalyzer.analyze_password_health(password_data)
+        breach_analysis = BreachChecker.bulk_breach_check(password_data)
+        
+        # Combine results
+        scan_results = {
+            **health_analysis,
+            'breach_analysis': breach_analysis,
+            'scan_timestamp': datetime.now(timezone.utc).isoformat(),
+            'scan_type': 'comprehensive'
+        }
+        
+        current_app.logger.info(f"Security scan completed for user {user_id}")
+        
+        return jsonify(scan_results), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Security scan failed: {str(e)}")
+        return jsonify({"error": "Security scan failed"}), 500
 
 
 # ============================================================================

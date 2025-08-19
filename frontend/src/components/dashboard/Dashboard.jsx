@@ -20,9 +20,22 @@ const Dashboard = () => {
   const [showImportWizard, setShowImportWizard] = useState(false);
   const [showFeatureBoard, setShowFeatureBoard] = useState(false);
   const [refreshVault, setRefreshVault] = useState(0);
+  const [passwords, setPasswords] = useState([]);
   const dropdownRef = useRef(null);
 
-  // Remove automatic onboarding trigger - only show when manually opened
+  // Fetch passwords for security dashboard
+  useEffect(() => {
+    const fetchPasswords = async () => {
+      try {
+        const data = await api.passwords.getAll();
+        setPasswords(data.passwords || data);
+      } catch (error) {
+        console.error('Failed to fetch passwords:', error);
+      }
+    };
+    
+    fetchPasswords();
+  }, [refreshVault]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -243,7 +256,7 @@ const Dashboard = () => {
             {activeTab === 'settings' && <Settings />}
             {activeTab === 'security' && (
               <div className="max-w-5xl mx-auto security-dashboard">
-                <SecurityDashboard />
+                <SecurityDashboard passwords={passwords} />
               </div>
             )}
 

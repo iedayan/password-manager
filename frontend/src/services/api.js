@@ -148,7 +148,9 @@ export const api = {
 
   // Security endpoints
   security: {
-    // Advanced analysis
+    // Dashboard and analysis
+    getDashboard: () => api.request('/api/v1/security/dashboard'),
+    runScan: () => api.request('/api/v1/security/scan', { method: 'POST' }),
     getAdvancedAnalysis: () => api.request('/api/v1/security/advanced-analysis'),
     getRealTimeThreats: () => api.request('/api/v1/security/threats/realtime'),
     

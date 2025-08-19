@@ -5,6 +5,10 @@ import { QuickActions } from '../dashboard';
 import { EditPasswordModal, DeleteConfirmModal } from '../modals';
 import { LoadingSpinner, ErrorMessage, Toast } from '../ui';
 import { api } from "../../services/api";
+import QuickActionsBar from './QuickActionsBar';
+import EnhancedSearch from './EnhancedSearch';
+import { CategoryIcon, StrengthIndicator, RecentlyAccessedSection, PasswordHealthBadges, FavoriteButton, AnimatedCounter, LoadingSkeletons } from './VisualEnhancements';
+import { SmartCategorizer } from './SmartCategorization';
 
 const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassword, refreshTrigger }) => {
   const [passwords, setPasswords] = useState([]);
@@ -203,7 +207,35 @@ const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassw
     }
   };
 
-  if (loading) return <LoadingSpinner size="lg" text="Loading vault..." />;
+  const handleCategorize = async (passwordId, newCategory) => {
+    try {
+      await api.passwords.update(passwordId, { category: newCategory });
+      setPasswords(prev => prev.map(p => 
+        p.id === passwordId ? { ...p, category: newCategory } : p
+      ));
+    } catch (error) {
+      console.error('Failed to update category:', error);
+    }
+  };
+
+  const handleEnhancedSearch = (term, filters) => {
+    setSearchTerm(term);
+    // Apply advanced filters here
+  };
+
+  const handleAdvancedFilter = (filters) => {
+    // Apply advanced filters
+    console.log('Advanced filters:', filters);
+  };
+
+  if (loading) return (
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-white mb-4">Password Vault</h1>
+        <LoadingSkeletons count={8} />
+      </div>
+    </div>
+  );
 
   if (passwords.length === 0) {
     return (
@@ -315,6 +347,20 @@ const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassw
         </div>
       </div>
 
+      {/* Smart Categorization */}
+      {passwords.length > 0 && (
+        <SmartCategorizer 
+          passwords={passwords}
+          onCategorize={handleCategorize}
+        />
+      )}
+
+      {/* Recently Accessed */}
+      <RecentlyAccessedSection 
+        passwords={passwords}
+        onPasswordClick={(password) => setEditingPassword(password)}
+      />
+
       {/* Quick Actions */}
       {passwords.length > 0 && <QuickActions onAddPassword={() => setShowAddForm?.(true)} />}
 
@@ -344,100 +390,15 @@ const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassw
         </div>
       )}
 
-      {/* Search and Filters */}
-      <div className="mb-6 space-y-3">
-        <div className="flex gap-3">
-          <div className="relative flex-1">
-            <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search passwords... (⌘K)"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-bar w-full pl-12 pr-16 py-3 border border-slate-600/60 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-slate-700/80 backdrop-blur-sm text-sm transition-all text-white placeholder-slate-400"
-            />
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-slate-400 bg-slate-600/80 px-2 py-1 rounded-md">
-              ⌘K
-            </div>
-          </div>
-          
-          {/* View Toggle */}
-          <div className="flex border border-slate-600/60 rounded-xl overflow-hidden">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`px-3 py-3 flex items-center gap-2 text-sm transition-all ${
-                viewMode === 'grid' ? 'bg-blue-900/60 text-blue-300' : 'text-slate-300 hover:bg-slate-600/80'
-              }`}
-            >
-              <Squares2X2Icon className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`px-3 py-3 flex items-center gap-2 text-sm transition-all border-l border-slate-600/60 ${
-                viewMode === 'list' ? 'bg-blue-900/60 text-blue-300' : 'text-slate-300 hover:bg-slate-600/80'
-              }`}
-            >
-              <ListBulletIcon className="w-4 h-4" />
-            </button>
-          </div>
-          
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`px-4 py-3 border border-slate-600/60 rounded-xl hover:bg-slate-600/80 flex items-center gap-2 text-sm transition-all ${
-              showFilters ? 'bg-blue-900/60 border-blue-600 text-blue-300' : 'text-slate-300'
-            }`}
-          >
-            <FunnelIcon className="w-4 h-4" />
-            Filters
-            <ChevronDownIcon className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
-          </button>
-        </div>
-        
-        {showFilters && (
-          <div className="bg-slate-700/90 backdrop-blur-sm border border-slate-600/60 rounded-xl p-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-2 uppercase tracking-wide">Sort by</label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full p-2.5 border border-slate-600/60 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-slate-800/80 text-white"
-                >
-                  <option value="name">Name (A-Z)</option>
-                  <option value="strength">Password Strength</option>
-                  <option value="recent">Recently Added</option>
-                  <option value="favorites">Favorites First</option>
-                  <option value="category">Category</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-2 uppercase tracking-wide">Filter by</label>
-                <select
-                  value={filterBy}
-                  onChange={(e) => setFilterBy(e.target.value)}
-                  className="w-full p-2.5 border border-slate-600/60 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-slate-800/80 text-white"
-                >
-                  <option value="all">All passwords</option>
-                  <option value="favorites">Favorites</option>
-                  <option value="strong">Strong (80%+)</option>
-                  <option value="medium">Medium (60-79%)</option>
-                  <option value="weak">Weak (&lt;60%)</option>
-                  <option value="duplicates">Duplicates</option>
-                  <option value="old">Old (90+ days)</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-2 uppercase tracking-wide">Bulk Actions</label>
-                <button
-                  onClick={selectAllPasswords}
-                  className="w-full p-2.5 border border-slate-600/60 rounded-lg hover:bg-slate-600/80 text-sm text-slate-300 transition-colors"
-                >
-                  Select All ({filteredPasswords.length})
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+      {/* Enhanced Search */}
+      <div className="mb-6">
+        <EnhancedSearch 
+          onSearch={handleEnhancedSearch}
+          onFilter={handleAdvancedFilter}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          passwords={passwords}
+        />
       </div>
 
       {/* Password List */}
@@ -512,6 +473,18 @@ const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassw
           onClose={() => setToast(null)}
         />
       )}
+
+      {/* Floating Quick Actions Bar */}
+      <QuickActionsBar 
+        onAddPassword={() => setShowAddForm?.(true)}
+        onSearch={() => document.querySelector('.search-bar')?.focus()}
+        onFilter={() => setShowFilters(!showFilters)}
+        onExport={() => console.log('Export passwords')}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        selectedCount={selectedPasswords.size}
+        onBulkAction={bulkDelete}
+      />
     </div>
   );
 };
