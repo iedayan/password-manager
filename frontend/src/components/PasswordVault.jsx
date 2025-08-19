@@ -221,7 +221,7 @@ const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassw
           </p>
           <button 
             onClick={() => setShowAddForm?.(true)}
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-medium"
+            className="add-password-btn bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-medium"
           >
             Add Your First Password
           </button>
@@ -357,7 +357,7 @@ const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassw
               placeholder="Search passwords... (⌘K)"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-16 py-3 border border-slate-600/60 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-slate-700/80 backdrop-blur-sm text-sm transition-all text-white placeholder-slate-400"
+              className="search-bar w-full pl-12 pr-16 py-3 border border-slate-600/60 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-slate-700/80 backdrop-blur-sm text-sm transition-all text-white placeholder-slate-400"
             />
             <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-slate-400 bg-slate-600/80 px-2 py-1 rounded-md">
               ⌘K

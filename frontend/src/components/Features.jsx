@@ -11,8 +11,8 @@ export default function Features() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
       ),
-      title: 'Auto-Update Weak Passwords',
-      description: 'Automatically detects weak and reused passwords, then updates them across all your accounts without you lifting a finger.',
+      title: 'Advanced Password Generator',
+      description: 'State-of-the-art password generation with Shannon entropy analysis, Markov chain validation, and cryptographic security.',
       color: 'from-blue-500 to-indigo-500',
       bgColor: 'bg-blue-50'
     },
@@ -103,12 +103,17 @@ export default function Features() {
     <section id="features" className="section-spacing px-6 bg-white" ref={sectionRef}>
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16 animate-fade-in">
+          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-100 to-red-100 border border-orange-300 text-orange-800 rounded-full text-sm font-semibold mb-6">
+            <div className="w-2 h-2 bg-orange-600 rounded-full mr-2 animate-pulse"></div>
+Beta Features Available Now in Web App
+          </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-            The world's first{' '}
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">self-updating</span> password manager
+            Experience the future of{' '}
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">password security</span> today
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-            Automatically finds and fixes weak passwords across all your accounts. No manual work required.
+            Try our beta web application with enterprise-grade security, advanced password generation, and zero-knowledge encryption. 
+            <strong className="text-blue-600"> Available now</strong> with mobile and desktop apps coming soon.
           </p>
         </div>
 

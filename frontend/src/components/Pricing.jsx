@@ -102,7 +102,7 @@ export default function Pricing() {
             <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Pricing</span>
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-            Choose the plan that's right for you. All plans include 14-day free trial.
+            Try our <strong className="text-blue-600">beta web app free</strong> now. Full pricing starts when mobile and desktop apps launch.
           </p>
         </div>
 
@@ -148,13 +148,13 @@ export default function Pricing() {
               </ul>
 
               <button 
-                onClick={() => document.getElementById('email-signup')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => window.location.href = '/login'}
                 className={`w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300 group-hover:scale-105 mt-auto focus-ring ${
                 plan.popular
                   ? 'bg-gradient-to-r from-blue-700 to-indigo-700 text-white hover:from-blue-800 hover:to-indigo-800 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
                   : 'bg-white text-gray-900 hover:bg-blue-50 hover:text-blue-700 border-2 border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md'
               }`}>
-Join Waitlist
+                Try Beta
               </button>
             </div>
           ))}

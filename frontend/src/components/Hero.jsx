@@ -54,9 +54,9 @@ export default function Hero() {
         </div>
 
         <div className="text-center">
-          <div className="inline-flex items-center px-4 py-2 bg-blue-100 border border-blue-200 text-blue-800 rounded-full text-sm font-semibold mb-8 animate-scale-in">
-            <div className="w-2 h-2 bg-blue-600 rounded-full mr-2"></div>
-            Auto-Updates Weak Passwords Across All Sites
+          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-100 to-red-100 border border-orange-300 text-orange-800 rounded-full text-sm font-semibold mb-8 animate-scale-in">
+            <div className="w-2 h-2 bg-orange-600 rounded-full mr-2 animate-pulse"></div>
+Web App Beta Now Available - Try It Free!
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight animate-slide-up">
@@ -65,16 +65,19 @@ export default function Hero() {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-700 mb-12 max-w-4xl mx-auto leading-relaxed animate-fade-in" style={{animationDelay: '2s', animationFillMode: 'both'}}>
-            The first password manager that automatically detects and updates weak, reused passwords 
-            across all your accounts. Enterprise-grade security with zero-knowledge encryption.
+            Experience our <strong className="text-blue-600">beta web application</strong> with enterprise-grade security, 
+            zero-knowledge encryption, and state-of-the-art password generation. Join thousands testing the future of password management.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8 animate-slide-up" style={{animationDelay: '2.5s', animationFillMode: 'both'}}>
             <button
               onClick={() => window.location.href = '/login'}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2 relative"
             >
-              <span>Try Demo</span>
+              <span>Try Beta Web App</span>
+              <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-bounce">
+                BETA
+              </div>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -111,7 +114,7 @@ export default function Hero() {
                     </>
                   ) : (
                     <>
-                      <span>Join the Waitlist</span>
+                      <span>Get Beta Updates</span>
                       <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                       </svg>
@@ -125,13 +128,13 @@ export default function Hero() {
                 {message}
               </p>
             ) : (
-              <p className="text-sm text-gray-600 mt-3">Be first to get early access • No spam • Unsubscribe anytime</p>
+              <p className="text-sm text-gray-600 mt-3">Get notified of new beta features • No spam • Unsubscribe anytime</p>
             )}
           </form>
 
           {/* Download Options */}
           <div className="max-w-2xl mx-auto animate-fade-in" style={{animationDelay: '3s', animationFillMode: 'both'}}>
-            <h3 className="text-center mb-6 font-black text-2xl md:text-3xl bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent tracking-wide">Coming Soon</h3>
+            <h3 className="text-center mb-6 font-black text-2xl md:text-3xl bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent tracking-wide">Coming Soon to Mobile & Desktop</h3>
             <div className="flex flex-wrap justify-center gap-4">
               <a 
                 href="#" 

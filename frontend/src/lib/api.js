@@ -274,6 +274,27 @@ export const api = {
     getAutofillData: (url) => api.request(`/api/v1/extension/autofill?url=${encodeURIComponent(url)}`),
     ping: () => api.request('/api/v1/extension/ping'),
   },
+
+  // Beta Feedback System
+  feedback: {
+    submit: (feedback) => {
+      console.log('Mock feedback submission:', feedback);
+      return Promise.resolve({ success: true, id: Date.now() });
+    }
+  },
+
+  // Feature Requests
+  features: {
+    getAll: () => Promise.resolve({ features: [] }),
+    create: (request) => {
+      console.log('Mock feature request:', request);
+      return Promise.resolve({ success: true, id: Date.now() });
+    },
+    vote: (id) => {
+      console.log('Mock vote for feature:', id);
+      return Promise.resolve({ success: true });
+    }
+  }
 };
 
 export default api;

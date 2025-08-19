@@ -49,7 +49,7 @@ export const DEFAULT_OPTIONS = {
   lowercase: true,
   numbers: true,
   symbols: true,
-  extendedSymbols: false,
+  extendedSymbols: true,
   wordCount: 4,
   separator: '-',
   capitalize: true

@@ -9,6 +9,10 @@ import Breadcrumb from './Breadcrumb';
 import OnboardingFlow from './OnboardingFlow';
 import ImportWizard from './ImportWizard';
 import SecurityDashboard from './SecurityDashboard';
+import BetaFeedbackWidget from './BetaFeedbackWidget';
+import ProductTour from './ProductTour';
+import SetupChecklist from './SetupChecklist';
+import FeatureRequestBoard from './FeatureRequestBoard';
 import { api } from '../lib/api';
 
 const Dashboard = () => {
@@ -20,6 +24,7 @@ const Dashboard = () => {
   const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showImportWizard, setShowImportWizard] = useState(false);
+  const [showFeatureBoard, setShowFeatureBoard] = useState(false);
   const [refreshVault, setRefreshVault] = useState(0);
   const dropdownRef = useRef(null);
 
@@ -77,6 +82,7 @@ const Dashboard = () => {
     { id: 'vault', name: 'Vault' },
     { id: 'generator', name: 'Generator' },
     { id: 'security', name: 'Security' },
+    { id: 'feedback', name: 'Feedback' },
     { id: 'settings', name: 'Settings' }
   ];
 
@@ -160,6 +166,18 @@ const Dashboard = () => {
                       
                       <button 
                         onClick={() => {
+                          setActiveTab('feedback');
+                          localStorage.setItem('activeTab', 'feedback');
+                          setShowSettingsDropdown(false);
+                        }}
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                      >
+                        <SparklesIcon className="w-4 h-4 text-gray-500" />
+                        <span className="font-medium">Feature Requests</span>
+                      </button>
+                      
+                      <button 
+                        onClick={() => {
                           setActiveTab('settings');
                           localStorage.setItem('activeTab', 'settings');
                           setShowSettingsDropdown(false);
@@ -217,27 +235,37 @@ const Dashboard = () => {
         <div className="mb-6">
           <Breadcrumb />
         </div>
+        
+        {/* Setup Checklist - only show if not completed */}
+        <SetupChecklist onComplete={() => setActiveTab('vault')} />
         <div className="bg-slate-800/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/60 p-8 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-700/20 via-transparent to-slate-900/20 pointer-events-none"></div>
           <div className="relative z-10">
             {activeTab === 'vault' && (
-              <PasswordVault 
-                showAddForm={showAddForm} 
-                setShowAddForm={setShowAddForm}
-                onImportClick={() => setShowImportWizard(true)}
-                onEditPassword={setEditingPassword}
-                refreshTrigger={refreshVault}
-              />
+              <div className="password-vault">
+                <PasswordVault 
+                  showAddForm={showAddForm} 
+                  setShowAddForm={setShowAddForm}
+                  onImportClick={() => setShowImportWizard(true)}
+                  onEditPassword={setEditingPassword}
+                  refreshTrigger={refreshVault}
+                />
+              </div>
             )}
             {activeTab === 'generator' && (
-              <div className="max-w-3xl mx-auto">
+              <div className="max-w-3xl mx-auto password-generator">
                 <PasswordGenerator />
               </div>
             )}
             {activeTab === 'settings' && <Settings />}
             {activeTab === 'security' && (
-              <div className="max-w-5xl mx-auto">
+              <div className="max-w-5xl mx-auto security-dashboard">
                 <SecurityDashboard />
+              </div>
+            )}
+            {activeTab === 'feedback' && (
+              <div className="max-w-4xl mx-auto">
+                <FeatureRequestBoard />
               </div>
             )}
           </div>
@@ -297,6 +325,12 @@ const Dashboard = () => {
           setRefreshVault(prev => prev + 1);
         }}
       />
+      
+      {/* Beta Feedback Widget */}
+      <BetaFeedbackWidget />
+      
+      {/* Product Tour */}
+      <ProductTour onComplete={() => setActiveTab('vault')} />
     </div>
   );
 };
