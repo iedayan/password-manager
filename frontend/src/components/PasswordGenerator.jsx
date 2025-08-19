@@ -1,187 +1,93 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { ArrowPathIcon, ClipboardIcon, CheckIcon, GlobeAltIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { usePasswordGenerator } from '../hooks/usePasswordGenerator';
+import { POPULAR_WEBSITES, CHARACTER_TYPE_OPTIONS } from '../constants/passwordGenerator';
+
+const SavePasswordModal = lazy(() => import('./SavePasswordModal'));
 
 const PasswordGenerator = ({ onGenerate }) => {
-  const [options, setOptions] = useState({
-    length: 16,
-    uppercase: true,
-    lowercase: true,
-    numbers: true,
-    symbols: true
-  });
-  const [generatedPassword, setGeneratedPassword] = useState('');
+  const { options, generatedPassword, generatePassword, updateOptions, cryptoUtils } = usePasswordGenerator();
   const [copied, setCopied] = useState(false);
   const [selectedWebsite, setSelectedWebsite] = useState('');
   const [showSaveModal, setShowSaveModal] = useState(false);
-  
-  const popularWebsites = [
-    { name: 'Google', url: 'google.com' },
-    { name: 'Facebook', url: 'facebook.com' },
-    { name: 'Twitter', url: 'twitter.com' },
-    { name: 'Instagram', url: 'instagram.com' },
-    { name: 'LinkedIn', url: 'linkedin.com' },
-    { name: 'GitHub', url: 'github.com' },
-    { name: 'Netflix', url: 'netflix.com' },
-    { name: 'Amazon', url: 'amazon.com' },
-  ];
 
-  const generatePassword = (customOptions) => {
-    const opts = customOptions || options;
-    
-    // Define character sets with ambiguous characters removed for better usability
-    const charSets = {
-      lowercase: 'abcdefghijkmnpqrstuvwxyz', // Removed 'l', 'o' to avoid confusion
-      uppercase: 'ABCDEFGHJKLMNPQRSTUVWXYZ', // Removed 'I', 'O' to avoid confusion
-      numbers: '23456789', // Removed '0', '1' to avoid confusion with 'O', 'l'
-      symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?~'
-    };
-
-    // Build charset based on selected options
-    let charset = '';
-    const selectedSets = [];
-    
-    if (opts.lowercase) {
-      charset += charSets.lowercase;
-      selectedSets.push(charSets.lowercase);
-    }
-    if (opts.uppercase) {
-      charset += charSets.uppercase;
-      selectedSets.push(charSets.uppercase);
-    }
-    if (opts.numbers) {
-      charset += charSets.numbers;
-      selectedSets.push(charSets.numbers);
-    }
-    if (opts.symbols) {
-      charset += charSets.symbols;
-      selectedSets.push(charSets.symbols);
-    }
-
-    if (!charset) {
-      // Fallback to lowercase if no options selected
-      charset = charSets.lowercase;
-      selectedSets.push(charSets.lowercase);
-    }
-
-    // Generate password using cryptographically secure random values
-    let password = '';
-    
-    // Ensure at least one character from each selected character set
-    selectedSets.forEach(set => {
-      password += set.charAt(getSecureRandomInt(set.length));
-    });
-    
-    // Ensure minimum length of 8 characters
-    const targetLength = Math.max(8, opts.length || 16);
-    
-    // Fill remaining positions with random characters from full charset
-    for (let i = password.length; i < targetLength; i++) {
-      password += charset.charAt(getSecureRandomInt(charset.length));
-    }
-    
-    // Shuffle the password to avoid predictable patterns
-    password = shuffleString(password);
-    
-    // Validate password meets complexity requirements
-    if (!validatePasswordComplexity(password, opts)) {
-      // Regenerate if validation fails (rare edge case)
-      return generatePassword(customOptions);
-    }
-    
-    setGeneratedPassword(password);
+  // Memoized event handlers
+  const handleGeneratePassword = useCallback((customOptions) => {
+    const password = generatePassword(customOptions);
     if (onGenerate) onGenerate(password);
-  };
+  }, [generatePassword, onGenerate]);
 
-  // Cryptographically secure random number generator
-  const getSecureRandomInt = (max) => {
-    if (window.crypto && window.crypto.getRandomValues) {
-      const array = new Uint32Array(1);
-      window.crypto.getRandomValues(array);
-      return array[0] % max;
-    }
-    // Fallback to Math.random() if crypto API not available
-    return Math.floor(Math.random() * max);
-  };
+  const handleOptionChange = useCallback((newOptions) => {
+    updateOptions(newOptions);
+    setTimeout(() => handleGeneratePassword({ ...options, ...newOptions }), 100);
+  }, [updateOptions, handleGeneratePassword, options]);
 
-  // Fisher-Yates shuffle algorithm for cryptographic randomness
-  const shuffleString = (str) => {
-    const array = str.split('');
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = getSecureRandomInt(i + 1);
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array.join('');
-  };
-
-  // Validate password meets complexity requirements
-  const validatePasswordComplexity = (password, opts) => {
-    if (opts.lowercase && !/[a-z]/.test(password)) return false;
-    if (opts.uppercase && !/[A-Z]/.test(password)) return false;
-    if (opts.numbers && !/[0-9]/.test(password)) return false;
-    if (opts.symbols && !/[^a-zA-Z0-9]/.test(password)) return false;
-    
-    // Check for common weak patterns
-    if (/(..).*\1/.test(password)) return false; // No repeated substrings
-    if (/012|123|234|345|456|567|678|789|890|abc|bcd|cde/.test(password.toLowerCase())) return false; // No sequences
-    
-    return true;
-  };
-
-  const copyPassword = async () => {
+  const copyPassword = useCallback(async () => {
     await navigator.clipboard.writeText(generatedPassword);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
+  }, [generatedPassword]);
 
-  const getStrength = () => {
-    if (!generatedPassword) return 0;
+  // Memoized strength calculation
+  const strengthData = useMemo(() => {
+    if (!generatedPassword) return { score: 0, entropy: 0, markovScore: 0 };
     
-    let score = 0;
     const password = generatedPassword;
+    let score = 0;
     
-    // Length scoring (more sophisticated)
-    if (password.length >= 8) score += 10;
-    if (password.length >= 12) score += 15;
-    if (password.length >= 16) score += 20;
-    if (password.length >= 20) score += 25;
+    const lengthScore = Math.min(40, password.length * 2.5);
+    score += lengthScore;
     
-    // Character variety scoring
-    if (/[a-z]/.test(password)) score += 15;
-    if (/[A-Z]/.test(password)) score += 15;
-    if (/[0-9]/.test(password)) score += 15;
-    if (/[^a-zA-Z0-9]/.test(password)) score += 20;
+    const charTypes = {
+      lowercase: /[a-z]/.test(password) ? 15 : 0,
+      uppercase: /[A-Z]/.test(password) ? 15 : 0,
+      numbers: /[0-9]/.test(password) ? 10 : 0,
+      symbols: /[^a-zA-Z0-9]/.test(password) ? 20 : 0
+    };
+    score += Object.values(charTypes).reduce((a, b) => a + b, 0);
     
-    // Entropy calculation based on character set size
-    let charsetSize = 0;
-    if (/[a-z]/.test(password)) charsetSize += 26;
-    if (/[A-Z]/.test(password)) charsetSize += 26;
-    if (/[0-9]/.test(password)) charsetSize += 10;
-    if (/[^a-zA-Z0-9]/.test(password)) charsetSize += 32;
+    const entropy = cryptoUtils.calculateShannonEntropy(password);
+    const entropyScore = Math.min(25, entropy * 5);
+    score += entropyScore;
     
-    const entropy = password.length * Math.log2(charsetSize);
-    if (entropy >= 50) score += 10;
-    if (entropy >= 70) score += 15;
+    const markovScore = cryptoUtils.calculateMarkovScore(password);
+    score -= markovScore * 30;
     
-    // Penalty for common patterns
-    if (/(..).*\1/.test(password)) score -= 10; // Repeated patterns
-    if (/012|123|234|345|456|567|678|789|890/.test(password)) score -= 15; // Sequences
-    if (/aaa|bbb|ccc|111|222|333/.test(password.toLowerCase())) score -= 20; // Repetition
+    const patterns = [
+      { regex: /(..).*\1/, penalty: 15 },
+      { regex: /(.)\\1{2,}/, penalty: 20 },
+      { regex: /012|123|234|345|456|567|678|789|890/, penalty: 25 },
+      { regex: /qwerty|asdf|password|admin/, penalty: 40 },
+      { regex: /(19|20)\\d{2}/, penalty: 10 }
+    ];
     
-    return Math.max(0, Math.min(100, score));
-  };
+    patterns.forEach(({ regex, penalty }) => {
+      if (regex.test(password.toLowerCase())) {
+        score -= penalty;
+      }
+    });
+    
+    if (entropy > 4.0 && password.length >= 16) score += 10;
+    if (entropy > 4.5 && password.length >= 20) score += 15;
+    
+    return {
+      score: Math.max(0, Math.min(100, score)),
+      entropy,
+      markovScore
+    };
+  }, [generatedPassword, cryptoUtils]);
 
-  const getStrengthLabel = () => {
-    const strength = getStrength();
-    if (strength >= 80) return { label: 'Very Strong', color: 'text-green-600' };
-    if (strength >= 60) return { label: 'Strong', color: 'text-yellow-600' };
-    if (strength >= 40) return { label: 'Medium', color: 'text-orange-600' };
+  const strengthLabel = useMemo(() => {
+    const { score } = strengthData;
+    if (score >= 80) return { label: 'Very Strong', color: 'text-green-600' };
+    if (score >= 60) return { label: 'Strong', color: 'text-yellow-600' };
+    if (score >= 40) return { label: 'Medium', color: 'text-orange-600' };
     return { label: 'Weak', color: 'text-red-600' };
-  };
+  }, [strengthData]);
 
   useEffect(() => {
-    // Auto-generate password on component mount
-    generatePassword();
-  }, []);
+    handleGeneratePassword();
+  }, [handleGeneratePassword]);
 
   return (
     <div className="space-y-8">
@@ -211,7 +117,7 @@ const PasswordGenerator = ({ onGenerate }) => {
           />
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {popularWebsites.map((site) => (
+            {POPULAR_WEBSITES.map((site) => (
               <button
                 key={site.url}
                 onClick={() => setSelectedWebsite(site.url)}
@@ -239,9 +145,9 @@ const PasswordGenerator = ({ onGenerate }) => {
                 <p className="text-sm text-slate-300">For: {selectedWebsite}</p>
               )}
             </div>
-            <div className={`flex items-center gap-2 ${getStrengthLabel().color.replace('text-', 'text-')}`}>
+            <div className={`flex items-center gap-2 ${strengthLabel.color.replace('text-', 'text-')}`}>
               <div className="w-3 h-3 rounded-full bg-current"></div>
-              <span className="text-sm font-medium text-white">{getStrengthLabel().label}</span>
+              <span className="text-sm font-medium text-white">{strengthLabel.label}</span>
             </div>
           </div>
           <div className="flex items-center gap-3 p-4 bg-slate-800/80 rounded-xl border border-slate-600/60 shadow-sm">
@@ -275,7 +181,7 @@ const PasswordGenerator = ({ onGenerate }) => {
         <div className="flex items-center justify-between">
           <h3 className="text-2xl font-bold text-white">Password Options</h3>
           <button
-            onClick={generatePassword}
+            onClick={() => handleGeneratePassword()}
             className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             <ArrowPathIcon className="w-5 h-5" />
@@ -283,123 +189,287 @@ const PasswordGenerator = ({ onGenerate }) => {
           </button>
         </div>
         
-        {/* Length Selector */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium text-slate-300">Password Length</label>
-          <div className="flex bg-slate-600/60 rounded-xl p-1">
-            {[8, 12, 16, 20, 24, 32].map(length => (
-              <button
-                key={length}
-                onClick={() => {
-                  const newOptions = {...options, length};
-                  setOptions(newOptions);
-                  setTimeout(() => generatePassword(newOptions), 100);
-                }}
-                className={`flex-1 py-3 px-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                  options.length === length 
-                    ? 'bg-blue-600 text-white shadow-sm' 
-                    : 'text-slate-300 hover:text-white hover:bg-slate-500/60'
-                }`}
-              >
-                {length}
-              </button>
-            ))}
-          </div>
-          <div className="text-xs text-slate-400 text-center">
-            Current: {options.length} characters
+        {/* Password Type Selector */}
+        <div className="space-y-4">
+          <label className="text-sm font-medium text-slate-300">Password Type</label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => handleOptionChange({ type: 'random' })}
+              className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                options.type === 'random'
+                  ? 'border-blue-500 bg-blue-900/60 text-blue-200'
+                  : 'border-slate-600/60 bg-slate-600/60 hover:border-blue-400 text-slate-200'
+              }`}
+            >
+              <div className="font-semibold mb-1">Random Password</div>
+              <div className="text-xs opacity-75">Cryptographically secure</div>
+            </button>
+            <button
+              onClick={() => handleOptionChange({ type: 'passphrase' })}
+              className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                options.type === 'passphrase'
+                  ? 'border-green-500 bg-green-900/60 text-green-200'
+                  : 'border-slate-600/60 bg-slate-600/60 hover:border-green-400 text-slate-200'
+              }`}
+            >
+              <div className="font-semibold mb-1">Passphrase</div>
+              <div className="text-xs opacity-75">Human-memorable</div>
+            </button>
           </div>
         </div>
 
-        {/* Character Options */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            { key: 'uppercase', label: 'Uppercase Letters', example: 'ABCDEF', icon: 'Aa', color: 'blue' },
-            { key: 'lowercase', label: 'Lowercase Letters', example: 'abcdef', icon: 'aa', color: 'green' },
-            { key: 'numbers', label: 'Numbers', example: '123456', icon: '123', color: 'purple' },
-            { key: 'symbols', label: 'Special Characters', example: '!@#$%^', icon: '!@#', color: 'orange' }
-          ].map(option => (
-            <label key={option.key} className={`group relative flex items-center p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:shadow-xl hover:scale-[1.02] backdrop-blur-sm ${
-              options[option.key] 
-                ? `border-${option.color}-400/60 bg-gradient-to-br from-${option.color}-900/80 to-${option.color}-800/60 shadow-lg shadow-${option.color}-500/20` 
-                : 'border-slate-500/40 bg-gradient-to-br from-slate-600/80 to-slate-700/60 hover:border-slate-400/60 hover:shadow-slate-500/20'
-            } before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 ${
-              options[option.key] 
-                ? `before:from-${option.color}-400/10 before:to-transparent`
-                : 'before:from-slate-400/10 before:to-transparent'
-            }`}>
-              <div className="relative z-10 flex items-center w-full">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 font-bold text-lg transition-all duration-300 group-hover:scale-110 ${
-                  options[option.key]
-                    ? `bg-${option.color}-500/30 text-${option.color}-200 shadow-lg`
-                    : 'bg-slate-500/30 text-slate-300'
-                }`}>
-                  {option.icon}
-                </div>
-                <div className="flex-1">
-                  <div className={`text-sm font-bold transition-colors mb-2 ${
-                    options[option.key] ? 'text-white' : 'text-slate-200 group-hover:text-white'
-                  }`}>{option.label}</div>
-                  <div className={`text-xs font-mono px-3 py-1.5 rounded-lg inline-block transition-all ${
-                    options[option.key] 
-                      ? `bg-${option.color}-500/20 text-${option.color}-200 border border-${option.color}-400/30`
-                      : 'bg-slate-800/80 text-slate-400 border border-slate-600/40'
-                  }`}>{option.example}</div>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={options[option.key]}
-                  onChange={(e) => {
-                    const newOptions = {...options, [option.key]: e.target.checked};
-                    setOptions(newOptions);
-                    setTimeout(() => generatePassword(newOptions), 100);
-                  }}
-                  className={`w-6 h-6 rounded-lg transition-all duration-200 ${
-                    options[option.key]
-                      ? `text-${option.color}-500 bg-${option.color}-500/20 border-${option.color}-400/60`
-                      : 'text-slate-500 bg-slate-700/60 border-slate-500/40'
-                  } focus:ring-2 focus:ring-blue-500`}
-                />
+        {options.type === 'random' ? (
+          <>
+            {/* Length Selector */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-slate-300">Password Length</label>
+              <div className="flex bg-slate-600/60 rounded-xl p-1">
+                {[8, 12, 16, 20, 24, 32].map(length => (
+                  <button
+                    key={length}
+                    onClick={() => handleOptionChange({ length })}
+                    className={`flex-1 py-3 px-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                      options.length === length 
+                        ? 'bg-blue-600 text-white shadow-sm' 
+                        : 'text-slate-300 hover:text-white hover:bg-slate-500/60'
+                    }`}
+                  >
+                    {length}
+                  </button>
+                ))}
               </div>
-            </label>
-          ))}
-        </div>
+              <div className="text-xs text-slate-400 text-center">
+                Current: {options.length} characters • Entropy: {strengthData.entropy.toFixed(2)} bits
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Passphrase Options */}
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-slate-300">Word Count</label>
+                <div className="flex bg-slate-600/60 rounded-xl p-1">
+                  {[3, 4, 5, 6, 7, 8].map(count => (
+                    <button
+                      key={count}
+                      onClick={() => handleOptionChange({ wordCount: count })}
+                      className={`flex-1 py-3 px-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                        options.wordCount === count 
+                          ? 'bg-green-600 text-white shadow-sm' 
+                          : 'text-slate-300 hover:text-white hover:bg-slate-500/60'
+                      }`}
+                    >
+                      {count}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-slate-300 mb-3 block">Separator</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { value: '-', label: 'Hyphen', symbol: '-', desc: 'word-word' },
+                    { value: '_', label: 'Underscore', symbol: '_', desc: 'word_word' },
+                    { value: '.', label: 'Period', symbol: '•', desc: 'word.word' }
+                  ].map((sep) => (
+                    <button
+                      key={sep.value}
+                      onClick={() => handleOptionChange({ separator: sep.value })}
+                      className={`group relative p-3 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
+                        options.separator === sep.value
+                          ? 'border-green-400/60 bg-green-900/60 text-green-200 shadow-lg shadow-green-500/20'
+                          : 'border-slate-500/40 bg-slate-600/60 hover:border-green-400/40 text-slate-200 hover:bg-slate-500/60'
+                      }`}
+                      title={sep.desc}
+                    >
+                      <div className={`text-lg font-bold mb-1 transition-colors ${
+                        options.separator === sep.value ? 'text-green-200' : 'text-slate-300 group-hover:text-green-300'
+                      }`}>
+                        {sep.symbol}
+                      </div>
+                      <div className={`text-xs transition-colors ${
+                        options.separator === sep.value ? 'text-green-300/80' : 'text-slate-400 group-hover:text-green-400'
+                      }`}>
+                        {sep.label}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {[
+                    { value: ' ', label: 'Space', symbol: '⎵', desc: 'word word' },
+                    { value: '', label: 'None', symbol: '∅', desc: 'wordword' }
+                  ].map((sep) => (
+                    <button
+                      key={sep.value}
+                      onClick={() => handleOptionChange({ separator: sep.value })}
+                      className={`group relative p-3 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
+                        options.separator === sep.value
+                          ? 'border-green-400/60 bg-green-900/60 text-green-200 shadow-lg shadow-green-500/20'
+                          : 'border-slate-500/40 bg-slate-600/60 hover:border-green-400/40 text-slate-200 hover:bg-slate-500/60'
+                      }`}
+                      title={sep.desc}
+                    >
+                      <div className={`text-lg font-bold mb-1 transition-colors ${
+                        options.separator === sep.value ? 'text-green-200' : 'text-slate-300 group-hover:text-green-300'
+                      }`}>
+                        {sep.symbol}
+                      </div>
+                      <div className={`text-xs transition-colors ${
+                        options.separator === sep.value ? 'text-green-300/80' : 'text-slate-400 group-hover:text-green-400'
+                      }`}>
+                        {sep.label}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Capitalize Words Toggle */}
+              <div>
+                <label className="text-sm font-medium text-slate-300 mb-3 block">Word Formatting</label>
+                <button
+                  onClick={() => handleOptionChange({ capitalize: !options.capitalize })}
+                  className={`w-full p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-3 hover:scale-[1.02] ${
+                    options.capitalize
+                      ? 'border-green-400/60 bg-green-900/60 text-green-200 shadow-lg shadow-green-500/20'
+                      : 'border-slate-500/40 bg-slate-600/60 hover:border-green-400/40 text-slate-200 hover:bg-slate-500/60'
+                  }`}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-lg transition-all ${
+                    options.capitalize
+                      ? 'bg-green-500/30 text-green-200'
+                      : 'bg-slate-500/30 text-slate-300'
+                  }`}>
+                    Aa
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className={`font-semibold transition-colors ${
+                      options.capitalize ? 'text-green-200' : 'text-slate-200'
+                    }`}>
+                      Capitalize Words
+                    </div>
+                    <div className={`text-xs mt-1 transition-colors ${
+                      options.capitalize ? 'text-green-300/80' : 'text-slate-400'
+                    }`}>
+                      {options.capitalize ? 'Apple-Bridge-Castle' : 'apple-bridge-castle'}
+                    </div>
+                  </div>
+                  <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
+                    options.capitalize
+                      ? 'border-green-400 bg-green-500 text-white'
+                      : 'border-slate-400 bg-transparent'
+                  }`}>
+                    {options.capitalize && (
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Character Options - Only show for random passwords */}
+        {options.type === 'random' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {CHARACTER_TYPE_OPTIONS.map(option => (
+              <label key={option.key} className={`group relative flex items-center p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:shadow-xl hover:scale-[1.02] backdrop-blur-sm ${
+                options[option.key] 
+                  ? `border-${option.color}-400/60 bg-gradient-to-br from-${option.color}-900/80 to-${option.color}-800/60 shadow-lg shadow-${option.color}-500/20` 
+                  : 'border-slate-500/40 bg-gradient-to-br from-slate-600/80 to-slate-700/60 hover:border-slate-400/60 hover:shadow-slate-500/20'
+              } before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 ${
+                options[option.key] 
+                  ? `before:from-${option.color}-400/10 before:to-transparent`
+                  : 'before:from-slate-400/10 before:to-transparent'
+              }`}>
+                <div className="relative z-10 flex items-center w-full">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 font-bold text-lg transition-all duration-300 group-hover:scale-110 ${
+                    options[option.key]
+                      ? `bg-${option.color}-500/30 text-${option.color}-200 shadow-lg`
+                      : 'bg-slate-500/30 text-slate-300'
+                  }`}>
+                    {option.icon}
+                  </div>
+                  <div className="flex-1">
+                    <div className={`text-sm font-bold transition-colors mb-2 ${
+                      options[option.key] ? 'text-white' : 'text-slate-200 group-hover:text-white'
+                    }`}>{option.label}</div>
+                    <div className={`text-xs font-mono px-3 py-1.5 rounded-lg inline-block transition-all ${
+                      options[option.key] 
+                        ? `bg-${option.color}-500/20 text-${option.color}-200 border border-${option.color}-400/30`
+                        : 'bg-slate-800/80 text-slate-400 border border-slate-600/40'
+                    }`}>{option.example}</div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={options[option.key]}
+                    onChange={(e) => handleOptionChange({ [option.key]: e.target.checked })}
+                    className={`w-6 h-6 rounded-lg transition-all duration-200 ${
+                      options[option.key]
+                        ? `text-${option.color}-500 bg-${option.color}-500/20 border-${option.color}-400/60`
+                        : 'text-slate-500 bg-slate-700/60 border-slate-500/40'
+                    } focus:ring-2 focus:ring-blue-500`}
+                  />
+                </div>
+              </label>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Strength Indicator */}
       <div className="bg-gradient-to-br from-slate-700/90 to-slate-800/80 border-2 border-slate-600/40 rounded-3xl shadow-xl p-8 backdrop-blur-xl">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-bold text-white">Password Strength</h3>
-          <span className="text-2xl font-bold text-white bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">{getStrength()}%</span>
+          <span className="text-2xl font-bold text-white bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">{strengthData.score}%</span>
         </div>
         <div className="w-full bg-slate-600/60 rounded-full h-4 overflow-hidden mb-4">
           <div 
             className={`h-4 rounded-full transition-all duration-500 ${
-              getStrength() >= 80 ? 'bg-gradient-to-r from-green-500 to-green-600' :
-              getStrength() >= 60 ? 'bg-gradient-to-r from-yellow-500 to-yellow-600' :
-              getStrength() >= 40 ? 'bg-gradient-to-r from-orange-500 to-orange-600' :
+              strengthData.score >= 80 ? 'bg-gradient-to-r from-green-500 to-green-600' :
+              strengthData.score >= 60 ? 'bg-gradient-to-r from-yellow-500 to-yellow-600' :
+              strengthData.score >= 40 ? 'bg-gradient-to-r from-orange-500 to-orange-600' :
               'bg-gradient-to-r from-red-500 to-red-600'
             }`}
-            style={{ width: `${getStrength()}%` }}
+            style={{ width: `${strengthData.score}%` }}
           />
         </div>
         
-        {/* Security Features */}
-        <div className="grid grid-cols-2 gap-3 text-xs">
-          <div className="flex items-center gap-2 text-green-400">
-            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-            <span>Cryptographically Secure</span>
+        {/* Advanced Security Metrics */}
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            <div className="bg-slate-600/40 rounded-lg p-3">
+              <div className="text-slate-300 mb-1">Shannon Entropy</div>
+              <div className="text-white font-bold">{strengthData.entropy.toFixed(2)} bits</div>
+            </div>
+            <div className="bg-slate-600/40 rounded-lg p-3">
+              <div className="text-slate-300 mb-1">Predictability</div>
+              <div className="text-white font-bold">{(strengthData.markovScore * 100).toFixed(1)}%</div>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-green-400">
-            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-            <span>Pattern Resistant</span>
-          </div>
-          <div className="flex items-center gap-2 text-green-400">
-            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-            <span>Ambiguity Reduced</span>
-          </div>
-          <div className="flex items-center gap-2 text-green-400">
-            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-            <span>Entropy Optimized</span>
+          
+          <div className="grid grid-cols-2 gap-3 text-xs">
+            <div className="flex items-center gap-2 text-green-400">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span>Crypto.getRandomValues()</span>
+            </div>
+            <div className="flex items-center gap-2 text-green-400">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span>Markov Chain Analysis</span>
+            </div>
+            <div className="flex items-center gap-2 text-green-400">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span>Shannon Entropy Scoring</span>
+            </div>
+            <div className="flex items-center gap-2 text-green-400">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span>ML Pattern Detection</span>
+            </div>
           </div>
         </div>
       </div>
@@ -407,7 +477,7 @@ const PasswordGenerator = ({ onGenerate }) => {
       {/* Quick Actions */}
       <div className="flex gap-4">
         <button
-          onClick={generatePassword}
+          onClick={() => handleGeneratePassword()}
           className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-5 rounded-2xl hover:from-blue-700 hover:to-cyan-700 font-bold text-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-2xl hover:shadow-blue-500/30 transform hover:scale-[1.02]"
         >
           <ArrowPathIcon className="w-6 h-6" />
@@ -423,116 +493,18 @@ const PasswordGenerator = ({ onGenerate }) => {
           </button>
         )}
       </div>
+      
       {/* Save Password Modal */}
       {showSaveModal && (
-        <SavePasswordModal
-          website={selectedWebsite}
-          password={generatedPassword}
-          onClose={() => setShowSaveModal(false)}
-          onSave={() => {
-            setShowSaveModal(false);
-            // Don't clear the generated password, only close modal
-          }}
-        />
+        <Suspense fallback={<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><div className="text-white">Loading...</div></div>}>
+          <SavePasswordModal
+            website={selectedWebsite}
+            password={generatedPassword}
+            onClose={() => setShowSaveModal(false)}
+            onSave={() => setShowSaveModal(false)}
+          />
+        </Suspense>
       )}
-    </div>
-  );
-};
-
-const SavePasswordModal = ({ website, password, onClose, onSave }) => {
-  const [formData, setFormData] = useState({
-    site_name: website.replace('.com', '').replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    site_url: website.startsWith('http') ? website : `https://${website}`,
-    username: '',
-    password: password
-  });
-  const [loading, setLoading] = useState(false);
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    try {
-      // Import api here to avoid circular dependency
-      const { api } = await import('../lib/api');
-      await api.passwords.create(formData);
-      onSave();
-    } catch (error) {
-      console.error('Failed to save password:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
-        <div className="p-6 border-b">
-          <h3 className="text-xl font-semibold text-gray-900">Save Password to Vault</h3>
-        </div>
-        
-        <form onSubmit={handleSave} className="p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Site Name</label>
-            <input
-              type="text"
-              value={formData.site_name}
-              onChange={(e) => setFormData(prev => ({...prev, site_name: e.target.value}))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Website URL</label>
-            <input
-              type="url"
-              value={formData.site_url}
-              onChange={(e) => setFormData(prev => ({...prev, site_url: e.target.value}))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Username/Email</label>
-            <input
-              type="text"
-              value={formData.username}
-              onChange={(e) => setFormData(prev => ({...prev, username: e.target.value}))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your username or email"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Generated Password</label>
-            <input
-              type="text"
-              value={formData.password}
-              readOnly
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 font-mono text-sm"
-            />
-          </div>
-          
-          <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : 'Save Password'}
-            </button>
-          </div>
-        </form>
-      </div>
     </div>
   );
 };

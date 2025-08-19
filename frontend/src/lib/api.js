@@ -209,6 +209,70 @@ export const api = {
     terminateSession: (sessionId) => api.request(`/api/v1/user/sessions/${sessionId}`, {
       method: 'DELETE',
     }),
+    changePassword: (data) => api.request('/api/v1/user/change-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+    deleteAccount: (password) => api.request('/api/v1/user/delete', {
+      method: 'DELETE',
+      body: JSON.stringify({ password }),
+    }),
+  },
+
+  // Password History & Versioning
+  history: {
+    getPasswordHistory: (passwordId) => api.request(`/api/v1/passwords/${passwordId}/history`),
+    restoreVersion: (passwordId, versionId) => api.request(`/api/v1/passwords/${passwordId}/restore/${versionId}`, { method: 'POST' }),
+  },
+
+  // Secure Notes
+  notes: {
+    getAll: () => api.request('/api/v1/notes'),
+    create: (note) => api.request('/api/v1/notes', { method: 'POST', body: JSON.stringify(note) }),
+    update: (id, note) => api.request(`/api/v1/notes/${id}`, { method: 'PUT', body: JSON.stringify(note) }),
+    delete: (id) => api.request(`/api/v1/notes/${id}`, { method: 'DELETE' }),
+    attachFile: (noteId, file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return api.request(`/api/v1/notes/${noteId}/attachments`, { method: 'POST', body: formData, headers: {} });
+    },
+  },
+
+  // Emergency Access
+  emergency: {
+    setupAccess: (contacts) => api.request('/api/v1/emergency/setup', {
+      method: 'POST', body: JSON.stringify(contacts)
+    }),
+    getContacts: () => api.request('/api/v1/emergency/contacts'),
+    requestAccess: (userId) => api.request('/api/v1/emergency/request', {
+      method: 'POST', body: JSON.stringify({ user_id: userId })
+    }),
+    grantAccess: (requestId) => api.request(`/api/v1/emergency/grant/${requestId}`, { method: 'POST' }),
+    revokeAccess: (contactId) => api.request(`/api/v1/emergency/revoke/${contactId}`, { method: 'POST' }),
+  },
+
+  // Basic Analytics
+  analytics: {
+    getSecurityScore: () => api.request('/api/v1/analytics/security-score'),
+    getPasswordStrengthReport: () => api.request('/api/v1/analytics/password-strength'),
+    getUsageStats: () => api.request('/api/v1/analytics/usage'),
+  },
+
+  // Dark Web Monitoring
+  monitoring: {
+    scanCredentials: () => api.request('/api/v1/monitoring/scan', { method: 'POST' }),
+    getBreachAlerts: () => api.request('/api/v1/monitoring/alerts'),
+    markAlertRead: (alertId) => api.request(`/api/v1/monitoring/alerts/${alertId}/read`, { method: 'POST' }),
+  },
+
+  // Browser Extension Support
+  extension: {
+    getCredentials: (domain) => api.request(`/api/v1/extension/credentials?domain=${encodeURIComponent(domain)}`),
+    saveCredentials: (data) => api.request('/api/v1/extension/save', {
+      method: 'POST', body: JSON.stringify(data)
+    }),
+    getAutofillData: (url) => api.request(`/api/v1/extension/autofill?url=${encodeURIComponent(url)}`),
+    ping: () => api.request('/api/v1/extension/ping'),
   },
 };
 
