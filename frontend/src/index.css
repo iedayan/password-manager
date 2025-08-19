@@ -4,6 +4,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './styles/accessibility.css';
+
 @layer base {
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;

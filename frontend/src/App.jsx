@@ -9,6 +9,7 @@ import { SecurityPage } from './components/security';
 import { ScrollToTop } from './components/ui';
 import { About, Features, Pricing, FAQ, PrivacyPolicy, TermsOfService } from './pages';
 import ErrorBoundary from './components/ui/ErrorBoundary';
+import { AccessibilityProvider } from './components/ui/AccessibilityProvider';
 
 const LandingPage = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -70,10 +71,11 @@ const ProtectedRoute = ({ children }) => {
 export default function App() {
   return (
     <ErrorBoundary>
-      <ToastProvider>
-        <Router>
-          <ScrollToTop />
-          <Routes>
+      <AccessibilityProvider>
+        <ToastProvider>
+          <Router>
+            <ScrollToTop />
+            <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Login />} />
@@ -95,9 +97,10 @@ export default function App() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/security" element={<SecurityPage />} />
-          </Routes>
-        </Router>
-      </ToastProvider>
+            </Routes>
+          </Router>
+        </ToastProvider>
+      </AccessibilityProvider>
     </ErrorBoundary>
   );
 }

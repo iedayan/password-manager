@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { MagnifyingGlassIcon, EyeIcon, ClipboardIcon, PencilIcon, TrashIcon, FunnelIcon, ChevronDownIcon, ShieldExclamationIcon, CheckCircleIcon, ExclamationTriangleIcon, Squares2X2Icon, ListBulletIcon, StarIcon, TagIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { QuickActions } from '../dashboard';
@@ -9,6 +9,11 @@ import QuickActionsBar from './QuickActionsBar';
 import EnhancedSearch from './EnhancedSearch';
 import { CategoryIcon, StrengthIndicator, RecentlyAccessedSection, PasswordHealthBadges, FavoriteButton, AnimatedCounter, LoadingSkeletons } from './VisualEnhancements';
 import { SmartCategorizer } from './SmartCategorization';
+import MobilePasswordCard from '../ui/MobilePasswordCard';
+import EmptyState from '../ui/EmptyState';
+import { useVirtualList } from '../../hooks/useVirtualList';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useAutoLock } from '../../hooks/useAutoLock';
 
 const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassword, refreshTrigger }) => {
   const [passwords, setPasswords] = useState([]);
@@ -28,6 +33,14 @@ const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassw
   const [categories, setCategories] = useState(new Map());
   const [toast, setToast] = useState(null);
   const [recentPasswords, setRecentPasswords] = useState(new Set());
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  
+  // Auto-lock functionality
+  useAutoLock(() => {
+    setToast({ type: 'warning', message: 'Session locked due to inactivity' });
+  });
 
   // Helper functions
   const detectDuplicates = () => {
@@ -60,6 +73,12 @@ const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassw
   useEffect(() => {
     fetchPasswords();
   }, [refreshTrigger]);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     fetchPasswords();
@@ -240,21 +259,21 @@ const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassw
   if (passwords.length === 0) {
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="text-center py-16">
-          <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <ShieldExclamationIcon className="w-10 h-10 text-blue-600" />
-          </div>
-          <h2 className="text-2xl font-semibold text-white mb-3">Your vault is empty</h2>
-          <p className="text-slate-300 mb-8 max-w-lg mx-auto text-sm leading-relaxed">
-            Start securing your digital life by adding your first password. All passwords are encrypted with military-grade security and stored safely.
-          </p>
-          <button 
-            onClick={() => setShowAddForm?.(true)}
-            className="add-password-btn bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-medium"
-          >
-            Add Your First Password
-          </button>
-        </div>
+        <EmptyState 
+          type="passwords"
+          onAction={() => setShowAddForm?.(true)}
+        />
+      </div>
+    );
+  }
+
+  if (filteredPasswords.length === 0 && searchTerm) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <EmptyState 
+          type="search"
+          onAction={() => setSearchTerm('')}
+        />
       </div>
     );
   }
@@ -402,25 +421,37 @@ const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassw
       </div>
 
       {/* Password List */}
-      <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2'}>
-        {filteredPasswords.map((password) => (
-          <PasswordCard 
-            key={password.id} 
-            password={password}
-            viewMode={viewMode}
-            isSelected={selectedPasswords.has(password.id)}
-            isFavorite={favorites.has(password.id)}
-            onCopy={(text, type) => copyToClipboard(text, type)}
-            category={getPasswordCategory(password.site_name)}
-            isDuplicate={duplicates.has(password.password)}
-            daysOld={getDaysOld(password.created_at)}
-            onReveal={setShowMasterKeyModal}
-            onEdit={onEditPassword || setEditingPassword}
-            onDelete={setDeletingPassword}
-            onToggleSelect={() => togglePasswordSelection(password.id)}
-            onToggleFavorite={() => toggleFavorite(password.id)}
-          />
-        ))}
+      <div className={isMobile ? 'space-y-3' : (viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2')}>
+        {filteredPasswords.map((password) => 
+          isMobile ? (
+            <MobilePasswordCard
+              key={password.id}
+              password={password}
+              onEdit={onEditPassword || setEditingPassword}
+              onDelete={setDeletingPassword}
+              onToggleFavorite={() => toggleFavorite(password.id)}
+              onCopy={(text, type) => copyToClipboard(text, type)}
+              onView={setShowMasterKeyModal}
+            />
+          ) : (
+            <PasswordCard 
+              key={password.id} 
+              password={password}
+              viewMode={viewMode}
+              isSelected={selectedPasswords.has(password.id)}
+              isFavorite={favorites.has(password.id)}
+              onCopy={(text, type) => copyToClipboard(text, type)}
+              category={getPasswordCategory(password.site_name)}
+              isDuplicate={duplicates.has(password.password)}
+              daysOld={getDaysOld(password.created_at)}
+              onReveal={setShowMasterKeyModal}
+              onEdit={onEditPassword || setEditingPassword}
+              onDelete={setDeletingPassword}
+              onToggleSelect={() => togglePasswordSelection(password.id)}
+              onToggleFavorite={() => toggleFavorite(password.id)}
+            />
+          )
+        )}
       </div>
 
       {/* Edit Password Modal */}
@@ -514,8 +545,8 @@ const PasswordCard = ({ password, viewMode, isSelected, isFavorite, onCopy, onRe
   const faviconUrl = getFaviconUrl(password.site_url);
 
   return (
-    <div className={`bg-slate-700/80 backdrop-blur-sm border rounded-xl p-4 hover:shadow-lg hover:bg-slate-600/80 transition-all duration-200 group relative ${
-      isSelected ? 'border-blue-500 bg-blue-900/20' : 'border-slate-600/60 hover:border-blue-500/60'
+    <div className={`bg-gradient-to-br from-slate-800/90 to-slate-700/90 backdrop-blur-sm border rounded-2xl p-5 hover:shadow-2xl hover:from-slate-700/90 hover:to-slate-600/90 transition-all duration-300 group relative transform hover:scale-[1.02] ${
+      isSelected ? 'border-blue-400 bg-gradient-to-br from-blue-900/30 to-blue-800/30 shadow-blue-500/20 shadow-lg' : 'border-slate-600/40 hover:border-slate-500/60'
     }`}>
       {/* Selection Checkbox */}
       <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -530,8 +561,8 @@ const PasswordCard = ({ password, viewMode, isSelected, isFavorite, onCopy, onRe
       <div className={`flex items-center ${viewMode === 'list' ? 'justify-between' : 'flex-col gap-3'} ${isSelected ? 'ml-6' : ''}`}>
         <div className={`${viewMode === 'list' ? 'flex-1' : 'w-full text-center'}`}>
           <div className={`flex items-center gap-3 ${viewMode === 'grid' ? 'flex-col' : ''}`}>
-            <div className={`bg-gradient-to-br from-blue-100 to-indigo-200 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0 ${
-              viewMode === 'grid' ? 'w-12 h-12' : 'w-10 h-10'
+            <div className={`bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 border border-slate-500/30 ${
+              viewMode === 'grid' ? 'w-14 h-14' : 'w-12 h-12'
             }`}>
               {faviconUrl ? (
                 <img 
@@ -544,8 +575,8 @@ const PasswordCard = ({ password, viewMode, isSelected, isFavorite, onCopy, onRe
                   }}
                 />
               ) : null}
-              <span className={`text-blue-600 font-semibold ${faviconUrl ? 'hidden' : 'block'} ${
-                viewMode === 'grid' ? 'text-base' : 'text-sm'
+              <span className={`text-slate-200 font-bold ${faviconUrl ? 'hidden' : 'block'} ${
+                viewMode === 'grid' ? 'text-lg' : 'text-base'
               }`}>
                 {password.site_name.charAt(0).toUpperCase()}
               </span>
@@ -577,58 +608,70 @@ const PasswordCard = ({ password, viewMode, isSelected, isFavorite, onCopy, onRe
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs px-2 py-0.5 rounded-md bg-blue-900/60 border border-blue-600 text-blue-200 font-medium">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-600/20 to-indigo-600/20 border border-blue-500/30 text-blue-300 font-semibold tracking-wide">
                   {category}
                 </span>
-                <div className="flex items-center gap-1">
-                  <div className={`w-16 h-1.5 rounded-full overflow-hidden ${getStrengthColor(password.strength_score || 0).replace('text-', 'bg-').replace('border-', 'bg-').replace('100', '500')}`}>
+                <div className="flex items-center gap-2">
+                  <div className="w-20 h-2 rounded-full bg-slate-600/50 overflow-hidden">
                     <div 
-                      className="h-full bg-current transition-all duration-300" 
-                      style={{ width: `${password.strength_score || 0}%` }}
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        (password.strength_score || 0) >= 80 ? 'bg-gradient-to-r from-green-500 to-emerald-500' :
+                        (password.strength_score || 0) >= 60 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' :
+                        'bg-gradient-to-r from-red-500 to-pink-500'
+                      }`}
+                      style={{ width: `${Math.max(5, password.strength_score || 0)}%` }}
                     ></div>
                   </div>
-                  <span className="text-xs text-slate-400">{password.strength_score || 0}%</span>
+                  <span className="text-xs font-bold text-slate-300 min-w-[35px]">{password.strength_score || 0}%</span>
                 </div>
               </div>
-              <p className="text-xs text-slate-300 truncate">{password.username}</p>
-              {password.site_url && (
-                <p className="text-xs text-slate-400 truncate mt-0.5">{password.site_url}</p>
-              )}
-              {daysOld > 0 && (
-                <p className="text-xs text-slate-500 mt-0.5">{daysOld} days old</p>
-              )}
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-slate-200 truncate flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-slate-500"></span>
+                  {password.username}
+                </p>
+                {password.site_url && (
+                  <p className="text-xs text-slate-400 truncate pl-4 font-mono">{password.site_url}</p>
+                )}
+                {daysOld > 0 && (
+                  <p className="text-xs text-slate-500 pl-4 flex items-center gap-1">
+                    <span className="w-1 h-1 rounded-full bg-slate-500"></span>
+                    {daysOld} days old
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>
         
-        <div className={`flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity ${
-          viewMode === 'grid' ? 'justify-center w-full' : 'ml-3'
+        <div className={`flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 ${
+          viewMode === 'grid' ? 'justify-center w-full mt-4' : 'ml-4'
         }`}>
           <button
             onClick={() => onCopy(password.username, 'Username')}
-            className="p-2 text-slate-400 hover:text-blue-400 hover:bg-blue-900/40 rounded-lg transition-colors"
-            title="Copy username (U)"
+            className="p-2.5 text-slate-400 hover:text-blue-300 hover:bg-blue-600/20 rounded-xl transition-all duration-200 hover:scale-110 border border-transparent hover:border-blue-500/30"
+            title="Copy username"
           >
             <ClipboardIcon className="w-4 h-4" />
           </button>
           <button
             onClick={() => onReveal(password.id)}
-            className="p-2 text-slate-400 hover:text-green-400 hover:bg-green-900/40 rounded-lg transition-colors"
-            title="Copy password"
+            className="p-2.5 text-slate-400 hover:text-green-300 hover:bg-green-600/20 rounded-xl transition-all duration-200 hover:scale-110 border border-transparent hover:border-green-500/30"
+            title="View password"
           >
             <EyeIcon className="w-4 h-4" />
           </button>
           <button
             onClick={() => onEdit(password)}
-            className="p-2 text-slate-400 hover:text-blue-400 hover:bg-blue-900/40 rounded-lg transition-colors"
+            className="p-2.5 text-slate-400 hover:text-purple-300 hover:bg-purple-600/20 rounded-xl transition-all duration-200 hover:scale-110 border border-transparent hover:border-purple-500/30"
             title="Edit password"
           >
             <PencilIcon className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(password.id)}
-            className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-900/40 rounded-lg transition-colors"
+            className="p-2.5 text-slate-400 hover:text-red-300 hover:bg-red-600/20 rounded-xl transition-all duration-200 hover:scale-110 border border-transparent hover:border-red-500/30"
             title="Delete password"
           >
             <TrashIcon className="w-4 h-4" />
