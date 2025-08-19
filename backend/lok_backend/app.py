@@ -62,11 +62,16 @@ def create_app(config_name="development"):
                 required_cols = [
                     ('is_2fa_enabled', 'BOOLEAN DEFAULT FALSE'),
                     ('totp_secret', 'VARCHAR(32)'),
+                    ('totp_secret_temp', 'VARCHAR(32)'),
                     ('biometric_enabled', 'BOOLEAN DEFAULT FALSE'),
+                    ('biometric_credential_id', 'VARCHAR(64)'),
                     ('last_login', 'TIMESTAMP'),
+                    ('last_logout', 'TIMESTAMP'),
+                    ('last_password_change', 'TIMESTAMP'),
                     ('is_active', 'BOOLEAN DEFAULT TRUE'),
                     ('email_verified', 'BOOLEAN DEFAULT FALSE'),
-                    ('auto_lock_timeout', 'INTEGER DEFAULT 15')
+                    ('auto_lock_timeout', 'INTEGER DEFAULT 15'),
+                    ('password_strength_requirement', 'VARCHAR(20) DEFAULT \'strong\'')
                 ]
                 
                 for col_name, col_def in required_cols:
@@ -94,6 +99,8 @@ def create_app(config_name="development"):
                     ('category', 'VARCHAR(50) DEFAULT \'Personal\''),
                     ('is_favorite', 'BOOLEAN DEFAULT FALSE'),
                     ('tags', 'TEXT'),
+                    ('last_accessed', 'TIMESTAMP'),
+                    ('auto_update_enabled', 'BOOLEAN DEFAULT FALSE'),
                     ('is_compromised', 'BOOLEAN DEFAULT FALSE')
                 ]
                 
