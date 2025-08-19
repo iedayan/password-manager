@@ -51,10 +51,64 @@ def create_app(config_name="development"):
             # Create all tables
             db.create_all()
 
-            # Get table names using inspector
-            from sqlalchemy import inspect
-
+            # Auto-migrate missing columns
+            from sqlalchemy import inspect, text
             inspector = inspect(db.engine)
+            
+            if 'users' in inspector.get_table_names():
+                user_columns = [col['name'] for col in inspector.get_columns('users')]
+                
+                missing_cols = []
+                required_cols = [
+                    ('is_2fa_enabled', 'BOOLEAN DEFAULT FALSE'),
+                    ('totp_secret', 'VARCHAR(32)'),
+                    ('biometric_enabled', 'BOOLEAN DEFAULT FALSE'),
+                    ('last_login', 'TIMESTAMP'),
+                    ('is_active', 'BOOLEAN DEFAULT TRUE'),
+                    ('email_verified', 'BOOLEAN DEFAULT FALSE'),
+                    ('auto_lock_timeout', 'INTEGER DEFAULT 15')
+                ]
+                
+                for col_name, col_def in required_cols:
+                    if col_name not in user_columns:
+                        try:
+                            if 'postgresql' in str(db.engine.url):
+                                db.engine.execute(text(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {col_name} {col_def}"))
+                            else:
+                                db.engine.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_def}"))
+                            missing_cols.append(col_name)
+                        except Exception:
+                            pass
+                
+                if missing_cols:
+                    app.logger.info(f"Auto-migrated user columns: {missing_cols}")
+            
+            # Auto-migrate passwords table
+            if 'passwords' in inspector.get_table_names():
+                password_columns = [col['name'] for col in inspector.get_columns('passwords')]
+                
+                missing_cols = []
+                required_cols = [
+                    ('category', 'VARCHAR(50) DEFAULT \'Personal\''),
+                    ('is_favorite', 'BOOLEAN DEFAULT FALSE'),
+                    ('tags', 'TEXT'),
+                    ('is_compromised', 'BOOLEAN DEFAULT FALSE')
+                ]
+                
+                for col_name, col_def in required_cols:
+                    if col_name not in password_columns:
+                        try:
+                            if 'postgresql' in str(db.engine.url):
+                                db.engine.execute(text(f"ALTER TABLE passwords ADD COLUMN IF NOT EXISTS {col_name} {col_def}"))
+                            else:
+                                db.engine.execute(text(f"ALTER TABLE passwords ADD COLUMN {col_name} {col_def}"))
+                            missing_cols.append(col_name)
+                        except Exception:
+                            pass
+                
+                if missing_cols:
+                    app.logger.info(f"Auto-migrated password columns: {missing_cols}")
+
             tables = inspector.get_table_names()
             app.logger.info(
                 f"Database tables ready: {len(tables)} tables - {', '.join(sorted(tables))}"
