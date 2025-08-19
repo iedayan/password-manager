@@ -25,6 +25,11 @@ class User(db.Model):
     two_factor_enabled = db.Column(db.Boolean, default=False, nullable=False)
     two_factor_secret = db.Column(db.String(32))
     backup_codes = db.Column(db.Text)  # JSON array of backup codes
+    
+    # Two-Factor Authentication (additional fields)
+    is_2fa_enabled = db.Column(db.Boolean, default=False, nullable=False)
+    totp_secret = db.Column(db.String(32))  # Base32 encoded secret
+    totp_secret_temp = db.Column(db.String(32))  # Temporary secret during setup
 
     # Timestamps
     created_at = db.Column(
@@ -106,6 +111,7 @@ class User(db.Model):
             "is_active": self.is_active,
             "email_verified": self.email_verified,
             "two_factor_enabled": self.two_factor_enabled,
+            "is_2fa_enabled": self.is_2fa_enabled,
             "auto_lock_timeout": self.auto_lock_timeout,
             "password_strength_requirement": self.password_strength_requirement,
         }
