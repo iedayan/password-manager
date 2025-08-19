@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ShieldCheckIcon, CpuChipIcon, EyeIcon, LockClosedIcon, ChartBarIcon, ExclamationTriangleIcon, CheckCircleIcon, ClockIcon, KeyIcon } from '@heroicons/react/24/outline';
-import { passwordAnalyzer, biometricSecurity, breachDetection } from '../utils/advancedSecurity';
-import { api } from '../lib/api';
+import { passwordAnalyzer, biometricSecurity, breachDetection } from "../../services/advancedSecurity";
+import { api } from "../../services/api";
 
 const AdvancedSecurityDashboard = () => {
   const [securityMetrics, setSecurityMetrics] = useState(null);

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { EyeIcon, EyeSlashIcon, XMarkIcon, KeyIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
-import LoadingSpinner from './LoadingSpinner';
-import PasswordStrengthIndicator from './PasswordStrengthIndicator';
-import { validatePasswordForm, sanitizeFormData } from '../utils/validation';
-import { api } from '../lib/api';
+import { LoadingSpinner, PasswordStrengthIndicator } from '../ui';
+import { validatePasswordForm, sanitizeFormData } from "../../services/validation";
+import { api } from "../../services/api";
 
 const EditPasswordModal = ({ password, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({

@@ -1,19 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { PlusIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon, UserIcon, ShieldCheckIcon, DocumentArrowUpIcon, SparklesIcon } from '@heroicons/react/24/outline';
-import PasswordVault from './PasswordVault';
-import PasswordGenerator from './PasswordGenerator';
-import AddPasswordModal from './AddPasswordModal';
-import EditPasswordModal from './EditPasswordModal';
-import Settings from './Settings';
-import Breadcrumb from './Breadcrumb';
-import OnboardingFlow from './OnboardingFlow';
-import ImportWizard from './ImportWizard';
-import SecurityDashboard from './SecurityDashboard';
-import BetaFeedbackWidget from './BetaFeedbackWidget';
-import ProductTour from './ProductTour';
-import SetupChecklist from './SetupChecklist';
-import FeatureRequestBoard from './FeatureRequestBoard';
-import { api } from '../lib/api';
+import { PasswordVault, SetupChecklist } from '../dashboard';
+import { PasswordGenerator, SecurityDashboard } from '../security';
+import { AddPasswordModal, EditPasswordModal } from '../modals';
+import { Settings, ImportWizard } from '../forms';
+import { Breadcrumb } from '../ui';
+import { OnboardingFlow } from '../auth';
+import { BetaFeedbackWidget, ProductTour, FeatureRequestBoard } from '../../features';
+import { api } from "../../services/api";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState(() => {

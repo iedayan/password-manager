@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-import { api } from '../lib/api';
+import { api } from "../../services/api";
 
 const Login = () => {
   const location = useLocation();

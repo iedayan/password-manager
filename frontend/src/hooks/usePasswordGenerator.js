@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { CHARACTER_SETS, WORD_LIST, DEFAULT_OPTIONS } from '../constants/passwordGenerator';
+import { CHARACTER_SETS, WORD_LIST, DEFAULT_OPTIONS } from '../services/passwordGenerator';
 
 export const usePasswordGenerator = (initialOptions = DEFAULT_OPTIONS) => {
   const [options, setOptions] = useState(initialOptions);

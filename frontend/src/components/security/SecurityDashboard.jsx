@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { ShieldCheckIcon, ExclamationTriangleIcon, ClockIcon, KeyIcon, EyeIcon, ChartBarIcon } from '@heroicons/react/24/outline';
-import PasswordHealthCheck from './PasswordHealthCheck';
-import TwoFactorAuth from './TwoFactorAuth';
-import ExportData from './ExportData';
-import AdvancedSecurityDashboard from './AdvancedSecurityDashboard';
-import { analyzePasswordHealth } from '../utils/passwordHealth';
-import { api } from '../lib/api';
+import { PasswordHealthCheck, AdvancedSecurityDashboard } from '../security';
+import { TwoFactorAuth } from '../auth';
+import { ExportData } from '../forms';
+import { analyzePasswordHealth } from "../../services/passwordHealth";
+import { api } from "../../services/api";
 
 const SecurityDashboard = () => {
   const [activeSection, setActiveSection] = useState('overview');

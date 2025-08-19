@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { UserIcon, ShieldCheckIcon, ArrowDownTrayIcon, ArrowUpTrayIcon, TrashIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
-import { useToast } from '../contexts/ToastContext';
-import { api } from '../lib/api';
-import LoadingSpinner from './LoadingSpinner';
-import ErrorMessage from './ErrorMessage';
+import { useToast } from '../../contexts/ToastContext';
+import { api } from "../../services/api";
+import { LoadingSpinner, ErrorMessage } from '../ui';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('profile');

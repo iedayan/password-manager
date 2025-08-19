@@ -14,7 +14,7 @@ const SavePasswordModal = ({ website, password, onClose, onSave }) => {
     setLoading(true);
     
     try {
-      const { api } = await import('../lib/api');
+      const { api } = await import('../../services/api');
       await api.passwords.create(formData);
       onSave();
     } catch (error) {

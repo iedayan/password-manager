@@ -1,5 +1,5 @@
 import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, CpuChipIcon } from '@heroicons/react/24/outline';
-import { passwordAnalyzer } from '../utils/advancedSecurity';
+import { passwordAnalyzer } from "../../services/advancedSecurity";
 
 const PasswordStrengthIndicator = ({ password, onStrengthChange }) => {
   const calculateStrength = (password) => {

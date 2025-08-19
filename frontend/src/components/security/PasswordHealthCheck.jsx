@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ShieldExclamationIcon, ExclamationTriangleIcon, ClockIcon, KeyIcon } from '@heroicons/react/24/outline';
-import { analyzePasswordHealth } from '../utils/passwordHealth';
-import { api } from '../lib/api';
+import { analyzePasswordHealth } from "../../services/passwordHealth";
+import { api } from "../../services/api";
 
 const PasswordHealthCheck = () => {
   const [healthData, setHealthData] = useState(null);

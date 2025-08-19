@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CheckCircleIcon, ClockIcon, ArrowRightIcon, ShieldCheckIcon, SparklesIcon } from '@heroicons/react/24/outline';
-import ImportWizard from './ImportWizard';
-import { api } from '../lib/api';
+import { ImportWizard } from '../forms';
+import { api } from "../../services/api";
 
 const OnboardingFlow = ({ isOpen, onClose, onComplete }) => {
   const [progress, setProgress] = useState(null);

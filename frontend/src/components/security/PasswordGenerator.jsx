@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { ArrowPathIcon, ClipboardIcon, CheckIcon, GlobeAltIcon, PlusIcon } from '@heroicons/react/24/outline';
-import { usePasswordGenerator } from '../hooks/usePasswordGenerator';
-import { POPULAR_WEBSITES, CHARACTER_TYPE_OPTIONS } from '../constants/passwordGenerator';
+import { usePasswordGenerator } from '../../hooks/usePasswordGenerator';
+import { POPULAR_WEBSITES, CHARACTER_TYPE_OPTIONS } from "../../services/passwordGenerator";
 
-const SavePasswordModal = lazy(() => import('./SavePasswordModal'));
+const SavePasswordModal = lazy(() => import('../modals/SavePasswordModal'));
 
 const PasswordGenerator = ({ onGenerate }) => {
   const { options, generatedPassword, generatePassword, updateOptions, cryptoUtils } = usePasswordGenerator();

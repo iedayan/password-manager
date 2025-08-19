@@ -1,20 +1,13 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { auth } from './lib/auth';
+import { auth } from './services/auth';
 import { ToastProvider } from './contexts/ToastContext';
-import Header from './components/Header';
-import Hero from './components/Hero';
-import Features from './components/Features';
-import About from './components/About';
-import Pricing from './components/Pricing';
-import FAQ from './components/FAQ';
-import Footer from './components/Footer';
-import Login from './components/Login';
-import Dashboard from './components/Dashboard';
-import PrivacyPolicy from './components/PrivacyPolicy';
-import TermsOfService from './components/TermsOfService';
-import SecurityPage from './components/SecurityPage';
-import ScrollToTop from './components/ScrollToTop';
+import { Header, Hero, Footer } from './components/layout';
+import { Login } from './components/auth';
+import { Dashboard } from './components/dashboard';
+import { SecurityPage } from './components/security';
+import { ScrollToTop } from './components/ui';
+import { About, Features, Pricing, FAQ, PrivacyPolicy, TermsOfService } from './pages';
 
 const LandingPage = () => {
   const [scrollProgress, setScrollProgress] = useState(0);

@@ -1,13 +1,10 @@
 import { useState, useEffect } from 'react';
 import { MagnifyingGlassIcon, EyeIcon, ClipboardIcon, PencilIcon, TrashIcon, FunnelIcon, ChevronDownIcon, ShieldExclamationIcon, CheckCircleIcon, ExclamationTriangleIcon, Squares2X2Icon, ListBulletIcon, StarIcon, TagIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
-import QuickActions from './QuickActions';
-import EditPasswordModal from './EditPasswordModal';
-import DeleteConfirmModal from './DeleteConfirmModal';
-import LoadingSpinner from './LoadingSpinner';
-import ErrorMessage from './ErrorMessage';
-import Toast from './Toast';
-import { api } from '../lib/api';
+import { QuickActions } from '../dashboard';
+import { EditPasswordModal, DeleteConfirmModal } from '../modals';
+import { LoadingSpinner, ErrorMessage, Toast } from '../ui';
+import { api } from "../../services/api";
 
 const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassword, refreshTrigger }) => {
   const [passwords, setPasswords] = useState([]);

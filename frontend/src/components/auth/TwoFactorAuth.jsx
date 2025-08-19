@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { QrCodeIcon, KeyIcon, CheckCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { api } from '../lib/api';
+import { api } from "../../services/api";
 
 const TwoFactorAuth = () => {
   const [is2FAEnabled, setIs2FAEnabled] = useState(false);

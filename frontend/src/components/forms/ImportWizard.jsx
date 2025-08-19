@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CloudArrowUpIcon, DocumentArrowUpIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { api } from '../lib/api';
+import { api } from "../../services/api";
 
 const ImportWizard = ({ isOpen, onClose, onComplete }) => {
   const [step, setStep] = useState(1);
