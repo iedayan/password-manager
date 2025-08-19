@@ -46,6 +46,7 @@ class User(db.Model):
         nullable=False,
     )
     last_login = db.Column(db.DateTime)
+    last_logout = db.Column(db.DateTime)
     last_password_change = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
     # Status

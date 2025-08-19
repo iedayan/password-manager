@@ -177,17 +177,38 @@ def login():
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required()
 def logout():
-    """Logout user and blacklist token."""
+    """Secure logout with token blacklisting and session cleanup."""
     try:
-        jti = get_jwt()["jti"]
-        blacklisted_tokens.add(jti)
-
         user_id = int(get_jwt_identity())
-        current_app.logger.info(f"User logged out: {user_id}")
-
-        return jsonify({"message": "Successfully logged out"}), 200
+        jti = get_jwt()["jti"]
+        
+        # Blacklist the current token
+        blacklisted_tokens.add(jti)
+        
+        # Update user's last logout time
+        user = User.query.get(user_id)
+        if user:
+            user.last_logout = datetime.now(timezone.utc)
+            db.session.commit()
+        
+        # Clear any active sessions (if session management is implemented)
+        from ...models.login_session import LoginSession
+        active_sessions = LoginSession.query.filter_by(user_id=user_id, is_active=True).all()
+        for session in active_sessions:
+            session.is_active = False
+            session.ended_at = datetime.now(timezone.utc)
+        
+        db.session.commit()
+        
+        current_app.logger.info(f"User logged out successfully: {user_id}")
+        
+        return jsonify({
+            "message": "Successfully logged out",
+            "logged_out_at": datetime.now(timezone.utc).isoformat()
+        }), 200
 
     except Exception as e:
+        db.session.rollback()
         current_app.logger.error(f"Logout error: {str(e)}")
         return jsonify({"error": "Logout failed"}), 500
 
@@ -320,6 +341,78 @@ def reset_password():
     except Exception as e:
         current_app.logger.error(f"Password reset error: {str(e)}")
         return jsonify({"error": "Password reset failed"}), 500
+
+
+@auth_bp.route("/logout-all", methods=["POST"])
+@jwt_required()
+def logout_all_sessions():
+    """Logout from all devices/sessions."""
+    try:
+        user_id = int(get_jwt_identity())
+        
+        # Get all user's tokens (in production, store JTIs in database)
+        # For now, we'll clear all sessions
+        from ...models.login_session import LoginSession
+        
+        # Deactivate all user sessions
+        active_sessions = LoginSession.query.filter_by(user_id=user_id, is_active=True).all()
+        session_count = len(active_sessions)
+        
+        for session in active_sessions:
+            session.is_active = False
+            session.ended_at = datetime.now(timezone.utc)
+        
+        # Update user logout time
+        user = User.query.get(user_id)
+        if user:
+            user.last_logout = datetime.now(timezone.utc)
+        
+        db.session.commit()
+        
+        current_app.logger.info(f"User logged out from all sessions: {user_id} ({session_count} sessions)")
+        
+        return jsonify({
+            "message": f"Successfully logged out from {session_count} sessions",
+            "sessions_terminated": session_count,
+            "logged_out_at": datetime.now(timezone.utc).isoformat()
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Logout all sessions error: {str(e)}")
+        return jsonify({"error": "Failed to logout from all sessions"}), 500
+
+
+@auth_bp.route("/sessions", methods=["GET"])
+@jwt_required()
+def get_active_sessions():
+    """Get user's active sessions."""
+    try:
+        user_id = int(get_jwt_identity())
+        
+        from ...models.login_session import LoginSession
+        
+        sessions = LoginSession.query.filter_by(user_id=user_id, is_active=True).all()
+        
+        session_data = []
+        for session in sessions:
+            session_data.append({
+                "id": session.id,
+                "ip_address": session.ip_address,
+                "user_agent": session.user_agent[:100] if session.user_agent else None,
+                "created_at": session.created_at.isoformat(),
+                "last_activity": session.last_activity.isoformat() if session.last_activity else None,
+                "is_current": session.jti == get_jwt()["jti"]
+            })
+        
+        return jsonify({
+            "sessions": session_data,
+            "total_sessions": len(session_data)
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Get sessions error: {str(e)}")
+        return jsonify({"error": "Failed to get sessions"}), 500
 
 
 # ============================================================================

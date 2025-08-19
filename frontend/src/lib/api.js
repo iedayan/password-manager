@@ -53,14 +53,30 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(userData),
     }),
-    logout: () => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user_id');
-      localStorage.removeItem('remember_me');
-      sessionStorage.removeItem('token');
-      sessionStorage.removeItem('user_id');
-      sessionStorage.removeItem('remember_me');
+    logout: async () => {
+      try {
+        // Call server to invalidate token
+        await api.request('/api/v1/auth/logout', { method: 'POST' });
+      } catch (error) {
+        console.warn('Server logout failed:', error);
+      } finally {
+        // Always clear client-side data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('remember_me');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user_id');
+        sessionStorage.removeItem('remember_me');
+        
+        // Clear any cached data
+        localStorage.removeItem('activeTab');
+        localStorage.removeItem('onboarding_completed');
+        localStorage.removeItem('2fa_enabled');
+      }
     },
+    logoutAll: () => api.request('/api/v1/auth/logout-all', { method: 'POST' }),
+    getSessions: () => api.request('/api/v1/auth/sessions'),
+    terminateSession: (sessionId) => api.request(`/api/v1/auth/sessions/${sessionId}`, { method: 'DELETE' }),
   },
 
   // Password endpoints
