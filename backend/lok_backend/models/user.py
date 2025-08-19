@@ -30,6 +30,10 @@ class User(db.Model):
     is_2fa_enabled = db.Column(db.Boolean, default=False, nullable=False)
     totp_secret = db.Column(db.String(32))  # Base32 encoded secret
     totp_secret_temp = db.Column(db.String(32))  # Temporary secret during setup
+    
+    # Biometric Authentication
+    biometric_enabled = db.Column(db.Boolean, default=False, nullable=False)
+    biometric_credential_id = db.Column(db.String(64))  # WebAuthn credential ID
 
     # Timestamps
     created_at = db.Column(

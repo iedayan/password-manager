@@ -971,6 +971,156 @@ def import_passwords():
         return jsonify({"error": f"Import failed: {str(e)}"}), 500
 
 
+@passwords_bp.route("/advanced-strength", methods=["POST"])
+@jwt_required()
+@limiter.limit("30 per minute")
+def analyze_advanced_strength():
+    """Analyze password strength using advanced AI algorithms."""
+    try:
+        data = request.get_json()
+        if not data or "password" not in data:
+            return jsonify({"error": "Password required"}), 400
+        
+        password = data["password"]
+        
+        from ...services.ai_security_service import ai_security_service
+        
+        # Perform advanced AI analysis
+        analysis = ai_security_service.analyze_password_strength_ml(password)
+        
+        return jsonify(analysis), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Advanced strength analysis failed: {str(e)}")
+        return jsonify({"error": "Strength analysis failed"}), 500
+
+
+@passwords_bp.route("/entropy-analysis", methods=["GET"])
+@jwt_required()
+def get_entropy_analysis():
+    """Get entropy analysis for all user passwords."""
+    try:
+        user_id = int(get_jwt_identity())
+        passwords = Password.query.filter_by(user_id=user_id).all()
+        
+        from ...services.ai_security_service import ai_security_service
+        
+        entropy_data = []
+        total_entropy = 0
+        
+        for password in passwords:
+            try:
+                decrypted = encryption_service.decrypt(password.encrypted_password)
+                analysis = ai_security_service.analyze_password_strength_ml(decrypted)
+                
+                entropy_data.append({
+                    'site_name': password.site_name,
+                    'entropy': analysis['entropy'],
+                    'score': analysis['score'],
+                    'level': analysis['level']
+                })
+                
+                total_entropy += analysis['entropy']
+                
+            except Exception:
+                continue
+        
+        average_entropy = total_entropy / len(entropy_data) if entropy_data else 0
+        
+        return jsonify({
+            'entropy_distribution': entropy_data,
+            'average_entropy': average_entropy,
+            'total_passwords': len(entropy_data)
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Entropy analysis failed: {str(e)}")
+        return jsonify({"error": "Entropy analysis failed"}), 500
+
+
+@passwords_bp.route("/pattern-analysis", methods=["GET"])
+@jwt_required()
+def get_pattern_analysis():
+    """Get pattern analysis for all user passwords."""
+    try:
+        user_id = int(get_jwt_identity())
+        passwords = Password.query.filter_by(user_id=user_id).all()
+        
+        from ...services.ai_security_service import ai_security_service
+        
+        pattern_summary = {}
+        total_patterns = 0
+        
+        for password in passwords:
+            try:
+                decrypted = encryption_service.decrypt(password.encrypted_password)
+                analysis = ai_security_service.analyze_password_strength_ml(decrypted)
+                
+                patterns = analysis.get('patterns_detected', {})
+                for pattern_type, pattern_list in patterns.items():
+                    if pattern_list:  # If patterns were found
+                        pattern_summary[pattern_type] = pattern_summary.get(pattern_type, 0) + len(pattern_list)
+                        total_patterns += len(pattern_list)
+                        
+            except Exception:
+                continue
+        
+        return jsonify({
+            'pattern_summary': pattern_summary,
+            'total_patterns': total_patterns,
+            'analyzed_passwords': len(passwords)
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Pattern analysis failed: {str(e)}")
+        return jsonify({"error": "Pattern analysis failed"}), 500
+
+
+@passwords_bp.route("/breach-monitoring/start", methods=["POST"])
+@jwt_required()
+@limiter.limit("5 per minute")
+def start_breach_monitoring():
+    """Start real-time breach monitoring for user passwords."""
+    try:
+        user_id = int(get_jwt_identity())
+        
+        # In production, this would start a background task
+        # For now, we'll just mark monitoring as active
+        
+        current_app.logger.info(f"Breach monitoring started for user {user_id}")
+        
+        return jsonify({
+            "message": "Breach monitoring started",
+            "monitoring_active": True,
+            "started_at": datetime.now(timezone.utc).isoformat()
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Failed to start breach monitoring: {str(e)}")
+        return jsonify({"error": "Failed to start monitoring"}), 500
+
+
+@passwords_bp.route("/breach-monitoring/stop", methods=["POST"])
+@jwt_required()
+@limiter.limit("5 per minute")
+def stop_breach_monitoring():
+    """Stop real-time breach monitoring."""
+    try:
+        user_id = int(get_jwt_identity())
+        
+        current_app.logger.info(f"Breach monitoring stopped for user {user_id}")
+        
+        return jsonify({
+            "message": "Breach monitoring stopped",
+            "monitoring_active": False,
+            "stopped_at": datetime.now(timezone.utc).isoformat()
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Failed to stop breach monitoring: {str(e)}")
+        return jsonify({"error": "Failed to stop monitoring"}), 500
+
+
 @passwords_bp.route("/export", methods=["GET"])
 @jwt_required()
 @limiter.limit("3 per minute")

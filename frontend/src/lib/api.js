@@ -130,6 +130,58 @@ export const api = {
     }
   },
 
+  // Security endpoints
+  security: {
+    // Advanced analysis
+    getAdvancedAnalysis: () => api.request('/api/v1/security/advanced-analysis'),
+    getRealTimeThreats: () => api.request('/api/v1/security/threats/realtime'),
+    
+    // 2FA endpoints
+    setup2FA: () => api.request('/api/v1/security/2fa/setup', { method: 'POST' }),
+    verify2FA: (code) => api.request('/api/v1/security/2fa/verify', {
+      method: 'POST',
+      body: JSON.stringify({ code })
+    }),
+    disable2FA: (password) => api.request('/api/v1/security/2fa/disable', {
+      method: 'POST',
+      body: JSON.stringify({ password })
+    }),
+    get2FAStatus: () => api.request('/api/v1/security/2fa/status'),
+    regenerateBackupCodes: (password) => api.request('/api/v1/security/2fa/backup-codes', {
+      method: 'POST',
+      body: JSON.stringify({ password })
+    }),
+    
+    // Biometric endpoints
+    setupBiometric: (data) => api.request('/api/v1/security/biometric/setup', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+    verifyBiometric: (data) => api.request('/api/v1/security/biometric/verify', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+    
+    // AI-powered endpoints
+    getAIRecommendations: () => api.request('/api/v1/security/ai/recommendations'),
+    getSecurityTrends: () => api.request('/api/v1/security/trends'),
+    getBehavioralAnalysis: () => api.request('/api/v1/security/behavioral-analysis'),
+    
+    // Health and monitoring
+    getHealthCheck: () => api.request('/api/v1/security/health-check'),
+    getDashboard: () => api.request('/api/v1/security/dashboard'),
+    getBreachCheck: (passwordIds) => api.request('/api/v1/security/breach-check', {
+      method: 'POST',
+      body: JSON.stringify({ password_ids: passwordIds })
+    }),
+    
+    // Export with security
+    secureExport: (options) => api.request('/api/v1/security/export', {
+      method: 'POST',
+      body: JSON.stringify(options)
+    })
+  },
+
   // User endpoints
   user: {
     getProfile: () => api.request('/api/v1/user/profile'),

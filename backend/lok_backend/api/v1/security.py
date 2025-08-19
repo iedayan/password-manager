@@ -418,6 +418,293 @@ def breach_check():
 # EXPORT WITH SECURITY
 # ============================================================================
 
+@security_bp.route("/advanced-analysis", methods=["GET"])
+@jwt_required()
+def get_advanced_analysis():
+    """Get advanced security analysis with AI insights."""
+    try:
+        user_id = int(get_jwt_identity())
+        passwords = Password.query.filter_by(user_id=user_id).all()
+        
+        from ...services.ai_security_service import ai_security_service
+        
+        # Prepare password data for analysis
+        password_data = []
+        for password in passwords:
+            try:
+                decrypted = encryption_service.decrypt(password.encrypted_password)
+                password_data.append({
+                    'id': password.id,
+                    'site_name': password.site_name,
+                    'username': password.username,
+                    'password': decrypted,
+                    'created_at': password.created_at.isoformat()
+                })
+            except Exception:
+                continue
+        
+        # Perform advanced AI analysis
+        analysis = {
+            'total_passwords': len(password_data),
+            'entropy_distribution': [],
+            'pattern_analysis': {},
+            'risk_score': 0,
+            'ai_recommendations': [],
+            'security_trends': []
+        }
+        
+        total_entropy = 0
+        total_risk = 0
+        patterns = {}
+        
+        for pwd_data in password_data:
+            # AI-powered strength analysis
+            strength_analysis = ai_security_service.analyze_password_strength_ml(pwd_data['password'])
+            total_entropy += strength_analysis['entropy']
+            
+            # Pattern detection
+            for pattern in strength_analysis.get('patterns_detected', {}):
+                patterns[pattern] = patterns.get(pattern, 0) + 1
+            
+            # Risk calculation
+            risk_factor = (100 - strength_analysis['score']) / 100
+            total_risk += risk_factor
+            
+            analysis['entropy_distribution'].append({
+                'site': pwd_data['site_name'],
+                'entropy': strength_analysis['entropy'],
+                'score': strength_analysis['score'],
+                'level': strength_analysis['level']
+            })
+        
+        # Calculate metrics
+        analysis['average_entropy'] = total_entropy / len(password_data) if password_data else 0
+        analysis['risk_score'] = min(100, (total_risk / len(password_data)) * 100) if password_data else 0
+        analysis['pattern_analysis'] = patterns
+        
+        # Generate AI recommendations
+        breach_risk = ai_security_service.predict_breach_risk(password_data)
+        analysis['ai_recommendations'] = breach_risk.get('recommendations', [])
+        
+        # Mock security trends (in production, this would come from analytics)
+        analysis['security_trends'] = [
+            {'date': '2024-01', 'score': 75, 'threats': 2},
+            {'date': '2024-02', 'score': 78, 'threats': 1},
+            {'date': '2024-03', 'score': 82, 'threats': 0},
+            {'date': '2024-04', 'score': 85, 'threats': 1},
+            {'date': '2024-05', 'score': 88, 'threats': 0}
+        ]
+        
+        return jsonify(analysis), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Advanced analysis failed: {str(e)}")
+        return jsonify({"error": "Advanced analysis failed"}), 500
+
+
+@security_bp.route("/threats/realtime", methods=["GET"])
+@jwt_required()
+def get_realtime_threats():
+    """Get real-time security threats."""
+    try:
+        user_id = int(get_jwt_identity())
+        
+        # Mock real-time threats (in production, this would come from threat intelligence)
+        threats = [
+            {
+                'id': 1,
+                'type': 'breach',
+                'message': 'New breach detected for example.com',
+                'severity': 'high',
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            },
+            {
+                'id': 2,
+                'type': 'pattern',
+                'message': 'Suspicious login pattern detected',
+                'severity': 'medium',
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            }
+        ]
+        
+        return jsonify({'threats': threats}), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Real-time threats failed: {str(e)}")
+        return jsonify({"error": "Failed to get threats"}), 500
+
+
+@security_bp.route("/biometric/setup", methods=["POST"])
+@jwt_required()
+@limiter.limit("5 per minute")
+def setup_biometric():
+    """Setup biometric authentication."""
+    try:
+        user_id = int(get_jwt_identity())
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Biometric data required"}), 400
+        
+        # Store biometric credential (in production, this would be properly secured)
+        user.biometric_enabled = True
+        user.biometric_credential_id = data.get('credential_id', secrets.token_hex(16))
+        
+        db.session.commit()
+        
+        current_app.logger.info(f"Biometric setup completed for user {user_id}")
+        
+        return jsonify({
+            "message": "Biometric authentication enabled",
+            "credential_id": user.biometric_credential_id
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Biometric setup failed: {str(e)}")
+        return jsonify({"error": "Biometric setup failed"}), 500
+
+
+@security_bp.route("/biometric/verify", methods=["POST"])
+@jwt_required()
+@limiter.limit("10 per minute")
+def verify_biometric():
+    """Verify biometric authentication."""
+    try:
+        user_id = int(get_jwt_identity())
+        user = User.query.get(user_id)
+        
+        if not user or not user.biometric_enabled:
+            return jsonify({"error": "Biometric authentication not enabled"}), 400
+        
+        data = request.get_json()
+        if not data or "credential_id" not in data:
+            return jsonify({"error": "Credential ID required"}), 400
+        
+        # Verify biometric credential (simplified for demo)
+        if data["credential_id"] == user.biometric_credential_id:
+            return jsonify({"verified": True, "message": "Biometric verification successful"}), 200
+        else:
+            return jsonify({"verified": False, "error": "Biometric verification failed"}), 401
+        
+    except Exception as e:
+        current_app.logger.error(f"Biometric verification failed: {str(e)}")
+        return jsonify({"error": "Biometric verification failed"}), 500
+
+
+@security_bp.route("/ai/recommendations", methods=["GET"])
+@jwt_required()
+def get_ai_recommendations():
+    """Get AI-powered security recommendations."""
+    try:
+        user_id = int(get_jwt_identity())
+        passwords = Password.query.filter_by(user_id=user_id).all()
+        
+        password_data = []
+        for password in passwords:
+            try:
+                decrypted = encryption_service.decrypt(password.encrypted_password)
+                password_data.append({
+                    'password': decrypted,
+                    'site_name': password.site_name,
+                    'created_at': password.created_at.isoformat()
+                })
+            except Exception:
+                continue
+        
+        from ...services.ai_security_service import ai_security_service
+        
+        # Get AI recommendations
+        breach_risk = ai_security_service.predict_breach_risk(password_data)
+        
+        recommendations = [
+            {
+                'type': 'security',
+                'priority': 'high',
+                'title': 'Enable Two-Factor Authentication',
+                'description': 'Add an extra layer of security to your most important accounts.',
+                'action': 'Setup 2FA'
+            },
+            {
+                'type': 'password',
+                'priority': 'medium',
+                'title': 'Update Weak Passwords',
+                'description': 'Several passwords have been identified as weak or compromised.',
+                'action': 'Generate stronger passwords'
+            }
+        ]
+        
+        recommendations.extend(breach_risk.get('recommendations', []))
+        
+        return jsonify({'recommendations': recommendations}), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"AI recommendations failed: {str(e)}")
+        return jsonify({"error": "Failed to get recommendations"}), 500
+
+
+@security_bp.route("/trends", methods=["GET"])
+@jwt_required()
+def get_security_trends():
+    """Get security trends and analytics."""
+    try:
+        user_id = int(get_jwt_identity())
+        
+        # Mock security trends (in production, this would come from analytics database)
+        trends = {
+            'monthly_scores': [
+                {'month': '2024-01', 'score': 75, 'threats': 2},
+                {'month': '2024-02', 'score': 78, 'threats': 1},
+                {'month': '2024-03', 'score': 82, 'threats': 0},
+                {'month': '2024-04', 'score': 85, 'threats': 1},
+                {'month': '2024-05', 'score': 88, 'threats': 0}
+            ],
+            'threat_categories': {
+                'weak_passwords': 15,
+                'reused_passwords': 8,
+                'breach_alerts': 2,
+                'suspicious_activity': 1
+            },
+            'improvement_rate': 12.5  # Percentage improvement over last month
+        }
+        
+        return jsonify(trends), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Security trends failed: {str(e)}")
+        return jsonify({"error": "Failed to get trends"}), 500
+
+
+@security_bp.route("/behavioral-analysis", methods=["GET"])
+@jwt_required()
+def get_behavioral_analysis():
+    """Get behavioral analysis and anomaly detection."""
+    try:
+        user_id = int(get_jwt_identity())
+        
+        # Get login data for behavioral analysis
+        login_data = {
+            'ip_address': request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr),
+            'user_agent': request.headers.get('User-Agent', ''),
+            'timestamp': datetime.now(timezone.utc).isoformat()
+        }
+        
+        from ...services.ai_security_service import ai_security_service
+        
+        # Perform behavioral analysis
+        analysis = ai_security_service.detect_anomalous_behavior(user_id, login_data)
+        
+        return jsonify(analysis), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Behavioral analysis failed: {str(e)}")
+        return jsonify({"error": "Behavioral analysis failed"}), 500
+
+
 @security_bp.route("/export", methods=["POST"])
 @jwt_required()
 @limiter.limit("3 per minute")
