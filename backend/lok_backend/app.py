@@ -27,6 +27,7 @@ def create_app(config_name="development"):
         app,
         origins=[
             "http://localhost:3000",
+            "http://localhost:5173",
             "https://comforting-sunshine-65105a.netlify.app",
             "https://*.netlify.app",
         ],

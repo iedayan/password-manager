@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { auth } from '../../services/auth';
 
 export default function Hero() {
   const [email, setEmail] = useState('');
@@ -20,7 +21,13 @@ export default function Hero() {
     return () => clearInterval(timer);
   }, []);
 
-
+  const handleGetStarted = () => {
+    if (auth.isAuthenticated()) {
+      window.location.href = '/dashboard';
+    } else {
+      window.location.href = '/login';
+    }
+  };
 
   return (
     <section id="hero" className="pt-32 pb-20 md:pb-24 lg:pb-32 px-6 bg-gradient-to-b from-white to-blue-50">
@@ -71,10 +78,10 @@ Web App Beta Now Available - Try It Free!
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8 animate-slide-up" style={{animationDelay: '2.5s', animationFillMode: 'both'}}>
             <button
-              onClick={() => window.location.href = '/login'}
+              onClick={handleGetStarted}
               className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2 relative"
             >
-              <span>Try Beta Web App</span>
+              <span>{auth.isAuthenticated() ? 'Go to Dashboard' : 'Try Beta Web App'}</span>
               <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-bounce">
                 BETA
               </div>

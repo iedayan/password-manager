@@ -23,6 +23,14 @@ const LandingPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleGetStarted = () => {
+    if (auth.isAuthenticated()) {
+      window.location.href = '/dashboard';
+    } else {
+      window.location.href = '/login';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-100 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-100/30 via-transparent to-indigo-100/20"></div>
