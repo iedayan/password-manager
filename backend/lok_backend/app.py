@@ -72,10 +72,12 @@ def create_app(config_name="development"):
                 for col_name, col_def in required_cols:
                     if col_name not in user_columns:
                         try:
-                            if 'postgresql' in str(db.engine.url):
-                                db.engine.execute(text(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {col_name} {col_def}"))
-                            else:
-                                db.engine.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_def}"))
+                            with db.engine.connect() as conn:
+                                if 'postgresql' in str(db.engine.url):
+                                    conn.execute(text(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {col_name} {col_def}"))
+                                else:
+                                    conn.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_def}"))
+                                conn.commit()
                             missing_cols.append(col_name)
                         except Exception:
                             pass
@@ -98,10 +100,12 @@ def create_app(config_name="development"):
                 for col_name, col_def in required_cols:
                     if col_name not in password_columns:
                         try:
-                            if 'postgresql' in str(db.engine.url):
-                                db.engine.execute(text(f"ALTER TABLE passwords ADD COLUMN IF NOT EXISTS {col_name} {col_def}"))
-                            else:
-                                db.engine.execute(text(f"ALTER TABLE passwords ADD COLUMN {col_name} {col_def}"))
+                            with db.engine.connect() as conn:
+                                if 'postgresql' in str(db.engine.url):
+                                    conn.execute(text(f"ALTER TABLE passwords ADD COLUMN IF NOT EXISTS {col_name} {col_def}"))
+                                else:
+                                    conn.execute(text(f"ALTER TABLE passwords ADD COLUMN {col_name} {col_def}"))
+                                conn.commit()
                             missing_cols.append(col_name)
                         except Exception:
                             pass
