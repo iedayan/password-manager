@@ -8,6 +8,7 @@ import Settings from './Settings';
 import Breadcrumb from './Breadcrumb';
 import OnboardingFlow from './OnboardingFlow';
 import ImportWizard from './ImportWizard';
+import SecurityDashboard from './SecurityDashboard';
 import { api } from '../lib/api';
 
 const Dashboard = () => {
@@ -236,54 +237,8 @@ const Dashboard = () => {
             {activeTab === 'settings' && <Settings />}
             {activeTab === 'security' && (
               <div className="max-w-5xl mx-auto">
-                <div className="text-center mb-12">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl">
-                    <ShieldCheckIcon className="w-8 h-8 text-white" />
-                  </div>
-                  <h2 className="text-2xl font-semibold text-white mb-4">Security Dashboard</h2>
-                  <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed">
-                    Advanced security monitoring and analysis tools to keep your passwords safe and secure.
-                  </p>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8 mb-8">
-                <div className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-6 hover:shadow-xl hover:bg-slate-700/70 transition-all backdrop-blur-sm">
-                  <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
-                    <ShieldCheckIcon className="w-6 h-6 text-green-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Password Health Check</h3>
-                  <p className="text-slate-300 text-sm mb-4 leading-relaxed">Analyze all your passwords for strength, reuse, and security vulnerabilities.</p>
-                  <div className="inline-flex items-center px-3 py-1 bg-green-500/20 border border-green-400/30 rounded-full text-xs text-green-300 font-medium">Coming Q1 2024</div>
-                </div>
-
-                <div className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-6 hover:shadow-xl hover:bg-slate-700/70 transition-all backdrop-blur-sm">
-                  <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mb-4">
-                    <ShieldCheckIcon className="w-6 h-6 text-orange-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Breach Monitoring</h3>
-                  <p className="text-slate-300 text-sm mb-4 leading-relaxed">Get instant alerts when your passwords appear in data breaches.</p>
-                  <div className="inline-flex items-center px-3 py-1 bg-orange-500/20 border border-orange-400/30 rounded-full text-xs text-orange-300 font-medium">Coming Q1 2024</div>
-                </div>
-
-                <div className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-6 hover:shadow-xl hover:bg-slate-700/70 transition-all backdrop-blur-sm">
-                  <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
-                    <ShieldCheckIcon className="w-6 h-6 text-purple-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Two-Factor Authentication</h3>
-                  <p className="text-slate-300 text-sm mb-4 leading-relaxed">Enhanced security with TOTP and biometric authentication options.</p>
-                  <div className="inline-flex items-center px-3 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full text-xs text-purple-300 font-medium">Coming Q2 2024</div>
-                </div>
-
-                <div className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-6 hover:shadow-xl hover:bg-slate-700/70 transition-all backdrop-blur-sm">
-                  <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
-                    <ShieldCheckIcon className="w-6 h-6 text-blue-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Advanced Analytics</h3>
-                  <p className="text-slate-300 text-sm mb-4 leading-relaxed">Comprehensive security insights and detailed password analytics.</p>
-                  <div className="inline-flex items-center px-3 py-1 bg-blue-500/20 border border-blue-400/30 rounded-full text-xs text-blue-300 font-medium">Coming Q2 2024</div>
-                </div>
+                <SecurityDashboard />
               </div>
-            </div>
             )}
           </div>
         </div>
