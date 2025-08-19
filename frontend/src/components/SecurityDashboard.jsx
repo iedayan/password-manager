@@ -3,6 +3,7 @@ import { ShieldCheckIcon, ExclamationTriangleIcon, ClockIcon, KeyIcon, EyeIcon, 
 import PasswordHealthCheck from './PasswordHealthCheck';
 import TwoFactorAuth from './TwoFactorAuth';
 import ExportData from './ExportData';
+import AdvancedSecurityDashboard from './AdvancedSecurityDashboard';
 import { analyzePasswordHealth } from '../utils/passwordHealth';
 import { api } from '../lib/api';
 
@@ -52,6 +53,7 @@ const SecurityDashboard = () => {
 
   const sections = [
     { id: 'overview', name: 'Overview', icon: ChartBarIcon },
+    { id: 'advanced', name: 'AI Security', icon: ShieldCheckIcon },
     { id: 'health', name: 'Password Health', icon: ShieldCheckIcon },
     { id: '2fa', name: 'Two-Factor Auth', icon: KeyIcon },
     { id: 'export', name: 'Export Data', icon: EyeIcon }
@@ -165,6 +167,7 @@ const SecurityDashboard = () => {
 
       {/* Content */}
       <div className="bg-slate-700/30 rounded-xl p-6">
+        {activeSection === 'advanced' && <AdvancedSecurityDashboard />}
         {activeSection === 'overview' && (
           <div className="space-y-6">
             <h3 className="text-xl font-semibold text-white mb-4">Security Overview</h3>
