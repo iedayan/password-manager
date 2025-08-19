@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { FeedbackButton } from '../../features';
 
 const AuthButtons = () => {
   const [user, setUser] = useState(null);
@@ -231,6 +232,9 @@ export default function Header() {
                 }`}></span>
               </a>
             ))}
+            <div className="ml-2 pl-2 border-l border-gray-200">
+              <FeedbackButton />
+            </div>
           </nav>
 
           {/* Auth Buttons */}
@@ -263,6 +267,14 @@ export default function Header() {
                   {item.label}
                 </a>
               ))}
+              
+              {/* Mobile Feedback Button */}
+              <div className="pt-4 border-t border-gray-100 mt-4">
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <span className="text-sm font-medium text-gray-700">Feedback</span>
+                  <FeedbackButton />
+                </div>
+              </div>
               
               {/* Mobile Auth Buttons */}
               <div className="pt-4 border-t border-gray-100 mt-4 space-y-3">
