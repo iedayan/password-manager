@@ -102,7 +102,7 @@ export default function Pricing() {
             <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Pricing</span>
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-            Try our <strong className="text-blue-600">beta web app free</strong> now. Full pricing starts when mobile and desktop apps launch.
+            <strong className="text-blue-600">Currently in free beta!</strong> Pricing starts only when the official final product is released with mobile and desktop apps.
           </p>
         </div>
 
