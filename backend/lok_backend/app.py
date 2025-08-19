@@ -74,6 +74,7 @@ def register_blueprints(app):
     from .api.v1.admin import admin_bp
     from .api.v1.security import security_bp
     from .api.v1.onboarding import onboarding_bp
+    from .api.v1.updates import updates_bp
 
     app.register_blueprint(auth_bp, url_prefix="/api/v1/auth")
     app.register_blueprint(passwords_bp, url_prefix="/api/v1/passwords")
@@ -81,3 +82,4 @@ def register_blueprints(app):
     app.register_blueprint(admin_bp, url_prefix="/api/v1/admin")
     app.register_blueprint(security_bp, url_prefix="/api/v1/security")
     app.register_blueprint(onboarding_bp, url_prefix="/api/v1/onboarding")
+    app.register_blueprint(updates_bp, url_prefix="/api/v1/updates")

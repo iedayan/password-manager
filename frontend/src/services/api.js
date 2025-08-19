@@ -326,6 +326,12 @@ export const api = {
     getProgress: () => api.request('/api/v1/onboarding/progress'),
     getSecurityAssessment: () => api.request('/api/v1/onboarding/security-assessment'),
     complete: () => api.request('/api/v1/onboarding/complete', { method: 'POST' })
+  },
+
+  // Updates
+  updates: {
+    check: () => api.request('/api/v1/updates/check'),
+    sync: () => api.request('/api/v1/updates/sync', { method: 'POST' })
   }
 };
 
