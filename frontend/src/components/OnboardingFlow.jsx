@@ -336,14 +336,8 @@ const OnboardingStepCard = ({ step, isActive, onAction }) => {
             {step.completed ? (
               <CheckCircleIcon className="w-6 h-6 text-white" />
             ) : (
-              <span className="text-white font-semibold">
-                {step.id === 'welcome' ? '👋' :
-                 step.id === 'import_passwords' ? '📥' :
-                 step.id === 'security_assessment' ? '🛡️' :
-                 step.id === 'setup_2fa' ? '🔐' :
-                 step.id === 'master_password' ? '🔑' :
-                 step.id === 'browser_extension' ? '🌐' :
-                 step.id === 'mobile_app' ? '📱' : '✓'}
+              <span className="text-white font-semibold text-lg">
+                {['welcome', 'import_passwords', 'security_assessment', 'setup_2fa', 'master_password', 'browser_extension', 'mobile_app'].indexOf(step.id) + 1}
               </span>
             )}
           </div>
