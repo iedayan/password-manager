@@ -294,6 +294,13 @@ export const api = {
       console.log('Mock vote for feature:', id);
       return Promise.resolve({ success: true });
     }
+  },
+
+  // Onboarding
+  onboarding: {
+    getProgress: () => api.request('/api/v1/onboarding/progress'),
+    getSecurityAssessment: () => api.request('/api/v1/onboarding/security-assessment'),
+    complete: () => api.request('/api/v1/onboarding/complete', { method: 'POST' })
   }
 };
 

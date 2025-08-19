@@ -12,135 +12,134 @@ const OnboardingFlow = ({ isOpen, onClose, onComplete }) => {
 
   useEffect(() => {
     if (isOpen) {
-      // Initialize with mock data for now
-      const mockProgress = {
-        progress: {
-          completed_steps: 0,
-          total_steps: 5,
-          percentage: 0,
-          estimated_time_remaining: 10
-        },
-        current_step: 'welcome',
-        is_complete: false,
-        steps: [
-          {
-            id: 'welcome',
-            title: 'Welcome to Lok',
-            description: 'Get started with your secure password manager',
-            completed: false,
-            required: true,
-            estimated_time: 1
-          },
-          {
-            id: 'import_passwords',
-            title: 'Import Your Passwords',
-            description: 'Bring your existing passwords from other managers',
-            completed: false,
-            required: false,
-            estimated_time: 5
-          },
-          {
-            id: 'security_assessment',
-            title: 'Security Assessment',
-            description: 'Analyze your password security and get recommendations',
-            completed: false,
-            required: true,
-            estimated_time: 2
-          },
-          {
-            id: 'setup_2fa',
-            title: 'Enable Two-Factor Authentication',
-            description: 'Add an extra layer of security to your account',
-            completed: false,
-            required: false,
-            estimated_time: 3
-          },
-          {
-            id: 'master_password',
-            title: 'Set Master Password',
-            description: 'Create a strong master password for encryption',
-            completed: false,
-            required: true,
-            estimated_time: 2
-          }
-        ]
-      };
-      setProgress(mockProgress);
-      setCurrentStep('welcome');
-      setLoading(false);
+      fetchOnboardingProgress();
     }
   }, [isOpen]);
 
-  const completeStep = (stepId) => {
-    setProgress(prev => {
-      const updatedSteps = prev.steps.map(step => 
-        step.id === stepId ? { ...step, completed: true } : step
-      );
-      const completedCount = updatedSteps.filter(s => s.completed).length;
-      const nextIncompleteStep = updatedSteps.find(s => !s.completed);
+  const fetchOnboardingProgress = async () => {
+    try {
+      setLoading(true);
+      const data = await api.onboarding.getProgress();
+      setProgress(data);
+      setCurrentStep(data.current_step);
       
-      return {
-        ...prev,
-        steps: updatedSteps,
-        current_step: nextIncompleteStep?.id || null,
-        is_complete: completedCount === prev.steps.length,
-        progress: {
-          ...prev.progress,
-          completed_steps: completedCount,
-          percentage: (completedCount / prev.steps.length) * 100,
-          estimated_time_remaining: Math.max(0, (prev.steps.length - completedCount) * 2)
-        }
-      };
-    });
+      // Auto-fetch security assessment if user has passwords
+      if (data.steps.find(s => s.id === 'security_assessment')?.completed) {
+        fetchSecurityAssessment();
+      }
+    } catch (error) {
+      console.error('Failed to fetch onboarding progress:', error);
+      // Fallback to basic progress if API fails
+      setProgress({
+        progress: { completed_steps: 1, total_steps: 8, percentage: 12.5 },
+        current_step: 'add_password',
+        is_complete: false,
+        steps: [
+          { id: 'welcome', title: 'Welcome to Lok', completed: true, required: true },
+          { id: 'add_password', title: 'Add Your First Password', completed: false, required: true },
+          { id: 'import_passwords', title: 'Import Existing Passwords', completed: false, required: false },
+          { id: 'security_assessment', title: 'Run Security Analysis', completed: false, required: true },
+          { id: 'setup_2fa', title: 'Enable Two-Factor Authentication', completed: false, required: false },
+          { id: 'master_password', title: 'Set Master Password', completed: false, required: true },
+          { id: 'browser_extension', title: 'Install Browser Extension', completed: false, required: false },
+          { id: 'mobile_app', title: 'Download Mobile App', completed: false, required: false }
+        ]
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const fetchSecurityAssessment = () => {
-    // Mock security assessment
-    setSecurityAssessment({
-      overall_score: 75,
-      risk_level: 'medium',
-      recommendations: [
-        'Enable two-factor authentication',
-        'Update weak passwords',
-        'Remove duplicate passwords',
-        'Set up master password recovery'
-      ]
-    });
+  const completeStep = async (stepId) => {
+    // Refresh progress from API to get real-time updates
+    setTimeout(() => {
+      fetchOnboardingProgress();
+    }, 500);
+  };
+
+  const fetchSecurityAssessment = async () => {
+    try {
+      const assessment = await api.onboarding.getSecurityAssessment();
+      setSecurityAssessment(assessment);
+    } catch (error) {
+      console.error('Failed to fetch security assessment:', error);
+      // Fallback assessment
+      setSecurityAssessment({
+        overall_score: 0,
+        risk_level: 'high',
+        recommendations: ['Add passwords to get security assessment']
+      });
+    }
   };
 
   const handleImportComplete = () => {
     setShowImportWizard(false);
-    completeStep('import_passwords');
+    // Refresh progress and assessment after import
+    fetchOnboardingProgress();
     fetchSecurityAssessment();
   };
 
-  const handleStepAction = (stepId) => {
+  const handleStepAction = async (stepId) => {
     switch (stepId) {
       case 'welcome':
         completeStep('welcome');
+        break;
+      case 'add_password':
+        // Close onboarding and trigger add password modal
+        onClose();
+        setTimeout(() => {
+          const addButton = document.querySelector('.add-password-btn');
+          if (addButton) addButton.click();
+        }, 100);
         break;
       case 'import_passwords':
         setShowImportWizard(true);
         break;
       case 'security_assessment':
-        fetchSecurityAssessment();
+        await fetchSecurityAssessment();
         completeStep('security_assessment');
         break;
       case 'setup_2fa':
-        // Navigate to 2FA setup
-        completeStep('setup_2fa');
+        // Navigate to settings 2FA section
+        onClose();
+        setTimeout(() => {
+          localStorage.setItem('activeTab', 'settings');
+          window.location.reload();
+        }, 100);
         break;
       case 'master_password':
-        // Navigate to master password setup
-        completeStep('master_password');
+        // Navigate to settings to change master password
+        onClose();
+        setTimeout(() => {
+          localStorage.setItem('activeTab', 'settings');
+          window.location.reload();
+        }, 100);
         break;
       case 'browser_extension':
-        // Open browser extension installation
-        window.open('https://chrome.google.com/webstore', '_blank');
+        // Open browser extension store
+        const isChrome = /Chrome/.test(navigator.userAgent);
+        const isFirefox = /Firefox/.test(navigator.userAgent);
+        
+        if (isChrome) {
+          window.open('https://chrome.google.com/webstore/category/extensions', '_blank');
+        } else if (isFirefox) {
+          window.open('https://addons.mozilla.org/firefox/', '_blank');
+        } else {
+          window.open('https://chrome.google.com/webstore/category/extensions', '_blank');
+        }
         completeStep('browser_extension');
         break;
       case 'mobile_app':
-        // Show mobile app download links
+        // Show mobile app download options
+        const userAgent = navigator.userAgent;
+        if (/iPad|iPhone|iPod/.test(userAgent)) {
+          window.open('https://apps.apple.com/app/lok-password-manager', '_blank');
+        } else if (/Android/.test(userAgent)) {
+          window.open('https://play.google.com/store/apps/details?id=com.lok.passwordmanager', '_blank');
+        } else {
+          // Show both options for desktop users
+          alert('Download Lok for mobile:\n\niOS: App Store\nAndroid: Google Play Store');
+        }
         completeStep('mobile_app');
         break;
       default:
@@ -337,7 +336,7 @@ const OnboardingStepCard = ({ step, isActive, onAction }) => {
               <CheckCircleIcon className="w-6 h-6 text-white" />
             ) : (
               <span className="text-white font-semibold text-lg">
-                {['welcome', 'import_passwords', 'security_assessment', 'setup_2fa', 'master_password', 'browser_extension', 'mobile_app'].indexOf(step.id) + 1}
+                {['welcome', 'add_password', 'import_passwords', 'security_assessment', 'setup_2fa', 'master_password', 'browser_extension', 'mobile_app'].indexOf(step.id) + 1}
               </span>
             )}
           </div>
@@ -366,12 +365,14 @@ const OnboardingStepCard = ({ step, isActive, onAction }) => {
                 : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
             }`}
           >
-            {step.id === 'import_passwords' ? 'Import' :
-             step.id === 'security_assessment' ? 'Analyze' :
-             step.id === 'setup_2fa' ? 'Setup' :
-             step.id === 'master_password' ? 'Create' :
+            {step.id === 'add_password' ? 'Add Password' :
+             step.id === 'import_passwords' ? 'Import' :
+             step.id === 'security_assessment' ? 'Run Analysis' :
+             step.id === 'setup_2fa' ? 'Setup 2FA' :
+             step.id === 'master_password' ? 'Update' :
              step.id === 'browser_extension' ? 'Install' :
-             step.id === 'mobile_app' ? 'Download' : 'Start'}
+             step.id === 'mobile_app' ? 'Download' :
+             'Start'}
             <ArrowRightIcon className="w-4 h-4 ml-2" />
           </button>
         )}
