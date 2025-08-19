@@ -256,7 +256,13 @@ const Dashboard = () => {
             {activeTab === 'settings' && <Settings />}
             {activeTab === 'security' && (
               <div className="max-w-5xl mx-auto security-dashboard">
-                <SecurityDashboard passwords={passwords} />
+                <SecurityDashboard 
+                  passwords={passwords} 
+                  onNavigateToGenerator={() => {
+                    setActiveTab('generator');
+                    localStorage.setItem('activeTab', 'generator');
+                  }}
+                />
               </div>
             )}
 

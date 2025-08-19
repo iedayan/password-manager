@@ -27,7 +27,7 @@ const isOld = (dateString) => {
   return days > 365;
 };
 
-const SecurityDashboard = ({ passwords = [] }) => {
+const SecurityDashboard = ({ passwords = [], onNavigateToGenerator }) => {
   const [securityScore, setSecurityScore] = useState(0);
   const [metrics, setMetrics] = useState({});
   const [activeTab, setActiveTab] = useState('overview');
@@ -275,7 +275,10 @@ const SecurityDashboard = ({ passwords = [] }) => {
               <div className="bg-gradient-to-br from-blue-900/40 to-indigo-900/40 border border-blue-600/40 rounded-xl p-6">
                 <h3 className="text-lg font-semibold text-blue-300 mb-3">Password Generator</h3>
                 <p className="text-slate-300 text-sm mb-4">Create strong, unique passwords</p>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                <button 
+                  onClick={() => onNavigateToGenerator?.()}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
                   Generate Password
                 </button>
               </div>

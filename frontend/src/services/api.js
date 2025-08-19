@@ -20,7 +20,6 @@ export const api = {
         let errorData;
         try {
           errorData = await response.json();
-          console.error('API Error Response:', errorData);
         } catch {
           errorData = { error: `HTTP ${response.status}: ${response.statusText}` };
         }
@@ -28,16 +27,40 @@ export const api = {
         // Handle validation errors from Pydantic
         if (errorData.detail && Array.isArray(errorData.detail)) {
           const validationErrors = errorData.detail.map(err => err.msg).join(', ');
-          throw new Error(validationErrors);
+          const error = new Error(validationErrors);
+          error.status = response.status;
+          error.type = 'validation';
+          throw error;
         }
         
-        throw new Error(errorData.error || errorData.message || `Request failed with status ${response.status}`);
+        // Handle authentication errors
+        if (response.status === 401) {
+          const error = new Error(errorData.error || 'Authentication required');
+          error.status = 401;
+          error.type = 'auth';
+          throw error;
+        }
+        
+        // Handle server errors
+        if (response.status >= 500) {
+          const error = new Error('Server error - please try again later');
+          error.status = response.status;
+          error.type = 'server';
+          throw error;
+        }
+        
+        const error = new Error(errorData.error || errorData.message || `Request failed with status ${response.status}`);
+        error.status = response.status;
+        error.type = 'api';
+        throw error;
       }
 
       return response.json();
     } catch (error) {
-      if (error instanceof TypeError) {
-        throw new Error('Network error: Unable to connect to server');
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        const networkError = new Error('Network error - please check your connection');
+        networkError.type = 'network';
+        throw networkError;
       }
       throw error;
     }
