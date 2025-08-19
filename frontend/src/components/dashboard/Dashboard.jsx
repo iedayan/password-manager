@@ -6,7 +6,7 @@ import { AddPasswordModal, EditPasswordModal } from '../modals';
 import { Settings, ImportWizard } from '../forms';
 import { Breadcrumb } from '../ui';
 import { OnboardingFlow } from '../auth';
-import { BetaFeedbackWidget, ProductTour, FeatureRequestBoard } from '../../features';
+import { BetaFeedbackWidget, ProductTour } from '../../features';
 import { api } from "../../services/api";
 
 const Dashboard = () => {
@@ -76,7 +76,6 @@ const Dashboard = () => {
     { id: 'vault', name: 'Vault' },
     { id: 'generator', name: 'Generator' },
     { id: 'security', name: 'Security' },
-    { id: 'feedback', name: 'Feedback' },
     { id: 'settings', name: 'Settings' }
   ];
 
@@ -158,17 +157,7 @@ const Dashboard = () => {
                         <span className="font-medium">Setup Guide</span>
                       </button>
                       
-                      <button 
-                        onClick={() => {
-                          setActiveTab('feedback');
-                          localStorage.setItem('activeTab', 'feedback');
-                          setShowSettingsDropdown(false);
-                        }}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
-                      >
-                        <SparklesIcon className="w-4 h-4 text-gray-500" />
-                        <span className="font-medium">Feature Requests</span>
-                      </button>
+
                       
                       <button 
                         onClick={() => {
@@ -257,11 +246,7 @@ const Dashboard = () => {
                 <SecurityDashboard />
               </div>
             )}
-            {activeTab === 'feedback' && (
-              <div className="max-w-4xl mx-auto">
-                <FeatureRequestBoard />
-              </div>
-            )}
+
           </div>
         </div>
       </div>

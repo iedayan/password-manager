@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { UserIcon, ShieldCheckIcon, ArrowDownTrayIcon, ArrowUpTrayIcon, TrashIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { UserIcon, ShieldCheckIcon, ArrowDownTrayIcon, ArrowUpTrayIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useToast } from '../../contexts/ToastContext';
 import { api } from "../../services/api";
 import { LoadingSpinner, ErrorMessage } from '../ui';
@@ -390,5 +390,7 @@ const DataSettings = ({ setLoading, setError, showSuccess, showError }) => {
     </div>
   );
 };
+
+
 
 export default Settings;
