@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ShieldCheckIcon, CpuChipIcon, EyeIcon, LockClosedIcon, ChartBarIcon, ExclamationTriangleIcon, CheckCircleIcon, ClockIcon, FingerprintIcon } from '@heroicons/react/24/outline';
+import { ShieldCheckIcon, CpuChipIcon, EyeIcon, LockClosedIcon, ChartBarIcon, ExclamationTriangleIcon, CheckCircleIcon, ClockIcon, KeyIcon } from '@heroicons/react/24/outline';
 import { passwordAnalyzer, biometricSecurity, breachDetection } from '../utils/advancedSecurity';
 import { api } from '../lib/api';
 
@@ -325,7 +325,7 @@ const AdvancedSecurityDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-white mb-2 flex items-center">
-                <FingerprintIcon className="w-5 h-5 text-blue-400 mr-2" />
+                <KeyIcon className="w-5 h-5 text-blue-400 mr-2" />
                 Biometric Authentication
               </h3>
               <p className="text-slate-300 text-sm">
