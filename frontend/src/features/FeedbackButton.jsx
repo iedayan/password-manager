@@ -94,8 +94,8 @@ const FeedbackButton = () => {
 
       {/* Enhanced Feedback Modal */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg transform animate-scale-in">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto" style={{animation: 'scaleInCenter 0.3s ease-out'}}>
             {/* Header */}
             <div className="relative p-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
@@ -121,9 +121,9 @@ const FeedbackButton = () => {
             </div>
 
             {submitted ? (
-              <div className="p-8 text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <HeartIcon className="w-10 h-10 text-white" />
+              <div className="p-6 text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <HeartIcon className="w-8 h-8 text-white" />
                 </div>
                 <h4 className="text-2xl font-bold text-gray-900 mb-3">Thank You!</h4>
                 <p className="text-gray-600 leading-relaxed">
@@ -135,19 +135,19 @@ const FeedbackButton = () => {
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
                 {/* Type Selector */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-3">
                     What type of feedback is this?
                   </label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
                     {feedbackTypes.map((feedbackType) => (
                       <button
                         key={feedbackType.value}
                         type="button"
                         onClick={() => setType(feedbackType.value)}
-                        className={`p-4 rounded-2xl border-2 transition-all duration-200 text-left group hover:scale-105 ${
+                        className={`p-3 sm:p-4 rounded-2xl border-2 transition-all duration-200 text-left group hover:scale-105 ${
                           type === feedbackType.value
                             ? `border-${feedbackType.color}-500 bg-${feedbackType.color}-50 shadow-lg`
                             : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
@@ -184,7 +184,7 @@ const FeedbackButton = () => {
                       value={feedback}
                       onChange={(e) => setFeedback(e.target.value)}
                       placeholder={selectedType.placeholder}
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent h-32 resize-none transition-all placeholder-gray-400"
+                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24 sm:h-32 resize-none transition-all placeholder-gray-400"
                       required
                     />
                     <div className="absolute bottom-3 right-3 text-xs text-gray-400">
