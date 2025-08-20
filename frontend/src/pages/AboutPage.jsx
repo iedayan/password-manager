@@ -15,26 +15,7 @@ export default function AboutPage() {
     }, 300);
   }, []);
 
-  const team = useMemo(() => [
-    {
-      name: "Ismail Emre Dayan",
-      role: "Founder & Lead Developer",
-      bio: "Full-stack developer passionate about cybersecurity and privacy. Building enterprise-grade security tools accessible to everyone.",
-      image: "/images/IEDProPic.jpeg"
-    },
-    {
-      name: "Mohammed Lakas",
-      role: "Co-Founder & Lead Developer",
-      bio: "Software engineer with Master's in AI/ML research. Leading intelligent security features and ML-powered threat detection.",
-      image: "/images/LakasProPic.jpeg"
-    },
-    {
-      name: "Open Source Community",
-      role: "Contributors",
-      bio: "Developers, security researchers, and privacy advocates contributing to make password security accessible worldwide.",
-      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=300&h=300&fit=crop&crop=face"
-    }
-  ], []);
+
 
   const values = useMemo(() => [
     {
@@ -289,49 +270,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="py-24 px-4 sm:px-6 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Meet Our Team</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Passionate developers and security advocates building the future of password management.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {team.map((member, index) => (
-              <div key={index} className="animate-on-scroll group" style={{animationDelay: `${index * 200}ms`}}>
-                <div className="bg-white rounded-3xl p-8 shadow-lg team-card-hover border border-gray-100 group relative overflow-hidden hover:border-blue-200">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="relative mb-6">
-                    <div className="w-24 h-24 mx-auto relative">
-                      <img 
-                        src={member.image} 
-                        alt={member.name}
-                        className="w-24 h-24 rounded-2xl object-cover shadow-lg group-hover:scale-110 transition-transform duration-300"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
-                    </div>
-                  </div>
-                  
-                  <div className="text-center">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>
-                    <div className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
-                      {member.role}
-                    </div>
-                    <p className="text-gray-600 leading-relaxed text-sm">{member.bio}</p>
-                  </div>
-                  
 
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Statistics Section */}
       <section className="py-16 px-4 sm:px-6 bg-gradient-to-r from-blue-600 to-indigo-600 relative overflow-hidden">
