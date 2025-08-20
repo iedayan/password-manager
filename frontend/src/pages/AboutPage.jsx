@@ -15,8 +15,6 @@ export default function AboutPage() {
     }, 300);
   }, []);
 
-
-
   const values = useMemo(() => [
     {
       icon: (
@@ -269,8 +267,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
-
 
       {/* Statistics Section */}
       <section className="py-16 px-4 sm:px-6 bg-gradient-to-r from-blue-600 to-indigo-600 relative overflow-hidden">
