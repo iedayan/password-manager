@@ -2,63 +2,146 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      width: 350px;
-      height: 400px;
+      width: 380px;
+      height: 500px;
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       color: white;
+      overflow: hidden;
     }
     
     .header {
-      padding: 20px;
+      padding: 24px 20px 20px;
       text-align: center;
-      border-bottom: 1px solid #475569;
+      border-bottom: 1px solid #334155;
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
     }
     
     .logo {
-      font-size: 24px;
-      font-weight: bold;
+      font-size: 28px;
+      font-weight: 700;
       margin-bottom: 8px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
     .subtitle {
       font-size: 14px;
       color: #94a3b8;
+      font-weight: 500;
+    }
+    
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 4px 12px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 20px;
+      font-size: 12px;
+      color: #10b981;
+    }
+    
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
     
     .content {
       padding: 20px;
+      height: calc(100% - 120px);
+      overflow-y: auto;
+    }
+    
+    .search-box {
+      width: 100%;
+      padding: 12px 16px;
+      background: #334155;
+      border: 1px solid #475569;
+      border-radius: 12px;
+      color: white;
+      font-size: 14px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+    
+    .search-box::placeholder {
+      color: #94a3b8;
+    }
+    
+    .search-box:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
     }
     
     .credential-item {
       display: flex;
       align-items: center;
-      padding: 12px;
+      padding: 14px 16px;
       margin-bottom: 8px;
       background: #334155;
-      border-radius: 8px;
+      border: 1px solid transparent;
+      border-radius: 12px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
     }
     
     .credential-item:hover {
       background: #475569;
+      border-color: #3b82f6;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .credential-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    .credential-item:hover::before {
+      opacity: 1;
     }
     
     .credential-icon {
-      width: 32px;
-      height: 32px;
-      background: #3b82f6;
-      border-radius: 6px;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-right: 12px;
+      margin-right: 14px;
       font-size: 16px;
+      font-weight: 600;
+      color: white;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
     }
     
     .credential-info {
@@ -66,41 +149,149 @@
     }
     
     .credential-site {
-      font-weight: 500;
-      margin-bottom: 2px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 15px;
     }
     
     .credential-username {
-      font-size: 12px;
+      font-size: 13px;
       color: #94a3b8;
+      font-weight: 400;
+    }
+    
+    .credential-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+    
+    .action-btn {
+      width: 28px;
+      height: 28px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 12px;
+    }
+    
+    .action-btn:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
     }
     
     .no-credentials {
       text-align: center;
-      padding: 40px 20px;
+      padding: 60px 20px;
       color: #94a3b8;
+    }
+    
+    .no-credentials-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.7;
+    }
+    
+    .no-credentials-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #e2e8f0;
+    }
+    
+    .no-credentials-subtitle {
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 24px;
     }
     
     .open-vault-btn {
       width: 100%;
-      padding: 12px;
-      background: #3b82f6;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
       color: white;
       border: none;
-      border-radius: 8px;
-      font-weight: 500;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 14px;
       cursor: pointer;
       margin-top: 16px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
     
     .open-vault-btn:hover {
-      background: #2563eb;
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    }
+    
+    .quick-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .quick-action-btn {
+      flex: 1;
+      padding: 10px 12px;
+      background: #334155;
+      border: 1px solid #475569;
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    
+    .quick-action-btn:hover {
+      background: #475569;
+      border-color: #3b82f6;
+      color: white;
+    }
+    
+    .footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 20px;
+      background: #1e293b;
+      border-top: 1px solid #334155;
+    }
+    
+    .footer-text {
+      font-size: 11px;
+      color: #64748b;
+      text-align: center;
     }
     
     .loading {
       text-align: center;
-      padding: 40px;
+      padding: 60px 20px;
       color: #94a3b8;
+    }
+    
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #334155;
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -108,28 +299,43 @@
   <div class="header">
     <div class="logo">🔐 Lok</div>
     <div class="subtitle">Password Manager</div>
+    <div class="status-indicator">
+      <div class="status-dot"></div>
+      <span>Secure</span>
+    </div>
   </div>
   
   <div class="content">
     <div id="loading" class="loading">
-      Loading credentials...
+      <div class="loading-spinner"></div>
+      <div>Loading credentials...</div>
     </div>
     
     <div id="credentials" style="display: none;">
-      <!-- Credentials will be populated here -->
+      <input type="text" class="search-box" placeholder="Search credentials..." id="search-input">
+      <div class="quick-actions">
+        <button class="quick-action-btn" onclick="generatePassword()">Generate</button>
+        <button class="quick-action-btn" onclick="autoFillCurrent()">Auto-fill</button>
+        <button class="quick-action-btn" onclick="addNew()">Add New</button>
+      </div>
+      <div id="credentials-list">
+        <!-- Credentials will be populated here -->
+      </div>
     </div>
     
     <div id="no-credentials" class="no-credentials" style="display: none;">
-      <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
-      <div>No credentials found for this site</div>
+      <div class="no-credentials-icon">🔍</div>
+      <div class="no-credentials-title">No credentials found</div>
+      <div class="no-credentials-subtitle">No saved passwords for this site.<br>Add one to get started!</div>
       <button class="open-vault-btn" onclick="openVault()">
         Open Password Vault
       </button>
     </div>
     
-    <button class="open-vault-btn" onclick="openVault()">
-      Open Vault
-    </button>
+  </div>
+  
+  <div class="footer">
+    <div class="footer-text">Lok Password Manager • Secure & Private</div>
   </div>
   
   <script src="popup.js"></script>

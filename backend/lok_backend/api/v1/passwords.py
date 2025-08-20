@@ -2,7 +2,7 @@
 
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from ..middleware.subscription import check_password_limit, require_feature
+from ...middleware.subscription import check_password_limit, require_feature
 from datetime import datetime, timezone
 from pydantic import ValidationError
 from sqlalchemy import or_

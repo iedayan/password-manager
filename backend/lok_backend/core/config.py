@@ -42,11 +42,12 @@ class ProductionConfig(Config):
 
     DEBUG = False
 
-    # Ensure required environment variables are set
-    if not os.environ.get("SECRET_KEY"):
-        raise ValueError("SECRET_KEY environment variable must be set")
-    if not os.environ.get("JWT_SECRET_KEY"):
-        raise ValueError("JWT_SECRET_KEY environment variable must be set")
+    def __init__(self):
+        # Ensure required environment variables are set
+        if not os.environ.get("SECRET_KEY"):
+            raise ValueError("SECRET_KEY environment variable must be set")
+        if not os.environ.get("JWT_SECRET_KEY"):
+            raise ValueError("JWT_SECRET_KEY environment variable must be set")
 
 
 class TestingConfig(Config):

@@ -2,12 +2,15 @@
   "manifest_version": 3,
   "name": "Lok Password Manager",
   "version": "1.0.0",
-  "description": "Secure password management with auto-fill and form detection",
+  "description": "AI-powered password manager with auto-fill, breach detection, and zero-knowledge security",
   
   "permissions": [
     "activeTab",
     "storage",
-    "tabs"
+    "tabs",
+    "notifications",
+    "contextMenus",
+    "scripting"
   ],
   
   "host_permissions": [
@@ -22,7 +25,13 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["src/content/form-detector.js", "src/content/auto-fill.js"],
+      "js": [
+        "src/utils/api.js",
+        "src/content/form-detector.js", 
+        "src/content/auto-fill.js",
+        "src/content/content.js"
+      ],
+      "css": ["src/content/styles.css"],
       "run_at": "document_end"
     }
   ],
@@ -33,15 +42,37 @@
   },
   
   "icons": {
-    "16": "assets/icon-16.png",
-    "48": "assets/icon-48.png",
-    "128": "assets/icon-128.png"
+    "16": "assets/icon16.png",
+    "32": "assets/icon32.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
   },
   
   "web_accessible_resources": [
     {
-      "resources": ["src/content/*"],
+      "resources": [
+        "src/content/*",
+        "src/popup/*",
+        "assets/*"
+      ],
       "matches": ["http://*/*", "https://*/*"]
     }
-  ]
+  ],
+  
+  "commands": {
+    "auto-fill": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+L",
+        "mac": "Command+Shift+L"
+      },
+      "description": "Auto-fill login form"
+    },
+    "open-vault": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+V",
+        "mac": "Command+Shift+V"
+      },
+      "description": "Open password vault"
+    }
+  }
 }
