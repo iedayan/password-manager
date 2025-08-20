@@ -1,73 +1,102 @@
-# Lok Password Manager Tests
+# Backend Testing Guide
+
+Comprehensive test suite for the Lok Password Manager backend.
 
 ## Test Structure
 
-```
-tests/
-├── integration/        # Full API integration tests
-├── unit/              # Unit tests for individual components
-├── ai/                # AI features testing
-└── fixtures/          # Test data and fixtures
-```
+### Core Tests
+- `test_auth_comprehensive.py` - Authentication and JWT tests
+- `test_passwords_comprehensive.py` - Password CRUD and management
+- `test_security_comprehensive.py` - Security dashboard and 2FA
+- `test_user_management.py` - User profile and session management
+- `test_health_endpoints.py` - Health checks and monitoring
+- `test_integration_comprehensive.py` - End-to-end workflows
+
+### Configuration
+- `conftest.py` - Test fixtures and configuration
+- `pytest.ini` - Pytest settings and markers
+- `run_comprehensive_tests.py` - Test runner with coverage
 
 ## Running Tests
 
-### Integration Tests
 ```bash
-# Basic backend functionality
-python3 tests/integration/test_backend.py
+# Run all comprehensive tests
+python run_comprehensive_tests.py
 
-# Full API integration test
-python3 -m pytest tests/integration/
-```
+# Run specific test category
+pytest test_auth_comprehensive.py -v
+pytest test_security_comprehensive.py -v
 
-### AI Features Tests
-```bash
-# Comprehensive AI features test
-python3 tests/ai/test_ai_features.py
+# Run with coverage report
+pytest --cov=lok_backend --cov-report=html --cov-report=term-missing
 
-# Simple AI demo
-python3 tests/ai/test_ai_simple.py
-```
+# Run integration tests only
+pytest -m integration
 
-### Unit Tests
-```bash
-# Run all unit tests
-python3 -m pytest tests/unit/
-
-# Run specific test file
-python3 -m pytest tests/unit/test_auth.py
+# Run excluding slow tests
+pytest -m "not slow"
 ```
 
 ## Test Categories
 
+### Authentication Tests
+- User registration and validation
+- Login/logout workflows
+- JWT token management
+- Password changes and resets
+
+### Password Management Tests
+- CRUD operations
+- Encryption/decryption
+- Search and filtering
+- Bulk operations
+- Password generation
+- Statistics and analytics
+
+### Security Tests
+- Security dashboard
+- 2FA setup and verification
+- Breach checking
+- AI-powered analysis
+- Biometric authentication
+- Real-time threat monitoring
+
+### User Management Tests
+- Profile management
+- Session handling
+- Account deletion
+- Settings updates
+
 ### Integration Tests
-- **test_backend.py** - Core API functionality (auth, passwords, CRUD)
-- Full end-to-end workflow testing
-- Database integration testing
+- Complete user workflows
+- Multi-step operations
+- Error handling scenarios
+- Rate limiting validation
 
-### AI Tests
-- **test_ai_features.py** - Comprehensive AI capabilities testing
-- **test_ai_simple.py** - Quick AI features demo
-- ML-powered analysis testing
-- Behavioral monitoring tests
+### Health Tests
+- System health checks
+- Database connectivity
+- Service status monitoring
 
-### Unit Tests
-- Authentication service tests
-- Password encryption tests
-- Security middleware tests
-- Database model tests
+## Test Features
 
-## Test Requirements
+### Fixtures
+- `app` - Test Flask application
+- `client` - Test client for API calls
+- `test_user` - Pre-created test user
+- `test_password` - Sample password entry
+- `auth_headers` - Authentication headers
+- `multiple_passwords` - Multiple test passwords
 
-- Python 3.8+
-- All backend dependencies installed
-- Test database (SQLite for development)
-- Network access for AI services
+### Coverage Goals
+- **Overall**: >95% code coverage
+- **Critical paths**: 100% coverage
+- **Security functions**: 100% coverage
+- **API endpoints**: 100% coverage
 
 ## Test Data
 
-Tests use randomly generated data to avoid conflicts:
-- Random email addresses
-- Test passwords with known strength scores
-- Mock security scenarios
+- Temporary SQLite databases for isolation
+- Mock user accounts and passwords
+- Simulated security scenarios
+- Test encryption keys

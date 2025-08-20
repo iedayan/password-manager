@@ -258,7 +258,7 @@ def password_health_check():
                 continue
         
         # Perform health analysis
-        health_analysis = analyze_password_health(password_data)
+        health_analysis = SecurityAnalyzer.analyze_password_health(password_data)
         
         return jsonify(health_analysis), 200
         
