@@ -12,7 +12,13 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
+    // Sanitize error data before logging to prevent log injection
+    const sanitizedError = {
+      message: error?.message?.replace(/[\r\n\t]/g, ' ').substring(0, 200) || 'Unknown error',
+      stack: error?.stack?.replace(/[\r\n\t]/g, ' ').substring(0, 500) || 'No stack trace',
+      componentStack: errorInfo?.componentStack?.replace(/[\r\n\t]/g, ' ').substring(0, 300) || 'No component stack'
+    };
+    console.error('Error caught by boundary:', sanitizedError);
   }
 
   render() {

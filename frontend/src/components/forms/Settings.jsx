@@ -291,10 +291,15 @@ const DataSettings = ({ setLoading, setError, showSuccess, showError }) => {
 
   const parseCSV = (csvText) => {
     const lines = csvText.split('\n').filter(line => line.trim());
-    const headers = lines[0].split(',');
+    if (lines.length < 2) throw new Error('Invalid CSV format');
+    
+    const sanitizeValue = (value) => {
+      if (typeof value !== 'string') return '';
+      return value.replace(/[<>"'&]/g, '').trim();
+    };
     
     return lines.slice(1).map(line => {
-      const values = line.split(',');
+      const values = line.split(',').map(sanitizeValue);
       return {
         site_name: values[0] || '',
         site_url: values[1] || '',

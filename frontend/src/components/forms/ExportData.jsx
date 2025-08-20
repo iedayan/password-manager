@@ -37,7 +37,7 @@ const ExportData = () => {
 
       switch (exportFormat) {
         case 'json':
-          exportData = formatAsJSON(passwords, includePasswords);
+          exportData = await formatAsJSON(passwords, includePasswords);
           filename = 'lok-passwords.json';
           mimeType = 'application/json';
           break;
@@ -85,22 +85,31 @@ const ExportData = () => {
     }
   };
 
-  const formatAsJSON = (passwords, includePasswords) => {
-    const data = passwords.map(password => ({
+  const formatAsJSON = async (passwords, includePasswords) => {
+    const data = await Promise.all(passwords.map(async password => ({
       site_name: password.site_name,
       site_url: password.site_url,
       username: password.username,
-      password: includePasswords ? password.password : '[HIDDEN]',
+      password: includePasswords ? await decryptPassword(password.id) : '[HIDDEN]',
       notes: password.notes || '',
       created_at: password.created_at,
       updated_at: password.updated_at
-    }));
+    })));
 
     return JSON.stringify({
       exported_at: new Date().toISOString(),
       source: 'Lok Password Manager',
       passwords: data
     }, null, 2);
+  };
+
+  const decryptPassword = async (passwordId) => {
+    try {
+      const response = await api.passwords.decrypt(passwordId, { master_password: masterPassword });
+      return response.password;
+    } catch (error) {
+      return '[DECRYPT_ERROR]';
+    }
   };
 
   const formatAsCSV = (passwords, includePasswords) => {

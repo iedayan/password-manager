@@ -65,6 +65,9 @@ class User(db.Model):
     login_sessions = db.relationship(
         "LoginSession", backref="user", lazy=True, cascade="all, delete-orphan"
     )
+    subscription = db.relationship(
+        "Subscription", backref="user", uselist=False, cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         safe_email = "".join(

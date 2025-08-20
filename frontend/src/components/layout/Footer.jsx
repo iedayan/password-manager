@@ -119,7 +119,7 @@ export default function Footer() {
           <div className="footer-animate opacity-0">
             <h3 className="font-semibold mb-4 text-white">Company</h3>
             <ul className="space-y-3 text-gray-400">
-              <li><a href="/#about" className="hover:text-white transition-colors hover:translate-x-1 inline-block duration-300">About</a></li>
+              <li><Link to="/about" className="hover:text-white transition-colors hover:translate-x-1 inline-block duration-300">About</Link></li>
               <li><Link to="/technical" className="hover:text-white transition-colors hover:translate-x-1 inline-block duration-300">Technical</Link></li>
               <li><a href="#" className="hover:text-white transition-colors hover:translate-x-1 inline-block duration-300">Blog</a></li>
               <li><a href="#" className="hover:text-white transition-colors hover:translate-x-1 inline-block duration-300">Careers</a></li>

@@ -2,6 +2,7 @@
 
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from ..middleware.subscription import require_feature
 import pyotp
 import qrcode
 import io
@@ -16,6 +17,7 @@ two_factor_bp = Blueprint("two_factor", __name__)
 
 @two_factor_bp.route("/setup", methods=["POST"])
 @jwt_required()
+@require_feature('2fa')
 @limiter.limit("3 per minute")
 def setup_2fa():
     """Setup TOTP 2FA for user."""

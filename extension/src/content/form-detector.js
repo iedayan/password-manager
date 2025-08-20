@@ -222,7 +222,7 @@ class FormDetector {
       const button = document.createElement('button');
       button.className = 'lok-autofill-btn';
       button.type = 'button';
-      button.innerHTML = '🔐';
+      button.textContent = '🔐'; // Use textContent instead of innerHTML
       button.style.cssText = `
         position: absolute;
         right: 5px;
@@ -252,8 +252,8 @@ class FormDetector {
   
   addSubmitListener(form, formData) {
     form.addEventListener('submit', (e) => {
-      const username = formData.usernameField?.value;
-      const password = formData.passwordField?.value;
+      const username = this.sanitizeInput(formData.usernameField?.value);
+      const password = this.sanitizeInput(formData.passwordField?.value);
       
       if (username && password) {
         this.notifyBackground('form_submitted', {
@@ -265,6 +265,11 @@ class FormDetector {
         });
       }
     });
+  }
+  
+  sanitizeInput(input) {
+    if (typeof input !== 'string') return '';
+    return input.replace(/[<>"'&]/g, '').trim();
   }
   
   requestAutoFill(formData) {

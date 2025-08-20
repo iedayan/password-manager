@@ -2,6 +2,7 @@
 
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from ..middleware.subscription import check_password_limit, require_feature
 from datetime import datetime, timezone
 from pydantic import ValidationError
 from sqlalchemy import or_
@@ -74,6 +75,7 @@ def get_password(password_id):
 
 @passwords_bp.route("", methods=["POST"])
 @jwt_required()
+@check_password_limit
 @limiter.limit("20 per minute")
 def add_password():
     """Add a new password entry."""
@@ -902,6 +904,7 @@ def smart_monitoring():
 
 @passwords_bp.route("/import", methods=["POST"])
 @jwt_required()
+@require_feature('import_export')
 @limiter.limit("5 per minute")
 def import_passwords():
     """Import passwords from various password managers."""
