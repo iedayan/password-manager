@@ -153,20 +153,20 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl w-full max-w-lg relative overflow-hidden my-8 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4 overflow-y-auto">
+      <div className="bg-white/95 backdrop-blur-xl border border-white/20 rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-lg relative overflow-hidden my-4 sm:my-8 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         {/* Gradient Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-white/50 to-indigo-50/50"></div>
         <div className="relative z-10">
-          <div className="flex items-center justify-between p-6 border-b border-white/20">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/20">
+            <div className="flex items-center gap-2 sm:gap-3">
               {favicon && (
-                <img src={favicon} alt="Site favicon" className="w-8 h-8 rounded-lg" onError={(e) => e.target.style.display = 'none'} />
+                <img src={favicon} alt="Site favicon" className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg" onError={(e) => e.target.style.display = 'none'} />
               )}
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">Add New Password</h2>
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Add New Password</h2>
                 {detectedSite && (
-                  <p className="text-sm text-gray-600">for {detectedSite.name}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">for {detectedSite.name}</p>
                 )}
               </div>
             </div>
@@ -178,8 +178,8 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
             </button>
           </div>
 
-        <div className="max-h-[calc(90vh-8rem)] overflow-y-auto">
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 relative z-10">
+        <div className="max-h-[calc(95vh-6rem)] sm:max-h-[calc(90vh-8rem)] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5 relative z-10">
           {loading && <LoadingSpinner text="Adding password..." />}
           
           {error && (
@@ -188,7 +188,7 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
                 <SparklesIcon className="w-4 h-4" />
@@ -314,7 +314,7 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
             </div>
             
             {passwordOptions.length > 0 && (
-              <div className="mb-4 p-4 bg-blue-50/70 backdrop-blur-sm rounded-xl border border-blue-200">
+              <div className="mb-4 p-3 sm:p-4 bg-blue-50/70 backdrop-blur-sm rounded-xl border border-blue-200">
                 <p className="text-xs text-blue-700 mb-2 font-medium">Choose a password:</p>
                 <div className="space-y-2">
                   {passwordOptions.map((pwd, index) => (
@@ -322,9 +322,9 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
                       key={index}
                       type="button"
                       onClick={() => selectPassword(pwd)}
-                      className="w-full text-left p-2 bg-white/70 hover:bg-white rounded-lg border border-blue-200 hover:border-blue-300 transition-all text-sm font-mono"
+                      className="w-full text-left p-2 bg-white/70 hover:bg-white rounded-lg border border-blue-200 hover:border-blue-300 transition-all text-xs sm:text-sm font-mono break-all"
                     >
-                      {pwd.substring(0, 20)}...
+                      {pwd.substring(0, window.innerWidth < 640 ? 15 : 20)}...
                     </button>
                   ))}
                 </div>
@@ -364,28 +364,29 @@ const AddPasswordModal = ({ isOpen, onClose, onAdd }) => {
             />
           </div>
 
-          <div className="flex gap-3 pt-6 border-t border-white/20">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t border-white/20">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl hover:bg-white/50 transition-all backdrop-blur-sm font-medium"
+              className="w-full sm:flex-1 px-4 sm:px-6 py-3 border border-gray-200 text-gray-700 rounded-xl hover:bg-white/50 transition-all backdrop-blur-sm font-medium text-sm sm:text-base"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || (formData.password && passwordStrength.score < 40)}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg font-medium"
+              className="w-full sm:flex-1 px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg font-medium text-sm sm:text-base"
             >
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Adding...
+                  <span className="hidden sm:inline">Adding...</span>
                 </>
               ) : (
                 <>
                   {passwordStrength.score >= 60 && <CheckCircleIcon className="w-4 h-4" />}
-                  Add Password
+                  <span className="sm:hidden">Add</span>
+                  <span className="hidden sm:inline">Add Password</span>
                   <ArrowRightIcon className="w-4 h-4" />
                 </>
               )}

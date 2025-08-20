@@ -63,7 +63,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-3 sm:p-4 relative overflow-hidden">
       {/* Security-themed background */}
       <div className="absolute inset-0">
         {/* Hexagonal security pattern */}
@@ -129,7 +129,7 @@ const Login = () => {
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-indigo-100/30 to-transparent rounded-full transform -translate-x-24 translate-y-24" />
       </div>
 
-      <div className="relative w-full max-w-sm">
+      <div className="relative w-full max-w-sm mx-auto">
         {/* Back Button */}
         <div className="mb-4">
           <button
@@ -144,7 +144,7 @@ const Login = () => {
         </div>
 
         {/* Main Card */}
-        <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-blue-100/50 p-6 relative">
+        <div className="bg-white/90 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-2xl border border-blue-100/50 p-4 sm:p-6 relative">
           {/* Security badge */}
           <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg">
             <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -152,9 +152,9 @@ const Login = () => {
             </svg>
           </div>
           {/* Logo */}
-          <div className="flex justify-center mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 32 32">
+          <div className="flex justify-center mb-4 sm:mb-6">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" viewBox="0 0 32 32">
                 <path d="M16 3l10 4v8c0 7-4 14-10 16-6-2-10-9-10-16V7l10-4z" fill="white" opacity="0.95"/>
                 <rect x="12" y="16" width="8" height="7" rx="1.5" fill="#3b82f6"/>
                 <path d="M13 16V12c0-1.7 1.3-3 3-3s3 1.3 3 3v4" stroke="#3b82f6" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
@@ -164,8 +164,8 @@ const Login = () => {
           </div>
 
           {/* Header */}
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+          <div className="text-center mb-4 sm:mb-6">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
               {isLogin ? 'Welcome back' : 'Create account'}
             </h1>
             <p className="text-gray-600 text-sm">
@@ -181,7 +181,7 @@ const Login = () => {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             {/* Email Field */}
             <div>
               <input

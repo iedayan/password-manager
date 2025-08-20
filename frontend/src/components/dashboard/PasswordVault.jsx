@@ -284,82 +284,82 @@ const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassw
       
       {/* Header with Stats */}
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-5">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-5 gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-white">Password Vault</h1>
-            <p className="text-slate-300 text-sm mt-1">Secure storage for all your passwords</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-white">Password Vault</h1>
+            <p className="text-slate-300 text-sm mt-1 hidden sm:block">Secure storage for all your passwords</p>
           </div>
-          <div className="text-right">
-            <span className="text-2xl font-bold text-blue-400">{stats.total}</span>
+          <div className="text-left sm:text-right">
+            <span className="text-xl sm:text-2xl font-bold text-blue-400">{stats.total}</span>
             <p className="text-xs text-slate-400">Total passwords</p>
           </div>
         </div>
         
         {/* Password Health Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
-          <div className="bg-slate-700/80 border border-slate-600/60 rounded-xl p-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mb-6">
+          <div className="bg-slate-700/80 border border-slate-600/60 rounded-lg sm:rounded-xl p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-slate-300 uppercase tracking-wide">Total</p>
-                <p className="text-xl font-bold text-white">{stats.total}</p>
+                <p className="text-lg sm:text-xl font-bold text-white">{stats.total}</p>
               </div>
-              <div className="w-8 h-8 bg-slate-600 rounded-lg flex items-center justify-center">
-                <ShieldExclamationIcon className="w-5 h-5 text-slate-300" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-slate-600 rounded-lg flex items-center justify-center">
+                <ShieldExclamationIcon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
               </div>
             </div>
           </div>
-          <div className="bg-green-900/60 border border-green-700/60 rounded-xl p-4">
+          <div className="bg-green-900/60 border border-green-700/60 rounded-lg sm:rounded-xl p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-green-300 uppercase tracking-wide">Strong</p>
-                <p className="text-xl font-bold text-green-200">{stats.strong}</p>
+                <p className="text-lg sm:text-xl font-bold text-green-200">{stats.strong}</p>
               </div>
-              <div className="w-8 h-8 bg-green-800 rounded-lg flex items-center justify-center">
-                <CheckCircleIcon className="w-5 h-5 text-green-400" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-800 rounded-lg flex items-center justify-center">
+                <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
               </div>
             </div>
           </div>
-          <div className="bg-yellow-900/60 border border-yellow-700/60 rounded-xl p-4">
+          <div className="bg-yellow-900/60 border border-yellow-700/60 rounded-lg sm:rounded-xl p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-yellow-300 uppercase tracking-wide">Medium</p>
-                <p className="text-xl font-bold text-yellow-200">{stats.medium}</p>
+                <p className="text-lg sm:text-xl font-bold text-yellow-200">{stats.medium}</p>
               </div>
-              <div className="w-8 h-8 bg-yellow-800 rounded-lg flex items-center justify-center">
-                <ExclamationTriangleIcon className="w-5 h-5 text-yellow-400" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-yellow-800 rounded-lg flex items-center justify-center">
+                <ExclamationTriangleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
               </div>
             </div>
           </div>
-          <div className="bg-red-900/60 border border-red-700/60 rounded-xl p-4">
+          <div className="bg-red-900/60 border border-red-700/60 rounded-lg sm:rounded-xl p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-red-300 uppercase tracking-wide">Weak</p>
-                <p className="text-xl font-bold text-red-200">{stats.weak}</p>
+                <p className="text-lg sm:text-xl font-bold text-red-200">{stats.weak}</p>
               </div>
-              <div className="w-8 h-8 bg-red-800 rounded-lg flex items-center justify-center">
-                <ExclamationTriangleIcon className="w-5 h-5 text-red-400" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-red-800 rounded-lg flex items-center justify-center">
+                <ExclamationTriangleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
               </div>
             </div>
           </div>
-          <div className="bg-orange-900/60 border border-orange-700/60 rounded-xl p-4">
+          <div className="bg-orange-900/60 border border-orange-700/60 rounded-lg sm:rounded-xl p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-orange-300 uppercase tracking-wide">Duplicates</p>
-                <p className="text-xl font-bold text-orange-200">{stats.duplicates}</p>
+                <p className="text-lg sm:text-xl font-bold text-orange-200">{stats.duplicates}</p>
               </div>
-              <div className="w-8 h-8 bg-orange-800 rounded-lg flex items-center justify-center">
-                <ClipboardIcon className="w-5 h-5 text-orange-400" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-orange-800 rounded-lg flex items-center justify-center">
+                <ClipboardIcon className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
               </div>
             </div>
           </div>
-          <div className="bg-purple-900/60 border border-purple-700/60 rounded-xl p-4">
+          <div className="bg-purple-900/60 border border-purple-700/60 rounded-lg sm:rounded-xl p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-purple-300 uppercase tracking-wide">Old</p>
-                <p className="text-xl font-bold text-purple-200">{stats.old}</p>
+                <p className="text-lg sm:text-xl font-bold text-purple-200">{stats.old}</p>
               </div>
-              <div className="w-8 h-8 bg-purple-800 rounded-lg flex items-center justify-center">
-                <ClockIcon className="w-5 h-5 text-purple-400" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-800 rounded-lg flex items-center justify-center">
+                <ClockIcon className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
               </div>
             </div>
           </div>
@@ -421,7 +421,7 @@ const PasswordVault = ({ showAddForm, setShowAddForm, onImportClick, onEditPassw
       </div>
 
       {/* Password List */}
-      <div className={isMobile ? 'space-y-3' : (viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2')}>
+      <div className={isMobile ? 'space-y-3' : (viewMode === 'grid' ? 'grid grid-cols-1 lg:grid-cols-2 gap-3' : 'space-y-2')}>
         {filteredPasswords.map((password) => 
           isMobile ? (
             <MobilePasswordCard
@@ -702,9 +702,9 @@ const MasterKeyModal = ({ passwordId, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white/95 backdrop-blur-md rounded-2xl p-6 w-full max-w-sm border border-gray-200/60 shadow-2xl">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900">Enter Master Key</h3>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white/95 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 w-full max-w-sm border border-gray-200/60 shadow-2xl">
+        <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-900">Enter Master Key</h3>
         <form onSubmit={handleSubmit}>
           <input
             type="password"
@@ -715,18 +715,18 @@ const MasterKeyModal = ({ passwordId, onClose, onSuccess }) => {
             autoFocus
             required
           />
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2.5 rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 transition-all text-sm font-medium"
+              className="w-full sm:flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2.5 rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 transition-all text-sm font-medium"
             >
               {loading ? 'Decrypting...' : 'Reveal'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-xl hover:bg-gray-200 transition-colors text-sm font-medium"
+              className="w-full sm:flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-xl hover:bg-gray-200 transition-colors text-sm font-medium"
             >
               Cancel
             </button>
