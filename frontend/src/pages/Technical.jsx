@@ -122,53 +122,130 @@ export default function Technical() {
   );
 
   const EncryptionSection = () => (
-    <div className="space-y-8">
-      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-200">
-        <h3 className="text-2xl font-bold text-gray-900 mb-6">Encryption Implementation</h3>
-        <div className="grid md:grid-cols-2 gap-8">
-          <div>
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Encryption Flow</h4>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
-                <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
-                <span className="text-gray-700">Master password entered</span>
-              </div>
-              <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
-                <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
-                <span className="text-gray-700">Key derived using PBKDF2</span>
-              </div>
-              <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
-                <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
-                <span className="text-gray-700">Data encrypted with AES-256</span>
-              </div>
-              <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
-                <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">4</div>
-                <span className="text-gray-700">Encrypted blob sent to server</span>
-              </div>
+    <div className="space-y-12">
+      <div className="relative bg-gradient-to-br from-white via-emerald-50/50 to-green-50 rounded-3xl p-12 border border-emerald-200/50 shadow-2xl backdrop-blur-sm overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-green-500/10 to-emerald-500/10 rounded-full blur-xl"></div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-600 to-green-600 rounded-2xl flex items-center justify-center shadow-xl">
+              <div className="w-8 h-8 bg-white/20 rounded-lg backdrop-blur-sm"></div>
+            </div>
+            <div>
+              <h3 className="text-3xl font-black text-gray-900 mb-2">Encryption Implementation</h3>
+              <p className="text-emerald-600 font-semibold">Advanced Cryptographic Protection</p>
             </div>
           </div>
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <h4 className="text-lg font-semibold mb-4">Technical Specifications</h4>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Algorithm:</span>
-                <span className="font-mono">AES-256-GCM</span>
+          
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div>
+              <h4 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg"></div>
+                Encryption Flow
+              </h4>
+              <div className="space-y-4">
+                <div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-lg group-hover:scale-110 transition-transform">
+                      1
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="text-lg font-bold text-gray-900 mb-2">Master Password Entry</h5>
+                      <p className="text-gray-600 leading-relaxed">Secure input with client-side validation</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-lg group-hover:scale-110 transition-transform">
+                      2
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="text-lg font-bold text-gray-900 mb-2">Key Derivation</h5>
+                      <p className="text-gray-600 leading-relaxed">PBKDF2-SHA256 with 100,000+ iterations</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-lg group-hover:scale-110 transition-transform">
+                      3
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="text-lg font-bold text-gray-900 mb-2">AES-256 Encryption</h5>
+                      <p className="text-gray-600 leading-relaxed">Military-grade symmetric encryption</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-lg group-hover:scale-110 transition-transform">
+                      4
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="text-lg font-bold text-gray-900 mb-2">Secure Transmission</h5>
+                      <p className="text-gray-600 leading-relaxed">Encrypted payload sent via TLS 1.3</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Key Derivation:</span>
-                <span className="font-mono">PBKDF2-SHA256</span>
+            </div>
+            
+            <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-8 shadow-xl border border-gray-200/50">
+              <h4 className="text-xl font-bold mb-6 flex items-center gap-3">
+                <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-green-500 rounded-lg"></div>
+                Technical Specifications
+              </h4>
+              <div className="space-y-6">
+                <div className="group p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200/50 hover:shadow-md transition-all">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-gray-700 font-medium">Algorithm:</span>
+                    <span className="font-mono text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-lg">AES-256-GCM</span>
+                  </div>
+                  <p className="text-sm text-gray-500 italic">Authenticated encryption mode</p>
+                </div>
+                <div className="group p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200/50 hover:shadow-md transition-all">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-gray-700 font-medium">Key Derivation:</span>
+                    <span className="font-mono text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-lg">PBKDF2-SHA256</span>
+                  </div>
+                  <p className="text-sm text-gray-500 italic">Industry standard KDF</p>
+                </div>
+                <div className="group p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200/50 hover:shadow-md transition-all">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-gray-700 font-medium">Iterations:</span>
+                    <span className="font-mono text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-lg">100,000+</span>
+                  </div>
+                  <p className="text-sm text-gray-500 italic">Brute force protection</p>
+                </div>
+                <div className="group p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200/50 hover:shadow-md transition-all">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-gray-700 font-medium">Salt Length:</span>
+                    <span className="font-mono text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-lg">32 bytes</span>
+                  </div>
+                  <p className="text-sm text-gray-500 italic">Cryptographically secure</p>
+                </div>
+                <div className="group p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200/50 hover:shadow-md transition-all">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-gray-700 font-medium">IV Length:</span>
+                    <span className="font-mono text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-lg">12 bytes</span>
+                  </div>
+                  <p className="text-sm text-gray-500 italic">GCM mode requirement</p>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Iterations:</span>
-                <span className="font-mono">100,000+</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Salt Length:</span>
-                <span className="font-mono">32 bytes</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">IV Length:</span>
-                <span className="font-mono">12 bytes</span>
+              
+              <div className="mt-8 p-6 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border border-emerald-200/50">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-500 rounded-lg flex items-center justify-center">
+                    <div className="w-4 h-4 bg-white/30 rounded"></div>
+                  </div>
+                  <h5 className="font-bold text-emerald-800">Security Guarantee</h5>
+                </div>
+                <p className="text-emerald-700 text-sm leading-relaxed">
+                  Our encryption implementation provides <strong>256-bit security</strong> with authenticated encryption, 
+                  ensuring both confidentiality and integrity of your sensitive data.
+                </p>
               </div>
             </div>
           </div>
@@ -178,64 +255,102 @@ export default function Technical() {
   );
 
   const InfrastructureSection = () => (
-    <div className="space-y-8">
-      <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-8 border border-purple-200">
-        <h3 className="text-2xl font-bold text-gray-900 mb-6">Infrastructure & Architecture</h3>
-        <div className="grid md:grid-cols-2 gap-8">
-          <div>
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Technology Stack</h4>
-            <div className="space-y-3">
-              <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                  <div className="w-6 h-6 bg-white/20 rounded-lg"></div>
+    <div className="space-y-12">
+      <div className="relative bg-gradient-to-br from-white via-purple-50/50 to-violet-50 rounded-3xl p-12 border border-purple-200/50 shadow-2xl backdrop-blur-sm overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/10 to-violet-500/10 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-violet-500/10 to-purple-500/10 rounded-full blur-xl"></div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-violet-600 rounded-2xl flex items-center justify-center shadow-xl">
+              <div className="w-8 h-8 bg-white/20 rounded-lg backdrop-blur-sm"></div>
+            </div>
+            <div>
+              <h3 className="text-3xl font-black text-gray-900 mb-2">Infrastructure & Architecture</h3>
+              <p className="text-purple-600 font-semibold">Enterprise-Grade Technology Stack</p>
+            </div>
+          </div>
+          
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div>
+              <h4 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg"></div>
+                Technology Stack
+              </h4>
+              <div className="space-y-4">
+                <div className="group relative bg-gradient-to-br from-white to-blue-50 rounded-2xl p-6 shadow-xl border border-blue-200/50 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <div className="w-8 h-8 bg-white/30 rounded-xl"></div>
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="text-xl font-black text-gray-900 mb-2">Python Flask Backend</h5>
+                      <p className="text-gray-600 leading-relaxed">High-performance RESTful API with SQLAlchemy ORM and advanced caching</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-bold text-lg text-gray-900">Backend: Python Flask</div>
-                  <div className="text-gray-600">RESTful API with SQLAlchemy ORM</div>
+                <div className="group relative bg-gradient-to-br from-white to-cyan-50 rounded-2xl p-6 shadow-xl border border-cyan-200/50 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <div className="w-8 h-8 bg-white/30 rounded-xl"></div>
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="text-xl font-black text-gray-900 mb-2">React Frontend</h5>
+                      <p className="text-gray-600 leading-relaxed">Modern SPA with Tailwind CSS, optimized for performance and accessibility</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center">
-                  <div className="w-6 h-6 bg-white/20 rounded-lg"></div>
-                </div>
-                <div>
-                  <div className="font-bold text-lg text-gray-900">Frontend: React</div>
-                  <div className="text-gray-600">Modern SPA with Tailwind CSS</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
-                  <div className="w-6 h-6 bg-white/20 rounded-lg"></div>
-                </div>
-                <div>
-                  <div className="font-bold text-lg text-gray-900">Database: PostgreSQL</div>
-                  <div className="text-gray-600">Encrypted at rest with backups</div>
+                <div className="group relative bg-gradient-to-br from-white to-emerald-50 rounded-2xl p-6 shadow-xl border border-emerald-200/50 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <div className="w-8 h-8 bg-white/30 rounded-xl"></div>
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="text-xl font-black text-gray-900 mb-2">PostgreSQL Database</h5>
+                      <p className="text-gray-600 leading-relaxed">Enterprise database with encryption at rest, automated backups, and replication</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div>
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Security Measures</h4>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                <span className="text-gray-700">TLS 1.3 encryption in transit</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                <span className="text-gray-700">Rate limiting and DDoS protection</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                <span className="text-gray-700">JWT authentication with expiration</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                <span className="text-gray-700">Input validation and sanitization</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                <span className="text-gray-700">Security headers (HSTS, CSP)</span>
+            
+            <div>
+              <h4 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg"></div>
+                Security Measures
+              </h4>
+              <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-8 shadow-xl border border-gray-200/50">
+                <div className="space-y-4">
+                  {[
+                    { title: 'TLS 1.3 Encryption', desc: 'Latest transport layer security protocol', icon: 'from-blue-500 to-blue-600' },
+                    { title: 'DDoS Protection', desc: 'Advanced rate limiting and traffic analysis', icon: 'from-red-500 to-red-600' },
+                    { title: 'JWT Authentication', desc: 'Stateless tokens with automatic expiration', icon: 'from-yellow-500 to-orange-500' },
+                    { title: 'Input Validation', desc: 'Comprehensive sanitization and SQL injection prevention', icon: 'from-green-500 to-emerald-500' },
+                    { title: 'Security Headers', desc: 'HSTS, CSP, and OWASP compliance measures', icon: 'from-purple-500 to-violet-500' }
+                  ].map((item, index) => (
+                    <div key={index} className="group flex items-start gap-4 p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200/50 hover:shadow-md transition-all">
+                      <div className={`w-10 h-10 bg-gradient-to-br ${item.icon} rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+                        <div className="w-5 h-5 bg-white/30 rounded-lg"></div>
+                      </div>
+                      <div className="flex-1">
+                        <h5 className="font-bold text-gray-900 mb-1">{item.title}</h5>
+                        <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-6 p-4 bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl border border-purple-200/50">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-violet-500 rounded-lg flex items-center justify-center">
+                      <div className="w-3 h-3 bg-white/30 rounded"></div>
+                    </div>
+                    <h5 className="font-bold text-purple-800">Enterprise Ready</h5>
+                  </div>
+                  <p className="text-purple-700 text-sm leading-relaxed">
+                    Our infrastructure meets enterprise security standards with <strong>99.9% uptime SLA</strong> and comprehensive monitoring.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -317,62 +432,119 @@ export default function Technical() {
   );
 
   const PerformanceSection = () => (
-    <div className="space-y-8">
-      <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-8 border border-yellow-200">
-        <h3 className="text-2xl font-bold text-gray-900 mb-6">Performance & Reliability</h3>
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="text-center p-6 bg-white rounded-xl shadow-sm">
-            <div className="text-4xl font-bold text-green-600 mb-2">99.9%</div>
-            <div className="text-lg font-semibold mb-1">Uptime SLA</div>
-            <div className="text-sm text-gray-600">Guaranteed availability</div>
+    <div className="space-y-12">
+      <div className="relative bg-gradient-to-br from-white via-amber-50/50 to-orange-50 rounded-3xl p-12 border border-amber-200/50 shadow-2xl backdrop-blur-sm overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-500/10 to-amber-500/10 rounded-full blur-xl"></div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-16 h-16 bg-gradient-to-br from-amber-600 to-orange-600 rounded-2xl flex items-center justify-center shadow-xl">
+              <div className="w-8 h-8 bg-white/20 rounded-lg backdrop-blur-sm"></div>
+            </div>
+            <div>
+              <h3 className="text-3xl font-black text-gray-900 mb-2">Performance & Reliability</h3>
+              <p className="text-amber-600 font-semibold">Enterprise-Grade Performance Metrics</p>
+            </div>
           </div>
-          <div className="text-center p-6 bg-white rounded-xl shadow-sm">
-            <div className="text-4xl font-bold text-blue-600 mb-2">&lt;200ms</div>
-            <div className="text-lg font-semibold mb-1">API Response</div>
-            <div className="text-sm text-gray-600">Average response time</div>
+          
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="group relative bg-gradient-to-br from-white to-green-50 rounded-3xl p-8 shadow-2xl border border-green-200/50 hover:shadow-3xl hover:scale-105 transition-all duration-300 text-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-600/5 to-emerald-600/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                  <div className="w-8 h-8 bg-white/30 rounded-xl"></div>
+                </div>
+                <div className="text-5xl font-black text-green-600 mb-4">99.9%</div>
+                <div className="text-xl font-bold text-gray-900 mb-2">Uptime SLA</div>
+                <div className="text-gray-600 leading-relaxed">Guaranteed availability with enterprise-grade infrastructure</div>
+              </div>
+            </div>
+            <div className="group relative bg-gradient-to-br from-white to-blue-50 rounded-3xl p-8 shadow-2xl border border-blue-200/50 hover:shadow-3xl hover:scale-105 transition-all duration-300 text-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-indigo-600/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                  <div className="w-8 h-8 bg-white/30 rounded-xl"></div>
+                </div>
+                <div className="text-5xl font-black text-blue-600 mb-4">&lt;200ms</div>
+                <div className="text-xl font-bold text-gray-900 mb-2">API Response</div>
+                <div className="text-gray-600 leading-relaxed">Lightning-fast response times with global CDN optimization</div>
+              </div>
+            </div>
+            <div className="group relative bg-gradient-to-br from-white to-purple-50 rounded-3xl p-8 shadow-2xl border border-purple-200/50 hover:shadow-3xl hover:scale-105 transition-all duration-300 text-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-violet-600/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-violet-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                  <div className="w-8 h-8 bg-white/30 rounded-xl"></div>
+                </div>
+                <div className="text-5xl font-black text-purple-600 mb-4">24/7</div>
+                <div className="text-xl font-bold text-gray-900 mb-2">Monitoring</div>
+                <div className="text-gray-600 leading-relaxed">Continuous system monitoring with proactive alerting</div>
+              </div>
+            </div>
           </div>
-          <div className="text-center p-6 bg-white rounded-xl shadow-sm">
-            <div className="text-4xl font-bold text-purple-600 mb-2">24/7</div>
-            <div className="text-lg font-semibold mb-1">Monitoring</div>
-            <div className="text-sm text-gray-600">Continuous oversight</div>
-          </div>
-        </div>
-      </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
-          <h4 className="text-lg font-semibold mb-4">Scalability</h4>
-          <ul className="space-y-3 text-gray-600">
-            <li className="flex items-start gap-3">
-              <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
-              <span>Horizontal scaling with load balancers</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
-              <span>Database replication and sharding</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
-              <span>CDN for global performance</span>
-            </li>
-          </ul>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
-          <h4 className="text-lg font-semibold mb-4">Backup & Recovery</h4>
-          <ul className="space-y-3 text-gray-600">
-            <li className="flex items-start gap-3">
-              <span className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
-              <span>Automated daily backups</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
-              <span>Point-in-time recovery</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
-              <span>Multi-region redundancy</span>
-            </li>
-          </ul>
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div className="bg-gradient-to-br from-white to-blue-50 rounded-2xl p-8 shadow-xl border border-blue-200/50">
+              <h4 className="text-xl font-bold mb-6 flex items-center gap-3">
+                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg"></div>
+                Scalability Architecture
+              </h4>
+              <div className="space-y-4">
+                {[
+                  { title: 'Horizontal Scaling', desc: 'Auto-scaling load balancers with intelligent traffic distribution', icon: 'from-blue-500 to-blue-600' },
+                  { title: 'Database Optimization', desc: 'Advanced replication, sharding, and query optimization', icon: 'from-indigo-500 to-indigo-600' },
+                  { title: 'Global CDN', desc: 'Edge caching and content delivery for worldwide performance', icon: 'from-purple-500 to-purple-600' }
+                ].map((item, index) => (
+                  <div key={index} className="group flex items-start gap-4 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200/50 hover:shadow-md transition-all">
+                    <div className={`w-10 h-10 bg-gradient-to-br ${item.icon} rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+                      <div className="w-5 h-5 bg-white/30 rounded-lg"></div>
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="font-bold text-gray-900 mb-1">{item.title}</h5>
+                      <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-white to-emerald-50 rounded-2xl p-8 shadow-xl border border-emerald-200/50">
+              <h4 className="text-xl font-bold mb-6 flex items-center gap-3">
+                <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-green-500 rounded-lg"></div>
+                Backup & Recovery
+              </h4>
+              <div className="space-y-4">
+                {[
+                  { title: 'Automated Backups', desc: 'Continuous data protection with encrypted incremental backups', icon: 'from-emerald-500 to-emerald-600' },
+                  { title: 'Point-in-Time Recovery', desc: 'Restore to any moment with granular recovery options', icon: 'from-green-500 to-green-600' },
+                  { title: 'Multi-Region Redundancy', desc: 'Geographic distribution with automatic failover capabilities', icon: 'from-teal-500 to-teal-600' }
+                ].map((item, index) => (
+                  <div key={index} className="group flex items-start gap-4 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200/50 hover:shadow-md transition-all">
+                    <div className={`w-10 h-10 bg-gradient-to-br ${item.icon} rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+                      <div className="w-5 h-5 bg-white/30 rounded-lg"></div>
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="font-bold text-gray-900 mb-1">{item.title}</h5>
+                      <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-6 p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200/50">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-6 h-6 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
+                    <div className="w-3 h-3 bg-white/30 rounded"></div>
+                  </div>
+                  <h5 className="font-bold text-amber-800">Performance Guarantee</h5>
+                </div>
+                <p className="text-amber-700 text-sm leading-relaxed">
+                  Our infrastructure delivers <strong>sub-200ms response times</strong> globally with 99.9% uptime SLA backed by enterprise monitoring.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
