@@ -55,9 +55,11 @@ const AuthButtons = () => {
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
+              className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg group"
             >
-              <span className="text-sm font-bold text-white">U</span>
+              <svg className="w-5 h-5 text-white group-hover:scale-110 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+              </svg>
             </button>
             {showUserMenu && (
               <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 animate-fade-in">
@@ -113,9 +115,11 @@ const AuthButtons = () => {
           )}
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center"
+            className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center hover:from-blue-600 hover:to-indigo-700 transition-all group"
           >
-            <span className="text-xs font-bold text-white">U</span>
+            <svg className="w-4 h-4 text-white group-hover:scale-110 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+            </svg>
           </button>
         </div>
       </>
