@@ -1,1 +1,1 @@
-# Tests package
+"""Test package for Lok Password Manager"""

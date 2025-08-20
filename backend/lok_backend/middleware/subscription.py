@@ -44,15 +44,24 @@ def check_password_limit(f):
         user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
         
-        if not user or not user.subscription:
-            return jsonify({"error": "Subscription not found"}), 404
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+            
+        # Get or create subscription
+        from ..models.subscription import Subscription
+        subscription = Subscription.query.filter_by(user_id=user_id).first()
+        if not subscription:
+            subscription = Subscription(user_id=user_id)
+            from ..core.database import db
+            db.session.add(subscription)
+            db.session.commit()
             
         # Check if user has reached password limit
-        if user.subscription.password_limit > 0:  # -1 means unlimited
+        if subscription.password_limit > 0:  # -1 means unlimited
             current_count = len(user.passwords)
-            if current_count >= user.subscription.password_limit:
+            if current_count >= subscription.password_limit:
                 return jsonify({
-                    "error": f"Password limit reached ({user.subscription.password_limit})",
+                    "error": f"Password limit reached ({subscription.password_limit})",
                     "upgrade_url": "/pricing"
                 }), 403
                 
@@ -67,8 +76,17 @@ def require_feature(feature_name):
             user_id = int(get_jwt_identity())
             user = User.query.get(user_id)
             
-            if not user or not user.subscription:
-                return jsonify({"error": "Subscription not found"}), 404
+            if not user:
+                return jsonify({"error": "User not found"}), 404
+                
+            # Get or create subscription
+            from ..models.subscription import Subscription
+            subscription = Subscription.query.filter_by(user_id=user_id).first()
+            if not subscription:
+                subscription = Subscription(user_id=user_id)
+                from ..core.database import db
+                db.session.add(subscription)
+                db.session.commit()
                 
             # Check feature access
             feature_map = {
@@ -78,7 +96,7 @@ def require_feature(feature_name):
             }
             
             if feature_name in feature_map:
-                if not getattr(user.subscription, feature_map[feature_name], False):
+                if not getattr(subscription, feature_map[feature_name], False):
                     return jsonify({
                         "error": f"Feature '{feature_name}' requires premium subscription",
                         "upgrade_url": "/pricing"

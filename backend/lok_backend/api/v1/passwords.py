@@ -119,7 +119,7 @@ def add_password():
             jsonify(
                 {
                     "message": "Password added successfully",
-                    "password": PasswordResponse.model_validate(password).model_dump(),
+                    "password": password.to_dict(),
                 }
             ),
             201,

@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Numeric
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from ..core.database import db
 
 class Subscription(db.Model):
@@ -31,7 +31,7 @@ class Subscription(db.Model):
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     
     # Relationships
-    user = relationship("User", back_populates="subscription")
+    user = relationship("User", backref="subscription")
     
     def __repr__(self):
         return f'<Subscription {self.user_id}:{self.tier}>'

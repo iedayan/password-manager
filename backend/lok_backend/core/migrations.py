@@ -22,6 +22,7 @@ def auto_migrate_columns(app, db):
                 ('biometric_credential_id', 'VARCHAR(64)'),
                 ('last_login', 'TIMESTAMP'),
                 ('last_logout', 'TIMESTAMP'),
+                ('last_sync', 'TIMESTAMP'),
                 ('last_password_change', 'TIMESTAMP'),
                 ('is_active', 'BOOLEAN DEFAULT TRUE'),
                 ('email_verified', 'BOOLEAN DEFAULT FALSE'),

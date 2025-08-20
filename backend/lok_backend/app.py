@@ -48,6 +48,7 @@ def create_app(config_name="development"):
             from .models.password import Password, PasswordUpdateLog
             from .models.login_session import LoginSession
             from .models.device import Device
+            from .models.subscription import Subscription
 
             # Create tables and run migrations
             db.create_all()

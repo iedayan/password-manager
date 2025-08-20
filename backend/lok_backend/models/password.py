@@ -12,7 +12,7 @@ class Password(db.Model):
         db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
     )
     site_name = db.Column(db.String(100), nullable=False)
-    site_url = db.Column(db.String(255), nullable=False)
+    site_url = db.Column(db.String(255), nullable=True)
     username = db.Column(db.String(100), nullable=False)
     encrypted_password = db.Column(db.Text, nullable=False)
     notes = db.Column(db.Text)
