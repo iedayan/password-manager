@@ -98,14 +98,23 @@ const Dashboard = () => {
       <div className="bg-white border-b border-gray-200 shadow-sm relative z-50">
         <div className="max-w-7xl mx-auto px-6 relative">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-semibold text-lg">L</span>
+            <button 
+              onClick={() => window.location.href = '/'}
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
+            >
+              <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" fill="none" viewBox="0 0 32 32">
+                  <path d="M16 3l10 4v8c0 7-4 14-10 16-6-2-10-9-10-16V7l10-4z" fill="white" opacity="0.95"/>
+                  <rect x="12" y="16" width="8" height="7" rx="1.5" fill="#0891b2"/>
+                  <path d="M13 16V12c0-1.7 1.3-3 3-3s3 1.3 3 3v4" stroke="#0891b2" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+                  <circle cx="16" cy="19.5" r="1.8" fill="white"/>
+                  <rect x="12.5" y="16.5" width="7" height="1" rx="0.5" fill="rgba(255,255,255,0.5)"/>
+                </svg>
               </div>
-              <h1 className="text-2xl font-semibold text-gray-900">
+              <h1 className="text-2xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                 Lok
               </h1>
-            </div>
+            </button>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-3">
                 <button
