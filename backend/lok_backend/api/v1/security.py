@@ -412,6 +412,32 @@ def security_scan():
         return jsonify({"error": "Security scan failed"}), 500
 
 
+@security_bp.route("/auto-update-reused", methods=["POST"])
+@jwt_required()
+@limiter.limit("3 per minute")
+def auto_update_reused_passwords():
+    """Automatically update reused passwords."""
+    try:
+        user_id = int(get_jwt_identity())
+        data = request.get_json() or {}
+        exclude_ids = data.get('exclude_ids', [])
+        
+        from ...services.auto_password_updater import AutoPasswordUpdater
+        
+        result = AutoPasswordUpdater.auto_update_reused_passwords(user_id, exclude_ids)
+        
+        current_app.logger.info(f"Auto-updated {result['updated_count']} reused passwords for user {user_id}")
+        
+        return jsonify({
+            **result,
+            'message': f"Successfully updated {result['updated_count']} reused passwords"
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Auto-update reused passwords failed: {str(e)}")
+        return jsonify({"error": "Auto-update failed"}), 500
+
+
 # ============================================================================
 # EXPORT WITH SECURITY
 # ============================================================================

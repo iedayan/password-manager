@@ -12,7 +12,7 @@ export default function Features() {
         </svg>
       ),
       title: 'Advanced Password Generator',
-      description: 'State-of-the-art password generation with Shannon entropy analysis, Markov chain validation, and cryptographic security.',
+      description: 'Create strong passwords in one click. Never worry about weak passwords again.',
       color: 'from-blue-500 to-indigo-500',
       bgColor: 'bg-blue-50'
     },

@@ -215,6 +215,10 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ password_ids: passwordIds })
     }),
+    autoUpdateReused: (options) => api.request('/api/v1/security/auto-update-reused', {
+      method: 'POST',
+      body: JSON.stringify(options)
+    }),
     
     // Export with security
     secureExport: (options) => api.request('/api/v1/security/export', {

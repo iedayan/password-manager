@@ -7,7 +7,7 @@ import { Login } from './components/auth';
 import { Dashboard } from './components/dashboard';
 import { SecurityPage } from './components/security';
 import { ScrollToTop } from './components/ui';
-import { About, Features, Pricing, FAQ, PrivacyPolicy, TermsOfService } from './pages';
+import { About, Features, Pricing, FAQ, PrivacyPolicy, TermsOfService, Technical } from './pages';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import { AccessibilityProvider } from './components/ui/AccessibilityProvider';
 
@@ -96,6 +96,7 @@ export default function App() {
         } />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/technical" element={<Technical />} />
         <Route path="/security" element={<SecurityPage />} />
             </Routes>
           </Router>
