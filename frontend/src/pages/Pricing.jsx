@@ -7,8 +7,10 @@ export default function Pricing() {
   const plans = [
     {
       name: "Personal",
-      price: "$6",
-      period: "/month",
+      price: "$144",
+      period: "lifetime",
+      monthlyPrice: "$6/month",
+      originalPrice: "$144",
       description: "Perfect for individuals",
       features: [
         "Unlimited passwords & secure notes",
@@ -19,13 +21,19 @@ export default function Pricing() {
         "Two-factor authentication (2FA)",
         "Email support",
         "1GB encrypted file storage",
-        "Password health dashboard"
-      ]
+        "Password health dashboard",
+        "Lifetime updates included"
+      ],
+      lifetime: true,
+      badge: "LIFETIME DEAL",
+      remaining: 500
     },
     {
       name: "Family",
-      price: "$15",
-      period: "/month",
+      price: "$360",
+      period: "lifetime",
+      monthlyPrice: "$15/month",
+      originalPrice: "$360",
       description: "AI-powered security for families",
       features: [
         "Everything in Personal",
@@ -37,14 +45,21 @@ export default function Pricing() {
         "Behavioral anomaly detection",
         "Priority chat support",
         "5GB encrypted file storage per member",
-        "Real-time breach alerts"
+        "Real-time breach alerts",
+        "Lifetime updates included"
       ],
-      popular: true
+
+      lifetime: true,
+      badge: "LIFETIME DEAL",
+      remaining: 500
     },
+
     {
       name: "Enterprise",
-      price: "$35",
-      period: "/month",
+      price: "$840",
+      period: "lifetime",
+      monthlyPrice: "$35/month",
+      originalPrice: "$840",
       description: "State-of-the-art AI security for business",
       features: [
         "Everything in Family",
@@ -59,8 +74,12 @@ export default function Pricing() {
         "Dedicated customer success manager",
         "Unlimited encrypted file storage",
         "Custom security policies",
-        "Advanced reporting & compliance"
-      ]
+        "Advanced reporting & compliance",
+        "Lifetime updates included"
+      ],
+      lifetime: true,
+      badge: "LIFETIME DEAL",
+      remaining: 500
     }
   ];
 
@@ -111,18 +130,19 @@ export default function Pricing() {
             <div 
               key={index} 
               className={`pricing-card relative p-10 bg-white rounded-3xl border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 opacity-0 group flex flex-col ${
-                plan.popular 
-                  ? 'border-blue-500 shadow-2xl scale-105 ring-4 ring-blue-100' 
+                plan.lifetime
+                  ? 'border-green-500 shadow-2xl ring-4 ring-green-100'
                   : 'border-gray-200 hover:border-blue-300 shadow-lg'
               }`}
               style={{
                 transform: `translate(${Math.max(-10, Math.min(10, (mousePosition.x - (typeof window !== 'undefined' ? window.innerWidth : 0) / 2) * 0.01))}px, ${Math.max(-10, Math.min(10, (mousePosition.y - (typeof window !== 'undefined' ? window.innerHeight : 0) / 2) * 0.01))}px)`,
               }}
             >
-              {plan.popular && (
-                <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 animate-bounce">
-                  <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg">
-                    Most Popular
+
+              {plan.lifetime && (
+                <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 animate-pulse">
+                  <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg">
+                    {plan.badge}
                   </span>
                 </div>
               )}
@@ -131,8 +151,21 @@ export default function Pricing() {
                 <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">{plan.name}</h3>
                 <p className="text-gray-600 mb-6 text-base md:text-lg">{plan.description}</p>
                 <div className="flex items-baseline justify-center mb-2">
-                  <span className="text-4xl md:text-5xl font-black text-gray-900">{plan.price}</span>
-                  <span className="text-gray-600 ml-2 text-lg md:text-xl">{plan.period}</span>
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-baseline justify-center mb-2">
+                      <span className="text-4xl md:text-5xl font-black text-gray-900">{plan.price}</span>
+                      <span className="text-gray-600 ml-2 text-lg md:text-xl">{plan.period}</span>
+                    </div>
+                    {plan.monthlyPrice && (
+                      <div className="text-sm text-gray-500 mb-2">Pay once, use forever</div>
+                    )}
+                    {plan.monthlyPrice && (
+                      <div className="text-sm text-blue-600 font-medium">Equivalent to 2 years of {plan.monthlyPrice}</div>
+                    )}
+                    {plan.remaining && (
+                      <div className="text-sm text-orange-600 font-semibold mt-2 bg-orange-50 px-3 py-1 rounded-full">{plan.remaining} spots left</div>
+                    )}
+                  </div>
                 </div>
               </div>
 

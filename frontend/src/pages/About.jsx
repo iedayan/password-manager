@@ -74,7 +74,7 @@ export default function About() {
 
         {/* Mission */}
         <div className="mb-24">
-          <div className="animate-on-scroll bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-16 text-center border border-blue-100 shadow-xl opacity-0 hover:scale-105 transition-transform duration-300">
+          <div className="animate-on-scroll bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-16 text-center border border-blue-100 shadow-xl opacity-0 hover:shadow-2xl hover:border-blue-200 transition-all duration-300">
             <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">Our Mission</h3>
             <p className="text-lg md:text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
               To make advanced cybersecurity accessible to everyone through AI-powered password management. 
@@ -91,20 +91,7 @@ export default function About() {
             {values.map((value, index) => (
               <div 
                 key={index} 
-                className="animate-on-scroll text-center p-8 bg-white rounded-3xl shadow-lg border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 opacity-0 group cursor-pointer"
-                onMouseMove={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const x = e.clientX - rect.left;
-                  const y = e.clientY - rect.top;
-                  const centerX = rect.width / 2;
-                  const centerY = rect.height / 2;
-                  const rotateX = (y - centerY) / 20;
-                  const rotateY = (centerX - x) / 20;
-                  e.currentTarget.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
-                }}
+                className="animate-on-scroll text-center p-8 bg-white rounded-3xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 opacity-0 group cursor-pointer relative"
               >
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-lg group-hover:rotate-12 group-hover:scale-110 transition-transform duration-300">
                   {value.icon}
