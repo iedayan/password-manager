@@ -1,5 +1,6 @@
 /**
  * Enhanced Popup interface for Lok Password Manager extension
+ * Optimized for performance and memory efficiency
  */
 
 class PopupInterface {
@@ -9,6 +10,8 @@ class PopupInterface {
     this.allCredentials = [];
     this.filteredCredentials = [];
     this.currentDomain = '';
+    this.cache = new Map();
+    this.performance = window.LokPerformance || { throttle: (k, f, d) => f() };
     this.init();
   }
   
@@ -35,8 +38,26 @@ class PopupInterface {
     const credentialsEl = document.getElementById('credentials');
     const noCredentialsEl = document.getElementById('no-credentials');
     
+    // Check cache first
+    const cacheKey = `credentials-${domain}`;
+    if (this.cache.has(cacheKey)) {
+      const cached = this.cache.get(cacheKey);
+      if (Date.now() - cached.timestamp < 30000) {
+        this.displayCredentials(cached.data);
+        loadingEl.style.display = 'none';
+        credentialsEl.style.display = 'block';
+        return;
+      }
+    }
+    
     try {
       const credentials = await this.getCredentialsForDomain(domain);
+      
+      // Cache the result
+      this.cache.set(cacheKey, {
+        data: credentials,
+        timestamp: Date.now()
+      });
       
       loadingEl.style.display = 'none';
       
@@ -97,35 +118,66 @@ class PopupInterface {
     const container = document.getElementById('credentials-list');
     if (!container) return;
     
-    container.innerHTML = '';
+    // Use DocumentFragment for better performance
+    const fragment = document.createDocumentFragment();
     
     this.filteredCredentials.forEach(credential => {
       const item = document.createElement('div');
       item.className = 'credential-item';
+      item.dataset.id = credential.id;
       
-      item.innerHTML = `
-        <div class="credential-icon">
-          ${this.getCredentialIcon(credential)}
+      const icon = document.createElement('div');
+      icon.className = 'credential-icon';
+      icon.innerHTML = this.getCredentialIcon(credential);
+      
+      const info = document.createElement('div');
+      info.className = 'credential-info';
+      info.innerHTML = `
+        <div class="credential-site">${this.escapeHtml(credential.site_name)}</div>
+        <div class="credential-username">${this.escapeHtml(credential.username)}</div>
+      `;
+      
+      const actions = document.createElement('div');
+      actions.className = 'credential-actions';
+      actions.innerHTML = `
+        <div class="action-btn" title="Copy username" data-action="copy" data-value="${this.escapeHtml(credential.username)}">
+          📄
         </div>
-        <div class="credential-info">
-          <div class="credential-site">${this.escapeHtml(credential.site_name)}</div>
-          <div class="credential-username">${this.escapeHtml(credential.username)}</div>
-        </div>
-        <div class="credential-actions">
-          <div class="action-btn" title="Copy username" onclick="event.stopPropagation(); copyToClipboard('${this.escapeHtml(credential.username)}', 'Username copied!')">
-            📄
-          </div>
-          <div class="action-btn" title="Auto-fill" onclick="event.stopPropagation(); fillCredential(${credential.id})">
-            🔄
-          </div>
+        <div class="action-btn" title="Auto-fill" data-action="fill">
+          🔄
         </div>
       `;
       
-      // Add click handler for main area
-      item.addEventListener('click', () => this.fillCredential(credential));
+      item.appendChild(icon);
+      item.appendChild(info);
+      item.appendChild(actions);
       
-      container.appendChild(item);
+      fragment.appendChild(item);
     });
+    
+    // Clear and append all at once
+    container.innerHTML = '';
+    container.appendChild(fragment);
+    
+    // Use event delegation for better performance
+    container.onclick = (e) => {
+      const item = e.target.closest('.credential-item');
+      if (!item) return;
+      
+      const credId = item.dataset.id;
+      const credential = this.allCredentials.find(c => c.id == credId);
+      
+      if (e.target.dataset.action === 'copy') {
+        e.stopPropagation();
+        this.copyToClipboard(e.target.dataset.value);
+        this.showNotification('Username copied!');
+      } else if (e.target.dataset.action === 'fill') {
+        e.stopPropagation();
+        this.fillCredential(credential);
+      } else if (credential) {
+        this.fillCredential(credential);
+      }
+    };
   }
   
   getCredentialIcon(credential) {
@@ -157,16 +209,19 @@ class PopupInterface {
   }
   
   filterCredentials(query) {
-    if (!query.trim()) {
-      this.filteredCredentials = this.allCredentials;
-    } else {
-      const lowerQuery = query.toLowerCase();
-      this.filteredCredentials = this.allCredentials.filter(cred => 
-        cred.site_name.toLowerCase().includes(lowerQuery) ||
-        cred.username.toLowerCase().includes(lowerQuery)
-      );
-    }
-    this.renderCredentialsList();
+    // Throttle filtering for better performance
+    this.performance.throttle('filter', () => {
+      if (!query.trim()) {
+        this.filteredCredentials = this.allCredentials;
+      } else {
+        const lowerQuery = query.toLowerCase();
+        this.filteredCredentials = this.allCredentials.filter(cred => 
+          cred.site_name.toLowerCase().includes(lowerQuery) ||
+          cred.username.toLowerCase().includes(lowerQuery)
+        );
+      }
+      this.renderCredentialsList();
+    }, 150);
   }
   
   async fillCredential(credential) {
@@ -202,20 +257,29 @@ class PopupInterface {
   }
   
   async generatePassword() {
-    try {
-      const response = await chrome.runtime.sendMessage({
-        action: 'generate_password',
-        options: { length: 16, includeSymbols: true }
-      });
-      
-      if (response.success) {
-        await this.copyToClipboard(response.password);
-        this.showNotification('Secure password generated and copied!');
+    // Throttle password generation
+    this.performance.throttle('generate-password', async () => {
+      try {
+        const response = await chrome.runtime.sendMessage({
+          action: 'generate_password',
+          options: { length: 16, includeSymbols: true }
+        });
+        
+        if (response.success) {
+          await this.copyToClipboard(response.password);
+          this.showNotification('Secure password generated and copied!');
+        }
+      } catch (error) {
+        console.error('Failed to generate password:', error);
+        this.showNotification('Failed to generate password', 'error');
       }
-    } catch (error) {
-      console.error('Failed to generate password:', error);
-      this.showNotification('Failed to generate password', 'error');
-    }
+    }, 1000);
+  }
+  
+  cleanup() {
+    this.cache.clear();
+    this.allCredentials = [];
+    this.filteredCredentials = [];
   }
   
   async copyToClipboard(text) {
@@ -305,7 +369,7 @@ async function copyToClipboard(text, successMessage = 'Copied!') {
   }
 }
 
-// Initialize popup when DOM is ready
+// Initialize popup when DOM is ready (optimized)
 document.addEventListener('DOMContentLoaded', () => {
   window.popupInterface = new PopupInterface();
   
@@ -324,4 +388,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   `;
   document.head.appendChild(style);
+});
+
+// Cleanup on window unload
+window.addEventListener('beforeunload', () => {
+  if (window.popupInterface) {
+    window.popupInterface.cleanup();
+  }
 });

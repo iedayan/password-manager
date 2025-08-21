@@ -1,34 +1,38 @@
 /**
- * Main content script for Lok Password Manager
+ * Optimized main content script for Lok Password Manager
  * Coordinates form detection, auto-fill, and UI interactions
+ * Enhanced with performance optimizations and memory management
  */
 
 class LokContentScript {
   constructor() {
     this.API_BASE = 'https://password-manager-production-89ed.up.railway.app';
     this.currentDomain = window.location.hostname;
-    this.detectedForms = new Map();
+    this.detectedForms = new WeakMap();
     this.isAuthenticated = false;
+    this.credentialsCache = new Map();
+    this.performance = window.LokPerformance;
     
     this.init();
   }
   
   async init() {
-    // Check authentication status
-    await this.checkAuthStatus();
+    this.performance.mark('content-script-start');
     
-    // Initialize message listeners
-    this.setupMessageListeners();
+    // Batch initialization tasks
+    await Promise.all([
+      this.checkAuthStatus(),
+      this.setupMessageListeners(),
+      this.setupKeyboardShortcuts(),
+      this.setupContextMenu()
+    ]);
     
-    // Initialize keyboard shortcuts
-    this.setupKeyboardShortcuts();
+    // Defer non-critical tasks
+    this.performance.debounce('security-check', () => {
+      this.checkSiteSecurityStatus();
+    }, 1000);
     
-    // Initialize context menu integration
-    this.setupContextMenu();
-    
-    // Check for security warnings
-    this.checkSiteSecurityStatus();
-    
+    this.performance.mark('content-script-end');
     console.log('Lok Password Manager extension loaded');
   }
   
@@ -70,4 +74,459 @@ class LokContentScript {
           
         default:
           sendResponse({ success: false, error: 'Unknown action' });
-      }\n      \n      return true;\n    });\n  }\n  \n  setupKeyboardShortcuts() {\n    document.addEventListener('keydown', (e) => {\n      // Ctrl/Cmd + Shift + L for auto-fill\n      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'L') {\n        e.preventDefault();\n        this.triggerAutoFill();\n      }\n      \n      // Ctrl/Cmd + Shift + V for vault\n      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'V') {\n        e.preventDefault();\n        this.openVault();\n      }\n    });\n  }\n  \n  setupContextMenu() {\n    document.addEventListener('contextmenu', (e) => {\n      const target = e.target;\n      \n      if (target.type === 'password' || target.type === 'email' || \n          (target.type === 'text' && this.isUsernameField(target))) {\n        // Store context for potential auto-fill\n        this.contextTarget = target;\n      }\n    });\n  }\n  \n  async triggerAutoFill() {\n    if (!this.isAuthenticated) {\n      this.showNotification('Please log in to use auto-fill', 'warning');\n      return;\n    }\n    \n    const credentials = await this.getCredentialsForCurrentSite();\n    \n    if (credentials.length === 0) {\n      this.showNotification('No credentials found for this site', 'warning');\n      return;\n    }\n    \n    if (credentials.length === 1) {\n      this.fillForm(credentials[0]);\n    } else {\n      this.showCredentialSelector(credentials);\n    }\n  }\n  \n  async getCredentialsForCurrentSite() {\n    try {\n      const token = await this.getAuthToken();\n      const response = await fetch(`${this.API_BASE}/api/v1/extension/credentials?domain=${this.currentDomain}`, {\n        headers: {\n          'Authorization': `Bearer ${token}`,\n          'Content-Type': 'application/json'\n        }\n      });\n      \n      if (response.ok) {\n        const data = await response.json();\n        return data.credentials || [];\n      }\n      \n      return [];\n    } catch (error) {\n      console.error('Failed to get credentials:', error);\n      return [];\n    }\n  }\n  \n  async getAuthToken() {\n    const result = await chrome.storage.local.get(['authToken']);\n    return result.authToken;\n  }\n  \n  fillForm(credentials) {\n    const forms = document.querySelectorAll('form');\n    let filled = false;\n    \n    forms.forEach(form => {\n      const usernameField = this.findUsernameField(form);\n      const passwordField = this.findPasswordField(form);\n      \n      if (usernameField && passwordField) {\n        this.fillField(usernameField, credentials.username);\n        this.fillField(passwordField, credentials.password);\n        filled = true;\n      }\n    });\n    \n    if (filled) {\n      this.showNotification('✓ Credentials filled successfully');\n    } else {\n      this.showNotification('No suitable form found', 'warning');\n    }\n  }\n  \n  fillField(field, value) {\n    // Focus the field\n    field.focus();\n    \n    // Clear existing value\n    field.value = '';\n    \n    // Set new value\n    field.value = value;\n    \n    // Trigger events for framework compatibility\n    const events = ['input', 'change', 'keyup', 'blur'];\n    events.forEach(eventType => {\n      field.dispatchEvent(new Event(eventType, { bubbles: true }));\n    });\n    \n    // Add visual feedback\n    field.style.borderColor = '#10b981';\n    field.style.boxShadow = '0 0 0 2px rgba(16, 185, 129, 0.2)';\n    \n    setTimeout(() => {\n      field.style.borderColor = '';\n      field.style.boxShadow = '';\n    }, 1000);\n  }\n  \n  findUsernameField(form) {\n    const selectors = [\n      'input[type=\"email\"]',\n      'input[autocomplete=\"username\"]',\n      'input[autocomplete=\"email\"]',\n      'input[name*=\"email\"]',\n      'input[name*=\"username\"]',\n      'input[name*=\"user\"]',\n      'input[id*=\"email\"]',\n      'input[id*=\"username\"]',\n      'input[id*=\"user\"]'\n    ];\n    \n    for (const selector of selectors) {\n      const field = form.querySelector(selector);\n      if (field && this.isVisible(field)) return field;\n    }\n    \n    // Fallback to first text input\n    const textInputs = form.querySelectorAll('input[type=\"text\"]');\n    for (const input of textInputs) {\n      if (this.isVisible(input)) return input;\n    }\n    \n    return null;\n  }\n  \n  findPasswordField(form) {\n    const passwordFields = form.querySelectorAll('input[type=\"password\"]');\n    for (const field of passwordFields) {\n      if (this.isVisible(field)) return field;\n    }\n    return null;\n  }\n  \n  isUsernameField(field) {\n    const name = (field.name || '').toLowerCase();\n    const id = (field.id || '').toLowerCase();\n    const autocomplete = (field.autocomplete || '').toLowerCase();\n    \n    return name.includes('email') || name.includes('username') || name.includes('user') ||\n           id.includes('email') || id.includes('username') || id.includes('user') ||\n           autocomplete.includes('email') || autocomplete.includes('username');\n  }\n  \n  isVisible(element) {\n    const style = window.getComputedStyle(element);\n    return style.display !== 'none' && \n           style.visibility !== 'hidden' && \n           style.opacity !== '0' &&\n           element.offsetWidth > 0 && \n           element.offsetHeight > 0;\n  }\n  \n  showCredentialSelector(credentials) {\n    // Remove existing selector\n    this.removeCredentialSelector();\n    \n    // Create overlay\n    const overlay = document.createElement('div');\n    overlay.className = 'lok-overlay';\n    overlay.onclick = () => this.removeCredentialSelector();\n    \n    // Create selector\n    const selector = document.createElement('div');\n    selector.className = 'lok-credential-selector';\n    selector.innerHTML = `\n      <div class=\"lok-credential-selector-header\">\n        <h3 class=\"lok-credential-selector-title\">Choose Account</h3>\n        <p class=\"lok-credential-selector-subtitle\">Select credentials for ${this.currentDomain}</p>\n      </div>\n      <div class=\"lok-credential-list\">\n        ${credentials.map(cred => `\n          <div class=\"lok-credential-item\" data-id=\"${cred.id}\">\n            <div class=\"lok-credential-icon\">\n              ${cred.site_name.charAt(0).toUpperCase()}\n            </div>\n            <div class=\"lok-credential-info\">\n              <div class=\"lok-credential-site\">${cred.site_name}</div>\n              <div class=\"lok-credential-username\">${cred.username}</div>\n            </div>\n          </div>\n        `).join('')}\n      </div>\n      <div class=\"lok-credential-selector-footer\">\n        <button class=\"lok-btn lok-btn-secondary\" onclick=\"document.querySelector('.lok-overlay').click()\">Cancel</button>\n        <button class=\"lok-btn lok-btn-primary\" onclick=\"window.open('${this.API_BASE.replace('password-manager-production-89ed.up.railway.app', 'comforting-sunshine-65105a.netlify.app')}')\">Open Vault</button>\n      </div>\n    `;\n    \n    // Add click handlers\n    selector.addEventListener('click', (e) => {\n      const item = e.target.closest('.lok-credential-item');\n      if (item) {\n        const credId = item.dataset.id;\n        const credential = credentials.find(c => c.id == credId);\n        if (credential) {\n          this.fillForm(credential);\n          this.removeCredentialSelector();\n        }\n      }\n    });\n    \n    document.body.appendChild(overlay);\n    document.body.appendChild(selector);\n  }\n  \n  removeCredentialSelector() {\n    const overlay = document.querySelector('.lok-overlay');\n    const selector = document.querySelector('.lok-credential-selector');\n    \n    if (overlay) overlay.remove();\n    if (selector) selector.remove();\n  }\n  \n  showSavePrompt(data) {\n    // Remove existing prompt\n    this.removeSavePrompt();\n    \n    const prompt = document.createElement('div');\n    prompt.className = 'lok-save-prompt';\n    prompt.innerHTML = `\n      <div class=\"lok-save-prompt-header\">\n        <h3 class=\"lok-save-prompt-title\">Save Password?</h3>\n        <p class=\"lok-save-prompt-subtitle\">Save credentials for ${this.currentDomain}</p>\n      </div>\n      <div class=\"lok-save-prompt-body\">\n        <div class=\"lok-save-prompt-field\">\n          <label class=\"lok-save-prompt-label\">Site Name</label>\n          <input class=\"lok-save-prompt-input\" type=\"text\" value=\"${data.siteName || this.currentDomain}\" id=\"lok-site-name\">\n        </div>\n        <div class=\"lok-save-prompt-field\">\n          <label class=\"lok-save-prompt-label\">Username</label>\n          <input class=\"lok-save-prompt-input\" type=\"text\" value=\"${data.username}\" id=\"lok-username\">\n        </div>\n      </div>\n      <div class=\"lok-save-prompt-footer\">\n        <button class=\"lok-btn lok-btn-secondary\" onclick=\"document.querySelector('.lok-save-prompt').remove()\">Not Now</button>\n        <button class=\"lok-btn lok-btn-primary\" id=\"lok-save-btn\">Save</button>\n      </div>\n    `;\n    \n    // Add save handler\n    prompt.querySelector('#lok-save-btn').onclick = () => {\n      this.saveCredentials({\n        siteName: prompt.querySelector('#lok-site-name').value,\n        username: prompt.querySelector('#lok-username').value,\n        password: data.password,\n        url: window.location.href,\n        domain: this.currentDomain\n      });\n      this.removeSavePrompt();\n    };\n    \n    document.body.appendChild(prompt);\n    \n    // Auto-remove after 10 seconds\n    setTimeout(() => this.removeSavePrompt(), 10000);\n  }\n  \n  removeSavePrompt() {\n    const prompt = document.querySelector('.lok-save-prompt');\n    if (prompt) prompt.remove();\n  }\n  \n  async saveCredentials(data) {\n    try {\n      const token = await this.getAuthToken();\n      const response = await fetch(`${this.API_BASE}/api/v1/passwords`, {\n        method: 'POST',\n        headers: {\n          'Authorization': `Bearer ${token}`,\n          'Content-Type': 'application/json'\n        },\n        body: JSON.stringify({\n          site_name: data.siteName,\n          site_url: data.url,\n          username: data.username,\n          password: data.password\n        })\n      });\n      \n      if (response.ok) {\n        this.showNotification('✓ Credentials saved successfully');\n      } else {\n        throw new Error('Failed to save credentials');\n      }\n    } catch (error) {\n      console.error('Save credentials error:', error);\n      this.showNotification('Failed to save credentials', 'error');\n    }\n  }\n  \n  checkSiteSecurityStatus() {\n    // Check if site is using HTTPS\n    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {\n      this.showSecurityIndicator('Insecure connection detected', 'danger');\n    }\n    \n    // Check for known phishing domains (basic check)\n    if (this.isPotentialPhishingSite()) {\n      this.showSecurityIndicator('Potential phishing site detected', 'danger');\n    }\n  }\n  \n  isPotentialPhishingSite() {\n    const suspiciousPatterns = [\n      /[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/, // IP addresses\n      /[a-z]+-[a-z]+\\.(tk|ml|ga|cf)$/, // Suspicious TLDs\n      /(paypal|amazon|google|microsoft|apple).*\\.(tk|ml|ga|cf|xyz)$/i // Brand impersonation\n    ];\n    \n    return suspiciousPatterns.some(pattern => pattern.test(this.currentDomain));\n  }\n  \n  showSecurityIndicator(message, type = 'info') {\n    const indicator = document.createElement('div');\n    indicator.className = `lok-security-indicator ${type}`;\n    indicator.textContent = message;\n    \n    document.body.appendChild(indicator);\n    \n    setTimeout(() => {\n      if (indicator.parentNode) {\n        indicator.remove();\n      }\n    }, 5000);\n  }\n  \n  showNotification(message, type = 'success') {\n    // Remove existing notifications\n    const existing = document.querySelectorAll('.lok-notification');\n    existing.forEach(n => n.remove());\n    \n    const notification = document.createElement('div');\n    notification.className = `lok-notification ${type}`;\n    notification.textContent = message;\n    \n    document.body.appendChild(notification);\n    \n    setTimeout(() => {\n      if (notification.parentNode) {\n        notification.remove();\n      }\n    }, 3000);\n  }\n  \n  showAuthenticationPrompt() {\n    this.showNotification('Please log in to Lok to use auto-fill features', 'warning');\n  }\n  \n  openVault() {\n    window.open('https://comforting-sunshine-65105a.netlify.app', '_blank');\n  }\n  \n  performSecurityCheck(data) {\n    // Implement security checks like breach detection\n    console.log('Performing security check:', data);\n  }\n}\n\n// Initialize the content script\nif (document.readyState === 'loading') {\n  document.addEventListener('DOMContentLoaded', () => new LokContentScript());\n} else {\n  new LokContentScript();\n}
+      }
+      
+      return true;
+    });
+  }
+  
+  setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+      // Ctrl/Cmd + Shift + L for auto-fill
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'L') {
+        e.preventDefault();
+        this.triggerAutoFill();
+      }
+      
+      // Ctrl/Cmd + Shift + V for vault
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'V') {
+        e.preventDefault();
+        this.openVault();
+      }
+    });
+  }
+  
+  setupContextMenu() {
+    document.addEventListener('contextmenu', (e) => {
+      const target = e.target;
+      
+      if (target.type === 'password' || target.type === 'email' || 
+          (target.type === 'text' && this.isUsernameField(target))) {
+        // Store context for potential auto-fill
+        this.contextTarget = target;
+      }
+    });
+  }
+  
+  async triggerAutoFill() {
+    if (!this.isAuthenticated) {
+      this.showNotification('Please log in to use auto-fill', 'warning');
+      return;
+    }
+    
+    const credentials = await this.getCredentialsForCurrentSite();
+    
+    if (credentials.length === 0) {
+      this.showNotification('No credentials found for this site', 'warning');
+      return;
+    }
+    
+    if (credentials.length === 1) {
+      this.fillForm(credentials[0]);
+    } else {
+      this.showCredentialSelector(credentials);
+    }
+  }
+  
+  async getCredentialsForCurrentSite() {
+    const cacheKey = `credentials-${this.currentDomain}`;
+    
+    // Check cache first
+    if (this.credentialsCache.has(cacheKey)) {
+      const cached = this.credentialsCache.get(cacheKey);
+      if (Date.now() - cached.timestamp < 30000) { // 30 second cache
+        return cached.data;
+      }
+    }
+    
+    try {
+      const token = await this.getAuthToken();
+      const response = await fetch(`${this.API_BASE}/api/v1/extension/credentials?domain=${this.currentDomain}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const credentials = data.credentials || [];
+        
+        // Cache the result
+        this.credentialsCache.set(cacheKey, {
+          data: credentials,
+          timestamp: Date.now()
+        });
+        
+        return credentials;
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Failed to get credentials:', error);
+      return [];
+    }
+  }
+  
+  async getAuthToken() {
+    const result = await chrome.storage.local.get(['authToken']);
+    return result.authToken;
+  }
+  
+  fillForm(credentials) {
+    const forms = document.querySelectorAll('form');
+    let filled = false;
+    
+    forms.forEach(form => {
+      const usernameField = this.findUsernameField(form);
+      const passwordField = this.findPasswordField(form);
+      
+      if (usernameField && passwordField) {
+        this.fillField(usernameField, credentials.username);
+        this.fillField(passwordField, credentials.password);
+        filled = true;
+      }
+    });
+    
+    if (filled) {
+      this.showNotification('✓ Credentials filled successfully');
+    } else {
+      this.showNotification('No suitable form found', 'warning');
+    }
+  }
+  
+  fillField(field, value) {
+    // Focus the field
+    field.focus();
+    
+    // Clear existing value
+    field.value = '';
+    
+    // Set new value
+    field.value = value;
+    
+    // Trigger events for framework compatibility
+    const events = ['input', 'change', 'keyup', 'blur'];
+    events.forEach(eventType => {
+      field.dispatchEvent(new Event(eventType, { bubbles: true }));
+    });
+    
+    // Add visual feedback
+    field.style.borderColor = '#10b981';
+    field.style.boxShadow = '0 0 0 2px rgba(16, 185, 129, 0.2)';
+    
+    setTimeout(() => {
+      field.style.borderColor = '';
+      field.style.boxShadow = '';
+    }, 1000);
+  }
+  
+  findUsernameField(form) {
+    const selectors = [
+      'input[type="email"]',
+      'input[autocomplete="username"]',
+      'input[autocomplete="email"]',
+      'input[name*="email"]',
+      'input[name*="username"]',
+      'input[name*="user"]',
+      'input[id*="email"]',
+      'input[id*="username"]',
+      'input[id*="user"]'
+    ];
+    
+    for (const selector of selectors) {
+      const field = form.querySelector(selector);
+      if (field && this.isVisible(field)) return field;
+    }
+    
+    // Fallback to first text input
+    const textInputs = form.querySelectorAll('input[type="text"]');
+    for (const input of textInputs) {
+      if (this.isVisible(input)) return input;
+    }
+    
+    return null;
+  }
+  
+  findPasswordField(form) {
+    const passwordFields = form.querySelectorAll('input[type="password"]');
+    for (const field of passwordFields) {
+      if (this.isVisible(field)) return field;
+    }
+    return null;
+  }
+  
+  isUsernameField(field) {
+    const name = (field.name || '').toLowerCase();
+    const id = (field.id || '').toLowerCase();
+    const autocomplete = (field.autocomplete || '').toLowerCase();
+    
+    return name.includes('email') || name.includes('username') || name.includes('user') ||
+           id.includes('email') || id.includes('username') || id.includes('user') ||
+           autocomplete.includes('email') || autocomplete.includes('username');
+  }
+  
+  isVisible(element) {
+    const style = window.getComputedStyle(element);
+    return style.display !== 'none' && 
+           style.visibility !== 'hidden' && 
+           style.opacity !== '0' &&
+           element.offsetWidth > 0 && 
+           element.offsetHeight > 0;
+  }
+  
+  showCredentialSelector(credentials) {
+    // Throttle selector creation
+    this.performance.throttle('credential-selector', () => {
+      this.removeCredentialSelector();
+      
+      const overlay = document.createElement('div');
+      overlay.className = 'lok-overlay';
+      overlay.onclick = () => this.removeCredentialSelector();
+      
+      const selector = document.createElement('div');
+      selector.className = 'lok-credential-selector';
+      
+      // Use DocumentFragment for better performance
+      const fragment = document.createDocumentFragment();
+      
+      const header = document.createElement('div');
+      header.className = 'lok-credential-selector-header';
+      header.innerHTML = `
+        <h3 class="lok-credential-selector-title">Choose Account</h3>
+        <p class="lok-credential-selector-subtitle">Select credentials for ${this.currentDomain}</p>
+      `;
+      
+      const list = document.createElement('div');
+      list.className = 'lok-credential-list';
+      
+      credentials.forEach(cred => {
+        const item = document.createElement('div');
+        item.className = 'lok-credential-item';
+        item.dataset.id = cred.id;
+        item.innerHTML = `
+          <div class="lok-credential-icon">
+            ${cred.site_name.charAt(0).toUpperCase()}
+          </div>
+          <div class="lok-credential-info">
+            <div class="lok-credential-site">${cred.site_name}</div>
+            <div class="lok-credential-username">${cred.username}</div>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+      
+      const footer = document.createElement('div');
+      footer.className = 'lok-credential-selector-footer';
+      footer.innerHTML = `
+        <button class="lok-btn lok-btn-secondary" onclick="document.querySelector('.lok-overlay').click()">Cancel</button>
+        <button class="lok-btn lok-btn-primary" onclick="window.open('${this.API_BASE.replace('password-manager-production-89ed.up.railway.app', 'comforting-sunshine-65105a.netlify.app')}')">Open Vault</button>
+      `;
+      
+      fragment.appendChild(header);
+      fragment.appendChild(list);
+      fragment.appendChild(footer);
+      selector.appendChild(fragment);
+      
+      // Efficient event delegation
+      this.performance.delegate(selector, '.lok-credential-item', 'click', (e) => {
+        const credId = e.currentTarget.dataset.id;
+        const credential = credentials.find(c => c.id == credId);
+        if (credential) {
+          this.fillForm(credential);
+          this.removeCredentialSelector();
+        }
+      });
+      
+      document.body.appendChild(overlay);
+      document.body.appendChild(selector);
+    }, 300);
+  }
+  
+  removeCredentialSelector() {
+    const overlay = document.querySelector('.lok-overlay');
+    const selector = document.querySelector('.lok-credential-selector');
+    
+    if (overlay) overlay.remove();
+    if (selector) selector.remove();
+  }
+  
+  showSavePrompt(data) {
+    // Remove existing prompt
+    this.removeSavePrompt();
+    
+    const prompt = document.createElement('div');
+    prompt.className = 'lok-save-prompt';
+    prompt.innerHTML = `
+      <div class="lok-save-prompt-header">
+        <h3 class="lok-save-prompt-title">Save Password?</h3>
+        <p class="lok-save-prompt-subtitle">Save credentials for ${this.currentDomain}</p>
+      </div>
+      <div class="lok-save-prompt-body">
+        <div class="lok-save-prompt-field">
+          <label class="lok-save-prompt-label">Site Name</label>
+          <input class="lok-save-prompt-input" type="text" value="${data.siteName || this.currentDomain}" id="lok-site-name">
+        </div>
+        <div class="lok-save-prompt-field">
+          <label class="lok-save-prompt-label">Username</label>
+          <input class="lok-save-prompt-input" type="text" value="${data.username}" id="lok-username">
+        </div>
+      </div>
+      <div class="lok-save-prompt-footer">
+        <button class="lok-btn lok-btn-secondary" onclick="document.querySelector('.lok-save-prompt').remove()">Not Now</button>
+        <button class="lok-btn lok-btn-primary" id="lok-save-btn">Save</button>
+      </div>
+    `;
+    
+    // Add save handler
+    prompt.querySelector('#lok-save-btn').onclick = () => {
+      this.saveCredentials({
+        siteName: prompt.querySelector('#lok-site-name').value,
+        username: prompt.querySelector('#lok-username').value,
+        password: data.password,
+        url: window.location.href,
+        domain: this.currentDomain
+      });
+      this.removeSavePrompt();
+    };
+    
+    document.body.appendChild(prompt);
+    
+    // Auto-remove after 10 seconds
+    setTimeout(() => this.removeSavePrompt(), 10000);
+  }
+  
+  removeSavePrompt() {
+    const prompt = document.querySelector('.lok-save-prompt');
+    if (prompt) prompt.remove();
+  }
+  
+  async saveCredentials(data) {
+    try {
+      const token = await this.getAuthToken();
+      const response = await fetch(`${this.API_BASE}/api/v1/passwords`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          site_name: data.siteName,
+          site_url: data.url,
+          username: data.username,
+          password: data.password
+        })
+      });
+      
+      if (response.ok) {
+        this.showNotification('✓ Credentials saved successfully');
+        // Clear cache to force refresh
+        this.credentialsCache.clear();
+      } else {
+        throw new Error('Failed to save credentials');
+      }
+    } catch (error) {
+      console.error('Save credentials error:', error);
+      this.showNotification('Failed to save credentials', 'error');
+    }
+  }
+  
+  checkSiteSecurityStatus() {
+    // Check if site is using HTTPS
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+      this.showSecurityIndicator('Insecure connection detected', 'danger');
+    }
+    
+    // Check for known phishing domains (basic check)
+    if (this.isPotentialPhishingSite()) {
+      this.showSecurityIndicator('Potential phishing site detected', 'danger');
+    }
+  }
+  
+  isPotentialPhishingSite() {
+    const suspiciousPatterns = [
+      /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/, // IP addresses
+      /[a-z]+-[a-z]+\.(tk|ml|ga|cf)$/, // Suspicious TLDs
+      /(paypal|amazon|google|microsoft|apple).*\.(tk|ml|ga|cf|xyz)$/i // Brand impersonation
+    ];
+    
+    return suspiciousPatterns.some(pattern => pattern.test(this.currentDomain));
+  }
+  
+  showSecurityIndicator(message, type = 'info') {
+    const indicator = document.createElement('div');
+    indicator.className = `lok-security-indicator ${type}`;
+    indicator.textContent = message;
+    
+    document.body.appendChild(indicator);
+    
+    setTimeout(() => {
+      if (indicator.parentNode) {
+        indicator.remove();
+      }
+    }, 5000);
+  }
+  
+  showNotification(message, type = 'success') {
+    // Throttle notifications to prevent spam
+    this.performance.throttle('notification', () => {
+      const existing = document.querySelectorAll('.lok-notification');
+      existing.forEach(n => n.remove());
+      
+      const notification = document.createElement('div');
+      notification.className = `lok-notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 3000);
+    }, 500);
+  }
+  
+  showAuthenticationPrompt() {
+    this.showNotification('Please log in to Lok to use auto-fill features', 'warning');
+  }
+  
+  openVault() {
+    window.open('https://comforting-sunshine-65105a.netlify.app', '_blank');
+  }
+  
+  performSecurityCheck(data) {
+    // Implement security checks like breach detection
+    console.log('Performing security check:', data);
+  }
+  
+  cleanup() {
+    // Clear caches
+    this.credentialsCache.clear();
+    this.detectedForms = new WeakMap();
+    
+    // Remove UI elements
+    this.removeCredentialSelector();
+    this.removeSavePrompt();
+    
+    // Clear existing notifications
+    const notifications = document.querySelectorAll('.lok-notification, .lok-security-indicator');
+    notifications.forEach(n => n.remove());
+  }
+}
+
+// Initialize the content script (optimized)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    window.lokContentScript = new LokContentScript();
+  });
+} else {
+  window.lokContentScript = new LokContentScript();
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+  if (window.lokContentScript) {
+    window.lokContentScript.cleanup();
+  }
+});

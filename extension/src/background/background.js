@@ -1,6 +1,9 @@
 class LokBackground {
   constructor() {
     this.apiUrl = 'http://localhost:5000/api';
+    this.cache = new Map();
+    this.requestQueue = [];
+    this.isProcessingQueue = false;
     this.init();
   }
 
@@ -13,21 +16,60 @@ class LokBackground {
 
   setupMessageListeners() {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      switch (message.action) {
-        case 'openPopup':
-          chrome.action.openPopup();
-          break;
-        case 'checkAuth':
-          this.checkAuthStatus().then(sendResponse);
-          return true;
-        case 'autoLock':
-          this.handleAutoLock();
-          break;
-        case 'resetAutoLock':
-          this.resetAutoLockTimer();
-          break;
-      }
+      // Queue requests to prevent overwhelming
+      this.queueRequest(message, sender, sendResponse);
+      return true;
     });
+  }
+  
+  queueRequest(message, sender, sendResponse) {
+    this.requestQueue.push({ message, sender, sendResponse });
+    this.processRequestQueue();
+  }
+  
+  async processRequestQueue() {
+    if (this.isProcessingQueue || this.requestQueue.length === 0) return;
+    
+    this.isProcessingQueue = true;
+    
+    while (this.requestQueue.length > 0) {
+      const { message, sender, sendResponse } = this.requestQueue.shift();
+      
+      try {
+        switch (message.action) {
+          case 'openPopup':
+            chrome.action.openPopup();
+            sendResponse({ success: true });
+            break;
+          case 'checkAuth':
+            const authResult = await this.checkAuthStatus();
+            sendResponse(authResult);
+            break;
+          case 'autoLock':
+            await this.handleAutoLock();
+            sendResponse({ success: true });
+            break;
+          case 'resetAutoLock':
+            this.resetAutoLockTimer();
+            sendResponse({ success: true });
+            break;
+          case 'generate_password':
+            const password = this.generateSecurePassword(message.options);
+            sendResponse({ success: true, password });
+            break;
+          default:
+            sendResponse({ success: false, error: 'Unknown action' });
+        }
+      } catch (error) {
+        console.error('Background script error:', error);
+        sendResponse({ success: false, error: error.message });
+      }
+      
+      // Small delay to prevent blocking
+      await new Promise(resolve => setTimeout(resolve, 10));
+    }
+    
+    this.isProcessingQueue = false;
   }
 
   setupContextMenus() {
@@ -89,10 +131,22 @@ class LokBackground {
   }
 
   async checkAuthStatus() {
+    const cacheKey = 'auth-status';
+    
+    // Check cache first (5 second cache)
+    if (this.cache.has(cacheKey)) {
+      const cached = this.cache.get(cacheKey);
+      if (Date.now() - cached.timestamp < 5000) {
+        return cached.data;
+      }
+    }
+    
     const result = await chrome.storage.local.get(['token', 'lastActivity']);
     
     if (!result.token) {
-      return { authenticated: false };
+      const authResult = { authenticated: false };
+      this.cache.set(cacheKey, { data: authResult, timestamp: Date.now() });
+      return authResult;
     }
 
     // Check if token is still valid
@@ -103,13 +157,19 @@ class LokBackground {
 
       if (response.ok) {
         this.resetAutoLockTimer();
-        return { authenticated: true };
+        const authResult = { authenticated: true };
+        this.cache.set(cacheKey, { data: authResult, timestamp: Date.now() });
+        return authResult;
       } else {
         await chrome.storage.local.clear();
-        return { authenticated: false };
+        const authResult = { authenticated: false };
+        this.cache.set(cacheKey, { data: authResult, timestamp: Date.now() });
+        return authResult;
       }
     } catch (error) {
-      return { authenticated: false, error: 'Connection error' };
+      const authResult = { authenticated: false, error: 'Connection error' };
+      this.cache.set(cacheKey, { data: authResult, timestamp: Date.now() });
+      return authResult;
     }
   }
 
@@ -142,21 +202,26 @@ class LokBackground {
     });
   }
 
-  generateSecurePassword() {
-    const length = 16;
-    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  generateSecurePassword(options = {}) {
+    const length = options.length || 16;
+    const includeSymbols = options.includeSymbols !== false;
+    
+    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const symbols = includeSymbols ? '!@#$%^&*' : '';
+    
+    const charset = lowercase + uppercase + numbers + symbols;
     let password = '';
     
     // Ensure at least one character from each category
-    const categories = [
-      'abcdefghijklmnopqrstuvwxyz',
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-      '0123456789',
-      '!@#$%^&*'
-    ];
+    const categories = [lowercase, uppercase, numbers];
+    if (includeSymbols) categories.push(symbols);
     
     categories.forEach(category => {
-      password += category.charAt(Math.floor(Math.random() * category.length));
+      if (category) {
+        password += category.charAt(Math.floor(Math.random() * category.length));
+      }
     });
     
     // Fill remaining length
@@ -172,7 +237,20 @@ class LokBackground {
     }
     return chars.join('');
   }
+  
+  cleanup() {
+    this.cache.clear();
+    this.requestQueue = [];
+    this.isProcessingQueue = false;
+  }
 }
 
 // Initialize background script
-new LokBackground();
+window.lokBackground = new LokBackground();
+
+// Cleanup on extension unload
+chrome.runtime.onSuspend.addListener(() => {
+  if (window.lokBackground) {
+    window.lokBackground.cleanup();
+  }
+});

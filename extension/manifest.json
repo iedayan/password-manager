@@ -26,12 +26,13 @@
     {
       "matches": ["http://*/*", "https://*/*"],
       "js": [
+        "src/utils/performance.js",
         "src/utils/api.js",
         "src/content/form-detector.js", 
         "src/content/auto-fill.js",
         "src/content/content.js"
       ],
-      "css": ["src/content/styles.css"],
+      "css": ["src/content/styles-optimized.css"],
       "run_at": "document_end"
     }
   ],

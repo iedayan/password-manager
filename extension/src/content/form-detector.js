@@ -1,11 +1,11 @@
 /**
  * Advanced login form detection for most websites
+ * Optimized for performance with caching and efficient DOM queries
  */
 
 class FormDetector {
   constructor() {
     this.loginSelectors = [
-      // Common login form patterns
       'form[action*="login"]',
       'form[action*="signin"]', 
       'form[action*="auth"]',
@@ -13,8 +13,6 @@ class FormDetector {
       'form[id*="signin"]',
       'form[class*="login"]',
       'form[class*="signin"]',
-      
-      // Generic forms with password fields
       'form:has(input[type="password"])',
       'form:has(input[name*="password"])',
       'form:has(input[id*="password"])'
@@ -41,61 +39,79 @@ class FormDetector {
       'input[autocomplete="new-password"]'
     ];
     
+    this.detectedForms = new WeakSet();
+    this.performance = window.LokPerformance;
     this.init();
   }
   
   init() {
-    this.detectForms();
+    this.performance.mark('form-detector-start');
+    this.performance.debounce('initial-detection', () => this.detectForms(), 100);
     this.observeChanges();
+    this.performance.mark('form-detector-end');
   }
   
   detectForms() {
     const forms = this.findLoginForms();
     
-    forms.forEach(form => {
-      const formData = this.analyzeForm(form);
-      if (formData.isValid) {
-        this.enhanceForm(form, formData);
-        this.notifyBackground('form_detected', {
-          url: window.location.href,
-          domain: window.location.hostname,
-          formData: formData
-        });
-      }
-    });
+    // Batch process forms for better performance
+    this.performance.batchDOMOperations(
+      forms.map(form => () => {
+        if (this.detectedForms.has(form)) return;
+        
+        const formData = this.analyzeForm(form);
+        if (formData.isValid) {
+          this.detectedForms.add(form);
+          this.enhanceForm(form, formData);
+          this.notifyBackground('form_detected', {
+            url: window.location.href,
+            domain: window.location.hostname,
+            formData: formData
+          });
+        }
+      })
+    );
   }
   
   findLoginForms() {
-    const forms = new Set();
-    
-    // Method 1: Direct form selectors
-    this.loginSelectors.forEach(selector => {
-      try {
-        document.querySelectorAll(selector).forEach(form => forms.add(form));
-      } catch (e) {
-        // Ignore invalid selectors
-      }
-    });
-    
-    // Method 2: Forms containing password fields
-    document.querySelectorAll('input[type="password"]').forEach(passwordField => {
-      const form = passwordField.closest('form');
-      if (form) forms.add(form);
-    });
-    
-    // Method 3: Heuristic detection for SPA forms
-    document.querySelectorAll('div, section').forEach(container => {
-      const passwordFields = container.querySelectorAll('input[type="password"]');
-      const textFields = container.querySelectorAll('input[type="text"], input[type="email"]');
+    return this.performance.lazy('login-forms', () => {
+      const forms = new Set();
       
-      if (passwordFields.length > 0 && textFields.length > 0) {
-        // Create virtual form for SPA
-        const virtualForm = this.createVirtualForm(container, textFields, passwordFields);
-        if (virtualForm) forms.add(virtualForm);
-      }
-    });
-    
-    return Array.from(forms);
+      // Method 1: Cached form queries
+      this.loginSelectors.forEach(selector => {
+        try {
+          const elements = this.performance.querySelector(selector) ? 
+            document.querySelectorAll(selector) : [];
+          elements.forEach(form => forms.add(form));
+        } catch (e) {
+          // Ignore invalid selectors
+        }
+      });
+      
+      // Method 2: Password field forms (cached)
+      const passwordFields = this.performance.querySelector('input[type="password"]') ?
+        document.querySelectorAll('input[type="password"]') : [];
+      
+      passwordFields.forEach(passwordField => {
+        const form = passwordField.closest('form');
+        if (form) forms.add(form);
+      });
+      
+      // Method 3: SPA detection (throttled)
+      this.performance.throttle('spa-detection', () => {
+        document.querySelectorAll('div, section').forEach(container => {
+          const passwordFields = container.querySelectorAll('input[type="password"]');
+          const textFields = container.querySelectorAll('input[type="text"], input[type="email"]');
+          
+          if (passwordFields.length > 0 && textFields.length > 0) {
+            const virtualForm = this.createVirtualForm(container, textFields, passwordFields);
+            if (virtualForm) forms.add(virtualForm);
+          }
+        });
+      }, 500);
+      
+      return Array.from(forms);
+    }, 2000);
   }
   
   analyzeForm(form) {
@@ -281,7 +297,7 @@ class FormDetector {
   }
   
   observeChanges() {
-    // Watch for dynamically added forms (SPA navigation)
+    // Optimized mutation observer with debouncing
     const observer = new MutationObserver((mutations) => {
       let shouldRecheck = false;
       
@@ -290,7 +306,7 @@ class FormDetector {
           mutation.addedNodes.forEach((node) => {
             if (node.nodeType === Node.ELEMENT_NODE) {
               if (node.tagName === 'FORM' || 
-                  node.querySelector && node.querySelector('form, input[type="password"]')) {
+                  (node.querySelector && node.querySelector('form, input[type="password"]'))) {
                 shouldRecheck = true;
               }
             }
@@ -299,7 +315,10 @@ class FormDetector {
       });
       
       if (shouldRecheck) {
-        setTimeout(() => this.detectForms(), 100);
+        this.performance.debounce('form-recheck', () => {
+          this.performance.lazy.delete('login-forms'); // Clear cache
+          this.detectForms();
+        }, 200);
       }
     });
     
@@ -307,19 +326,40 @@ class FormDetector {
       childList: true,
       subtree: true
     });
+    
+    // Store observer for cleanup
+    this.observer = observer;
   }
   
   notifyBackground(action, data) {
-    chrome.runtime.sendMessage({
-      action: action,
-      data: data
-    });
+    this.performance.throttle(`notify-${action}`, () => {
+      chrome.runtime.sendMessage({
+        action: action,
+        data: data
+      });
+    }, 100);
+  }
+  
+  cleanup() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+    this.detectedForms = new WeakSet();
   }
 }
 
-// Initialize form detector when page loads
+// Initialize form detector when page loads (optimized)
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => new FormDetector());
+  document.addEventListener('DOMContentLoaded', () => {
+    window.lokFormDetector = new FormDetector();
+  });
 } else {
-  new FormDetector();
+  window.lokFormDetector = new FormDetector();
 }
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+  if (window.lokFormDetector) {
+    window.lokFormDetector.cleanup();
+  }
+});
