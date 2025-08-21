@@ -5,14 +5,14 @@ import { ToastProvider } from './contexts/ToastContext';
 import { Header, Hero, Footer } from './components/layout';
 import { Login } from './components/auth';
 // Lazy load heavy dashboard components
-const Dashboard = lazy(() => import('./components/dashboard'));
-const SecurityPage = lazy(() => import('./components/security'));
+const Dashboard = lazy(() => import('./components/dashboard').then(module => ({ default: module.Dashboard || module.default })));
+const SecurityPage = lazy(() => import('./components/security').then(module => ({ default: module.SecurityPage || module.default })));
 import { ScrollToTop } from './components/ui';
 // Lazy load non-critical components
-const Features = lazy(() => import('./pages/Features'));
-const Pricing = lazy(() => import('./pages/Pricing'));
-const About = lazy(() => import('./pages/About'));
-const FAQ = lazy(() => import('./pages/FAQ'));
+const Features = lazy(() => import('./pages/Features').then(module => ({ default: module.default })));
+const Pricing = lazy(() => import('./pages/Pricing').then(module => ({ default: module.default })));
+const About = lazy(() => import('./pages/About').then(module => ({ default: module.default })));
+const FAQ = lazy(() => import('./pages/FAQ').then(module => ({ default: module.default })));
 
 import { PrivacyPolicy, TermsOfService, Technical } from './pages';
 import AboutPage from './pages/AboutPage';
