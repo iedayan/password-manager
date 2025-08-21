@@ -1,14 +1,15 @@
 """Configuration settings for the application."""
 
 import os
+import secrets
 from datetime import timedelta
 
 
 class Config:
     """Base configuration."""
 
-    SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-secret-key"
-    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or "dev-jwt-secret"
+    SECRET_KEY = os.environ.get("SECRET_KEY") or secrets.token_urlsafe(32)
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or secrets.token_urlsafe(32)
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False

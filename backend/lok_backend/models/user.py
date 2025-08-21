@@ -78,9 +78,10 @@ class User(db.Model):
             self.early_bird_access = False
 
     def __repr__(self):
+        # Sanitize email to prevent XSS and log injection
         safe_email = "".join(
-            c for c in (self.email or "") if c.isprintable() and c not in "<>\"'"
-        )
+            c for c in (self.email or "") if c.isprintable() and c not in "<>\"'\n\r\t"
+        )[:50]  # Limit length
         return f"<User {safe_email}>"
 
     @property

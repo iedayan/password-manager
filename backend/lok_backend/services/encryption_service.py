@@ -13,7 +13,14 @@ class EncryptionService:
             self.encryption_key = Fernet.generate_key()
             logger.warning("No ENCRYPTION_KEY found. Generated new key - set ENCRYPTION_KEY env var for persistence.")
         else:
-            self.encryption_key = self.encryption_key.encode()
+            # Validate encryption key format
+            try:
+                if isinstance(self.encryption_key, str):
+                    self.encryption_key = self.encryption_key.encode()
+                Fernet(self.encryption_key)  # Validate key format
+            except Exception:
+                logger.error("Invalid ENCRYPTION_KEY format")
+                raise ValueError("Invalid ENCRYPTION_KEY format")
         
         self.cipher_suite = Fernet(self.encryption_key)
     
@@ -24,7 +31,7 @@ class EncryptionService:
                 raise ValueError("Data must be a string")
             return self.cipher_suite.encrypt(data.encode()).decode()
         except Exception as e:
-            logger.error(f"Encryption failed: {type(e).__name__}")
+            logger.error("Encryption failed: Invalid input data")
             raise
     
     def decrypt(self, encrypted_data: str) -> str:
@@ -37,7 +44,7 @@ class EncryptionService:
             logger.error("Decryption failed: Invalid token or corrupted data")
             raise ValueError("Invalid or corrupted encrypted data")
         except Exception as e:
-            logger.error(f"Decryption failed: {type(e).__name__}")
+            logger.error("Decryption failed: Invalid data or key")
             raise
 
 # Global instance

@@ -32,9 +32,11 @@ def get_passwords():
     """Get all passwords for the authenticated user."""
     try:
         user_id = int(get_jwt_identity())
-        passwords = (
-            Password.query.filter_by(user_id=user_id).order_by(Password.site_name).all()
-        )
+        page = request.args.get('page', 1, type=int)
+        per_page = min(request.args.get('per_page', 50, type=int), 100)
+        
+        passwords_query = Password.query.filter_by(user_id=user_id).order_by(Password.site_name)
+        passwords = passwords_query.paginate(page=page, per_page=per_page, error_out=False).items
 
         return (
             jsonify(
@@ -48,7 +50,7 @@ def get_passwords():
 
     except Exception as e:
         current_app.logger.error(
-            f"Error fetching passwords for user {get_jwt_identity()}: {str(e)}"
+            f"Error fetching passwords for user {get_jwt_identity()}: Database operation failed"
         )
         return jsonify({"error": "Failed to fetch passwords"}), 500
 
@@ -242,9 +244,9 @@ def search_passwords():
             Password.query.filter(
                 Password.user_id == user_id,
                 or_(
-                    Password.site_name.ilike(f"%{query}%"),
-                    Password.username.ilike(f"%{query}%"),
-                    Password.site_url.ilike(f"%{query}%"),
+                    Password.site_name.ilike(f"%{query.replace('%', '\\%').replace('_', '\\_')[:100]}%"),
+                    Password.username.ilike(f"%{query.replace('%', '\\%').replace('_', '\\_')[:100]}%"),
+                    Password.site_url.ilike(f"%{query.replace('%', '\\%').replace('_', '\\_')[:100]}%"),
                 ),
             )
             .order_by(Password.site_name)
@@ -266,7 +268,7 @@ def search_passwords():
         )
 
     except Exception as e:
-        current_app.logger.error(f"Error searching passwords: {str(e).replace(chr(10), ' ').replace(chr(13), ' ')[:200]}")
+        current_app.logger.error("Error searching passwords: Search operation failed")
         return jsonify({"error": "Search failed"}), 500
 
 
@@ -663,7 +665,7 @@ def generate_password():
         )
 
     except Exception as e:
-        current_app.logger.error(f"Error generating password: {str(e).replace(chr(10), ' ').replace(chr(13), ' ')[:200]}")
+        current_app.logger.error("Error generating password: Generation operation failed")
         return jsonify({"error": "Password generation failed"}), 500
 
 
@@ -918,6 +920,12 @@ def import_passwords():
         file = request.files['file']
         if file.filename == '':
             return jsonify({"error": "No file selected"}), 400
+            
+        # Validate file extension
+        allowed_extensions = {'.csv', '.json', '.txt'}
+        file_ext = '.' + file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else ''
+        if file_ext not in allowed_extensions:
+            return jsonify({"error": "Invalid file type. Only CSV, JSON, and TXT files allowed"}), 400
         
         # Get format type from form data
         format_type = request.form.get('format', '')
@@ -971,7 +979,7 @@ def import_passwords():
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"Password import failed: {str(e)}")
-        return jsonify({"error": f"Import failed: {str(e)}"}), 500
+        return jsonify({"error": "Import operation failed"}), 500
 
 
 @passwords_bp.route("/advanced-strength", methods=["POST"])

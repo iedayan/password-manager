@@ -20,8 +20,17 @@ from ...schemas.auth import UserRegistration, UserLogin
 
 auth_bp = Blueprint("auth", __name__)
 
-# Token blacklist for logout functionality
-blacklisted_tokens = set()
+# Token blacklist with TTL cleanup to prevent memory leaks
+blacklisted_tokens = {}
+TOKEN_BLACKLIST_TTL = 24 * 60 * 60  # 24 hours in seconds
+
+def cleanup_expired_tokens():
+    """Clean up expired blacklisted tokens"""
+    import time
+    current_time = time.time()
+    expired_tokens = [token for token, expiry in blacklisted_tokens.items() if expiry < current_time]
+    for token in expired_tokens:
+        blacklisted_tokens.pop(token, None)
 
 
 # ============================================================================
@@ -38,8 +47,7 @@ def register():
         if not data:
             return jsonify({"error": "Invalid JSON data"}), 400
         
-        # Debug logging (remove in production)
-        current_app.logger.info(f"Registration attempt with data keys: {list(data.keys())}")
+        # Remove debug logging to prevent information disclosure
 
         # Validate input using Pydantic
         try:
@@ -106,8 +114,7 @@ def login():
         if not data:
             return jsonify({"error": "Invalid JSON data"}), 400
         
-        # Debug logging (remove in production)
-        current_app.logger.info(f"Login attempt with data keys: {list(data.keys())}")
+        # Remove debug logging to prevent information disclosure
 
         # Validate input using Pydantic
         try:
@@ -182,8 +189,10 @@ def logout():
         user_id = int(get_jwt_identity())
         jti = get_jwt()["jti"]
         
-        # Blacklist the current token
-        blacklisted_tokens.add(jti)
+        # Blacklist the current token with expiry
+        import time
+        cleanup_expired_tokens()
+        blacklisted_tokens[jti] = time.time() + TOKEN_BLACKLIST_TTL
         
         # Update user's last logout time
         user = User.query.get(user_id)
@@ -242,9 +251,11 @@ def refresh_token():
         if not user or not user.is_active:
             return jsonify({"error": "Invalid user"}), 401
 
-        # Blacklist old token
+        # Blacklist old token with expiry
         jti = get_jwt()["jti"]
-        blacklisted_tokens.add(jti)
+        import time
+        cleanup_expired_tokens()
+        blacklisted_tokens[jti] = time.time() + TOKEN_BLACKLIST_TTL
 
         # Create new token
         new_token = create_access_token(identity=str(user.id))
@@ -512,9 +523,11 @@ def deactivate_account():
         user.updated_at = datetime.now(timezone.utc)
         db.session.commit()
 
-        # Blacklist current token
+        # Blacklist current token with expiry
         jti = get_jwt()["jti"]
-        blacklisted_tokens.add(jti)
+        import time
+        cleanup_expired_tokens()
+        blacklisted_tokens[jti] = time.time() + TOKEN_BLACKLIST_TTL
 
         current_app.logger.info(f"Account deactivated for user: {user_id}")
 
@@ -534,7 +547,11 @@ def deactivate_account():
 def check_if_token_revoked(jwt_header, jwt_payload):
     """Check if JWT token is blacklisted."""
     jti = jwt_payload["jti"]
-    return jti in blacklisted_tokens
+    cleanup_expired_tokens()
+    import time
+    if jti in blacklisted_tokens:
+        return blacklisted_tokens[jti] > time.time()
+    return False
 
 
 def generate_secure_token(length=32):
