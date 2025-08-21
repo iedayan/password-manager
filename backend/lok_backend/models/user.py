@@ -71,6 +71,12 @@ class User(db.Model):
     )
     # subscription relationship will be defined in subscription.py to avoid circular imports
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Ensure early_bird_access has a default value
+        if self.early_bird_access is None:
+            self.early_bird_access = False
+
     def __repr__(self):
         safe_email = "".join(
             c for c in (self.email or "") if c.isprintable() and c not in "<>\"'"
@@ -81,7 +87,12 @@ class User(db.Model):
     def is_locked(self):
         """Check if user account is locked"""
         if self.locked_until:
-            return datetime.now(timezone.utc) < self.locked_until
+            # Handle both timezone-aware and naive datetimes
+            now = datetime.now(timezone.utc)
+            locked_until = self.locked_until
+            if locked_until.tzinfo is None:
+                locked_until = locked_until.replace(tzinfo=timezone.utc)
+            return now < locked_until
         return False
 
     def lock_account(self, duration_minutes=30):
