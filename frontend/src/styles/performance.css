@@ -1,0 +1,55 @@
+/* Performance optimizations */
+
+/* Hardware acceleration for animations */
+.animate-fade-in,
+.animate-slide-up,
+.animate-scale-in,
+.animate-bounce,
+.animate-pulse {
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Contain layout for isolated sections */
+.section-spacing {
+  contain: layout style paint;
+}
+
+/* Optimize gradients for better performance */
+.bg-gradient-to-br,
+.bg-gradient-to-r,
+.bg-gradient-to-b {
+  will-change: auto;
+}
+
+/* Reduce paint on scroll elements */
+.fixed {
+  will-change: transform;
+}
+
+/* Optimize blur effects */
+.blur-3xl {
+  will-change: filter;
+  backface-visibility: hidden;
+}
+
+/* Performance-optimized animations */
+@keyframes float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -20px, 0) rotate(180deg); }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-scale-in,
+  .animate-bounce,
+  .animate-pulse {
+    animation: none;
+  }
+  
+  .blur-3xl {
+    display: none;
+  }
+}
