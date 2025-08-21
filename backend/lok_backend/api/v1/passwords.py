@@ -240,13 +240,17 @@ def search_passwords():
         if not query:
             return jsonify({"error": "Search query required"}), 400
 
+        # Sanitize query for SQL injection prevention
+        safe_query = query.replace('%', r'\%').replace('_', r'\_')[:100]
+        search_pattern = f"%{safe_query}%"
+        
         passwords = (
             Password.query.filter(
                 Password.user_id == user_id,
                 or_(
-                    Password.site_name.ilike(f"%{query.replace('%', '\\%').replace('_', '\\_')[:100]}%"),
-                    Password.username.ilike(f"%{query.replace('%', '\\%').replace('_', '\\_')[:100]}%"),
-                    Password.site_url.ilike(f"%{query.replace('%', '\\%').replace('_', '\\_')[:100]}%"),
+                    Password.site_name.ilike(search_pattern),
+                    Password.username.ilike(search_pattern),
+                    Password.site_url.ilike(search_pattern),
                 ),
             )
             .order_by(Password.site_name)

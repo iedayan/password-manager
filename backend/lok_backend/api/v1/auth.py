@@ -20,17 +20,29 @@ from ...schemas.auth import UserRegistration, UserLogin
 
 auth_bp = Blueprint("auth", __name__)
 
-# Token blacklist with TTL cleanup to prevent memory leaks
-blacklisted_tokens = {}
+from ...core.redis_client import redis_client
+
+# Token blacklist with Redis support and fallback
+blacklisted_tokens = {}  # Fallback for when Redis is unavailable
 TOKEN_BLACKLIST_TTL = 24 * 60 * 60  # 24 hours in seconds
 
-def cleanup_expired_tokens():
-    """Clean up expired blacklisted tokens"""
-    import time
-    current_time = time.time()
-    expired_tokens = [token for token, expiry in blacklisted_tokens.items() if expiry < current_time]
-    for token in expired_tokens:
-        blacklisted_tokens.pop(token, None)
+def blacklist_token(jti: str):
+    """Blacklist token with Redis or fallback"""
+    if redis_client.connected:
+        redis_client.set(f"blacklist:{jti}", "1", ttl=TOKEN_BLACKLIST_TTL)
+    else:
+        import time
+        blacklisted_tokens[jti] = time.time() + TOKEN_BLACKLIST_TTL
+
+def is_token_blacklisted(jti: str) -> bool:
+    """Check if token is blacklisted"""
+    if redis_client.connected:
+        return redis_client.exists(f"blacklist:{jti}")
+    else:
+        import time
+        if jti in blacklisted_tokens:
+            return blacklisted_tokens[jti] > time.time()
+        return False
 
 
 # ============================================================================
@@ -189,10 +201,8 @@ def logout():
         user_id = int(get_jwt_identity())
         jti = get_jwt()["jti"]
         
-        # Blacklist the current token with expiry
-        import time
-        cleanup_expired_tokens()
-        blacklisted_tokens[jti] = time.time() + TOKEN_BLACKLIST_TTL
+        # Blacklist the current token
+        blacklist_token(jti)
         
         # Update user's last logout time
         user = User.query.get(user_id)
@@ -251,11 +261,9 @@ def refresh_token():
         if not user or not user.is_active:
             return jsonify({"error": "Invalid user"}), 401
 
-        # Blacklist old token with expiry
+        # Blacklist old token
         jti = get_jwt()["jti"]
-        import time
-        cleanup_expired_tokens()
-        blacklisted_tokens[jti] = time.time() + TOKEN_BLACKLIST_TTL
+        blacklist_token(jti)
 
         # Create new token
         new_token = create_access_token(identity=str(user.id))
@@ -523,11 +531,9 @@ def deactivate_account():
         user.updated_at = datetime.now(timezone.utc)
         db.session.commit()
 
-        # Blacklist current token with expiry
+        # Blacklist current token
         jti = get_jwt()["jti"]
-        import time
-        cleanup_expired_tokens()
-        blacklisted_tokens[jti] = time.time() + TOKEN_BLACKLIST_TTL
+        blacklist_token(jti)
 
         current_app.logger.info(f"Account deactivated for user: {user_id}")
 
@@ -547,11 +553,7 @@ def deactivate_account():
 def check_if_token_revoked(jwt_header, jwt_payload):
     """Check if JWT token is blacklisted."""
     jti = jwt_payload["jti"]
-    cleanup_expired_tokens()
-    import time
-    if jti in blacklisted_tokens:
-        return blacklisted_tokens[jti] > time.time()
-    return False
+    return is_token_blacklisted(jti)
 
 
 def generate_secure_token(length=32):

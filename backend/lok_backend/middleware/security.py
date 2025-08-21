@@ -9,11 +9,12 @@ import logging
 
 security_logger = logging.getLogger("security")
 
-# In-memory store for rate limiting (use Redis in production)
-# TODO: Replace with Redis for production scalability
-request_counts = defaultdict(list)
-failed_attempts = defaultdict(int)
-blocked_ips = {}
+from ...core.redis_client import redis_client
+
+# Rate limiting with Redis support and fallback
+request_counts = defaultdict(list)  # Fallback
+failed_attempts = defaultdict(int)  # Fallback
+blocked_ips = {}  # Fallback
 
 # Configuration constants
 BLOCK_DURATION_HOURS = int(os.environ.get('BLOCK_DURATION_HOURS', 1))

@@ -1,6 +1,10 @@
 import pytest
 import tempfile
 import os
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from lok_backend.app import create_app
 from lok_backend.core.database import db
 from lok_backend.models.user import User

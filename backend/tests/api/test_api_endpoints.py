@@ -1,8 +1,8 @@
 import pytest
 import json
-from lok_backend.models.user import User
-from lok_backend.models.password import Password
-from lok_backend.core.database import db
+from ...models.user import User
+from ...models.password import Password
+from ...core.database import db
 
 
 class TestAPIEndpoints:
