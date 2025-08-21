@@ -57,6 +57,10 @@ class User(db.Model):
     # Preferences
     auto_lock_timeout = db.Column(db.Integer, default=15)  # minutes
     password_strength_requirement = db.Column(db.String(20), default="strong")
+    
+    # Early Bird Access
+    early_bird_access = db.Column(db.Boolean, default=False, nullable=False)
+    early_bird_claimed_at = db.Column(db.DateTime)
 
     # Relationships
     passwords = db.relationship(

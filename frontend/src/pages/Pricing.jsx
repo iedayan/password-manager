@@ -2,13 +2,32 @@ import { useState, useEffect, useRef } from 'react';
 
 export default function Pricing() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [spotsRemaining, setSpotsRemaining] = useState(500);
   const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const fetchSpotsRemaining = async () => {
+      try {
+        const response = await fetch('/api/v1/early-bird/spots-remaining');
+        if (response.ok) {
+          const data = await response.json();
+          setSpotsRemaining(data.spotsRemaining);
+        }
+      } catch (error) {
+        console.error('Failed to fetch spots remaining:', error);
+      }
+    };
+
+    fetchSpotsRemaining();
+    const interval = setInterval(fetchSpotsRemaining, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   const plans = [
     {
       name: "Personal",
       price: "$99",
-      period: "lifetime",
+      period: "5 years",
       monthlyPrice: "$6/month",
       originalPrice: "$144",
       description: "Perfect for individuals",
@@ -22,16 +41,15 @@ export default function Pricing() {
         "Email support",
         "1GB encrypted file storage",
         "Password health dashboard",
-        "Lifetime updates included"
+        "5 years of updates included"
       ],
       lifetime: true,
-      badge: "LIFETIME DEAL",
-      remaining: 500
+      badge: "5-YEAR DEAL"
     },
     {
       name: "Family",
       price: "$249",
-      period: "lifetime",
+      period: "5 years",
       monthlyPrice: "$15/month",
       originalPrice: "$360",
       description: "AI-powered security for families",
@@ -46,18 +64,17 @@ export default function Pricing() {
         "Priority chat support",
         "5GB encrypted file storage per member",
         "Real-time breach alerts",
-        "Lifetime updates included"
+        "5 years of updates included"
       ],
 
       lifetime: true,
-      badge: "LIFETIME DEAL",
-      remaining: 500
+      badge: "5-YEAR DEAL"
     },
 
     {
       name: "Enterprise",
       price: "$599",
-      period: "lifetime",
+      period: "5 years",
       monthlyPrice: "$35/month",
       originalPrice: "$840",
       description: "State-of-the-art AI security for business",
@@ -75,11 +92,10 @@ export default function Pricing() {
         "Unlimited encrypted file storage",
         "Custom security policies",
         "Advanced reporting & compliance",
-        "Lifetime updates included"
+        "5 years of updates included"
       ],
       lifetime: true,
-      badge: "LIFETIME DEAL",
-      remaining: 500
+      badge: "5-YEAR DEAL"
     }
   ];
 
@@ -120,9 +136,12 @@ export default function Pricing() {
             Simple{' '}
             <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Pricing</span>
           </h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-4">
             <strong className="text-blue-600">Currently in free beta!</strong> Pricing starts only when the official final product is released with mobile and desktop apps.
           </p>
+          <div className="inline-block px-6 py-3 bg-orange-100 text-orange-800 rounded-full font-semibold">
+Limited Time: First 500 users get 5-year access! Only {spotsRemaining} spots left.
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -157,7 +176,7 @@ export default function Pricing() {
                       <span className="text-gray-600 ml-2 text-lg md:text-xl">{plan.period}</span>
                     </div>
                     {plan.monthlyPrice && (
-                      <div className="text-sm text-gray-500 mb-2">Pay once, use forever</div>
+                      <div className="text-sm text-gray-500 mb-2">Pay once, use for 5 years</div>
                     )}
                     {plan.monthlyPrice && (
                       <div className="text-sm text-blue-600 font-medium">
@@ -166,9 +185,7 @@ export default function Pricing() {
                          'Equivalent to 17 months of $35/month'}
                       </div>
                     )}
-                    {plan.remaining && (
-                      <div className="text-sm text-orange-600 font-semibold mt-2 bg-orange-50 px-3 py-1 rounded-full">{plan.remaining} spots left</div>
-                    )}
+                    <div className="text-sm text-orange-600 font-semibold mt-2 bg-orange-50 px-3 py-1 rounded-full">First 500 users only: {spotsRemaining} spots left</div>
                   </div>
                 </div>
               </div>
