@@ -7,7 +7,7 @@ export default function Pricing() {
   const plans = [
     {
       name: "Personal",
-      price: "$144",
+      price: "$99",
       period: "lifetime",
       monthlyPrice: "$6/month",
       originalPrice: "$144",
@@ -30,7 +30,7 @@ export default function Pricing() {
     },
     {
       name: "Family",
-      price: "$360",
+      price: "$249",
       period: "lifetime",
       monthlyPrice: "$15/month",
       originalPrice: "$360",
@@ -56,7 +56,7 @@ export default function Pricing() {
 
     {
       name: "Enterprise",
-      price: "$840",
+      price: "$599",
       period: "lifetime",
       monthlyPrice: "$35/month",
       originalPrice: "$840",
@@ -160,7 +160,11 @@ export default function Pricing() {
                       <div className="text-sm text-gray-500 mb-2">Pay once, use forever</div>
                     )}
                     {plan.monthlyPrice && (
-                      <div className="text-sm text-blue-600 font-medium">Equivalent to 2 years of {plan.monthlyPrice}</div>
+                      <div className="text-sm text-blue-600 font-medium">
+                        {index === 0 ? 'Equivalent to 16 months of $6/month' :
+                         index === 1 ? 'Equivalent to 16 months of $15/month' :
+                         'Equivalent to 17 months of $35/month'}
+                      </div>
                     )}
                     {plan.remaining && (
                       <div className="text-sm text-orange-600 font-semibold mt-2 bg-orange-50 px-3 py-1 rounded-full">{plan.remaining} spots left</div>
