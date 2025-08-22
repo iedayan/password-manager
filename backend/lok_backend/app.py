@@ -79,6 +79,7 @@ def register_blueprints(app):
     from .api.v1.two_factor import two_factor_bp
     from .api.v1.user import user_bp
     from .api.v1.early_bird import early_bird_bp
+    from .api.v1.extension import extension_bp
 
     app.register_blueprint(auth_bp, url_prefix="/api/v1/auth")
     app.register_blueprint(passwords_bp, url_prefix="/api/v1/passwords")
@@ -90,3 +91,4 @@ def register_blueprints(app):
     app.register_blueprint(two_factor_bp, url_prefix="/api/v1/security/2fa")
     app.register_blueprint(user_bp, url_prefix="/api/v1/user")
     app.register_blueprint(early_bird_bp, url_prefix="/api/v1/early-bird")
+    app.register_blueprint(extension_bp, url_prefix="/api/v1/extension")

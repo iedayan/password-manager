@@ -110,7 +110,11 @@ class LokContentScript {
   
   async triggerAutoFill() {
     if (!this.isAuthenticated) {
-      this.showNotification('Please log in to use auto-fill', 'warning');
+      this.showNotification(
+        'Sign in to your Lok account to access saved passwords',
+        'warning',
+        'Login Required'
+      );
       return;
     }
     
@@ -467,28 +471,51 @@ class LokContentScript {
     }, 5000);
   }
   
-  showNotification(message, type = 'success') {
-    // Throttle notifications to prevent spam
+  showNotification(message, type = 'success', title = null) {
     this.performance.throttle('notification', () => {
       const existing = document.querySelectorAll('.lok-notification');
       existing.forEach(n => n.remove());
       
       const notification = document.createElement('div');
       notification.className = `lok-notification ${type}`;
-      notification.textContent = message;
+      
+      const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+      };
+      
+      notification.innerHTML = `
+        <div class="lok-notification-icon">${icons[type] || '•'}</div>
+        <div class="lok-notification-content">
+          ${title ? `<div class="lok-notification-title">${title}</div>` : ''}
+          <div class="lok-notification-message">${message}</div>
+        </div>
+        <button class="lok-notification-close">×</button>
+      `;
+      
+      notification.querySelector('.lok-notification-close').onclick = () => {
+        notification.remove();
+      };
       
       document.body.appendChild(notification);
       
       setTimeout(() => {
         if (notification.parentNode) {
-          notification.remove();
+          notification.style.animation = 'slideOutRight 0.3s ease-in forwards';
+          setTimeout(() => notification.remove(), 300);
         }
-      }, 3000);
+      }, 4000);
     }, 500);
   }
   
   showAuthenticationPrompt() {
-    this.showNotification('Please log in to Lok to use auto-fill features', 'warning');
+    this.showNotification(
+      'Sign in to unlock auto-fill and secure password management',
+      'info',
+      'Authentication Required'
+    );
   }
   
   openVault() {

@@ -28,6 +28,9 @@
       "js": [
         "src/utils/performance.js",
         "src/utils/api.js",
+        "src/utils/biometric-auth.js",
+        "src/utils/offline-storage.js",
+        "src/content/smart-suggestions.js",
         "src/content/form-detector.js", 
         "src/content/auto-fill.js",
         "src/content/content.js"
@@ -74,6 +77,13 @@
         "mac": "Command+Shift+V"
       },
       "description": "Open password vault"
+    },
+    "generate-password": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+G",
+        "mac": "Command+Shift+G"
+      },
+      "description": "Generate secure password"
     }
   }
 }

@@ -234,35 +234,30 @@ class FormDetector {
   }
   
   addAutoFillButton(formData) {
-    if (formData.usernameField && !formData.usernameField.nextElementSibling?.classList.contains('lok-autofill-btn')) {
+    if (formData.usernameField && !formData.usernameField.dataset.lokEnhanced) {
+      formData.usernameField.dataset.lokEnhanced = 'true';
+      
       const button = document.createElement('button');
       button.className = 'lok-autofill-btn';
       button.type = 'button';
-      button.textContent = '🔐'; // Use textContent instead of innerHTML
-      button.style.cssText = `
-        position: absolute;
-        right: 5px;
-        top: 50%;
-        transform: translateY(-50%);
-        border: none;
-        background: #3b82f6;
-        color: white;
-        width: 24px;
-        height: 24px;
-        border-radius: 4px;
-        cursor: pointer;
-        z-index: 10000;
-        font-size: 12px;
-      `;
+      button.innerHTML = '🔐';
+      button.title = 'Auto-fill with Lok';
       
-      button.addEventListener('click', () => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         this.requestAutoFill(formData);
       });
       
-      // Position relative to username field
-      const fieldRect = formData.usernameField.getBoundingClientRect();
-      formData.usernameField.parentNode.style.position = 'relative';
-      formData.usernameField.parentNode.appendChild(button);
+      // Smart positioning
+      const parent = formData.usernameField.parentElement;
+      const computedStyle = getComputedStyle(parent);
+      
+      if (computedStyle.position === 'static') {
+        parent.style.position = 'relative';
+      }
+      
+      parent.appendChild(button);
     }
   }
   

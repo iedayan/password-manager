@@ -79,6 +79,11 @@ class BackgroundService {
           sendResponse({ success: true, password });
           return;
           
+        case 'check_pwned':
+          const isPwned = await this.checkPasswordBreach(message.password);
+          sendResponse({ success: true, isPwned });
+          return;
+          
         default:
           console.log('Unknown message action:', message.action);
       }
@@ -222,6 +227,12 @@ class BackgroundService {
       case 'open-vault':
         chrome.tabs.create({ url: this.WEB_APP_URL });
         break;
+        
+      case 'generate-password':
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          chrome.tabs.sendMessage(tabs[0].id, { action: 'show_password_generator' });
+        });
+        break;
     }
   }
   
@@ -307,26 +318,30 @@ class BackgroundService {
     }
   }
   
-  async checkPasswordBreach(data) {
+  async checkPasswordBreach(password) {
     try {
-      // Use HaveIBeenPwned API or similar service
-      const hash = await this.sha1Hash(data.password);
+      const hash = await this.sha1Hash(password);
       const prefix = hash.substring(0, 5);
       const suffix = hash.substring(5).toUpperCase();
       
       const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
       const text = await response.text();
       
-      if (text.includes(suffix)) {
+      const isPwned = text.includes(suffix);
+      
+      if (isPwned) {
         chrome.notifications.create({
           type: 'basic',
           iconUrl: 'assets/icon48.png',
           title: 'Password Compromised',
-          message: 'This password has been found in data breaches. Consider changing it.'
+          message: 'This password has been found in data breaches.'
         });
       }
+      
+      return isPwned;
     } catch (error) {
       console.error('Breach check error:', error);
+      return false;
     }
   }
   
@@ -339,7 +354,7 @@ class BackgroundService {
   
   generateSecurePassword(options = {}) {
     const {
-      length = 16,
+      length = 20,
       includeUppercase = true,
       includeLowercase = true,
       includeNumbers = true,

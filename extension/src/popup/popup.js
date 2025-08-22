@@ -181,17 +181,15 @@ class PopupInterface {
   }
   
   getCredentialIcon(credential) {
-    // Try to get favicon or use first letter
     const domain = this.extractDomain(credential.site_url);
+    const firstLetter = credential.site_name.charAt(0).toUpperCase();
+    
     if (domain) {
       return `<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=32" 
-                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" 
-                   style="width: 20px; height: 20px; border-radius: 4px;">
-              <span style="display: none; font-size: 16px; font-weight: 600;">
-                ${credential.site_name.charAt(0).toUpperCase()}
-              </span>`;
+                   onerror="this.parentElement.innerHTML='${firstLetter}'" 
+                   style="width: 20px; height: 20px; border-radius: 4px;">`;
     }
-    return credential.site_name.charAt(0).toUpperCase();
+    return firstLetter;
   }
   
   extractDomain(url) {
@@ -329,10 +327,16 @@ function openVault() {
   window.close();
 }
 
+function openSettings() {
+  chrome.tabs.create({
+    url: 'https://comforting-sunshine-65105a.netlify.app/settings'
+  });
+  window.close();
+}
+
 function generatePassword() {
-  if (window.popupInterface) {
-    window.popupInterface.generatePassword();
-  }
+  const quickActions = new QuickActions();
+  quickActions.showPasswordGenerator();
 }
 
 function autoFillCurrent() {
